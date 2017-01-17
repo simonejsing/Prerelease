@@ -92,13 +92,24 @@ namespace Prerelease.Main
             spriteBatch.Draw(sprites.GetSprite(spriteIdentifier), xnaVector, Color.White);
         }
 
-        public void RenderText(SpriteBatch spriteBatch, Vector2 origin, string text, Color color)
+        public void RenderText(SpriteBatch spriteBatch, Vector2 position, string text, Color color)
+        {
+            RenderText(spriteBatch, position, text, color, 0f, Vector2.Zero, new Vector2(1f, 1f));
+        }
+
+        public void RenderText(SpriteBatch spriteBatch, Vector2 position, string text, Color color, float rotation,
+            Vector2 origin, Vector2 scale, float layerDepth = 0f)
         {
             spriteBatch.DrawString(
                 DefaultFont,
                 text,
+                ToXnaVector(transform.Apply(position)),
+                color,
+                rotation,
                 ToXnaVector(transform.Apply(origin)),
-                color);
+                ToXnaVector(scale),
+                SpriteEffects.None,
+                layerDepth);
         }
 
         private Microsoft.Xna.Framework.Vector2 ToXnaVector(Vector2 position)

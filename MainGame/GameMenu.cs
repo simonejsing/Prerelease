@@ -11,7 +11,7 @@ namespace Prerelease.Main
 {
     class GameMenu : ISceene
     {
-        private const float textHeight = 30f;
+        private const float textHeight = 50f;
         private Renderer renderer;
         private SpriteBatch spriteBatch;
 
@@ -74,16 +74,12 @@ namespace Prerelease.Main
             var textBox = new Vector2(200, -mainMenu.Length * textHeight);
             var position = (viewport - textBox) / 2f;
 
-            /*renderer.RenderOpagueSprite(spriteBatch, SpriteLibrary.SpriteIdentifier.Player, new Vector2(1, -1));
-            renderer.RenderOpagueSprite(spriteBatch, SpriteLibrary.SpriteIdentifier.Player, new Vector2(2736-40, -1));
-            renderer.RenderOpagueSprite(spriteBatch, SpriteLibrary.SpriteIdentifier.Player, new Vector2(1, -1824+240));
-            renderer.RenderOpagueSprite(spriteBatch, SpriteLibrary.SpriteIdentifier.Player, new Vector2(2736-40, -1824+40));*/
             for(var i = 0; i < mainMenu.Length; i++)
             {
-                renderer.RenderText(spriteBatch, position, mainMenu[i], Color.White);
+                renderer.RenderText(spriteBatch, position, mainMenu[i], Color.White, 0f, Vector2.Zero, new Vector2(2f, 2f));
                 if (i == selectedOption)
                 {
-                    renderer.RenderText(spriteBatch, position - new Vector2(30, 0), "*", Color.White);
+                    renderer.RenderText(spriteBatch, position - new Vector2(30, 0), "*", Color.Red, 0f, Vector2.Zero, new Vector2(3f, 3f));
                 }
                 position -= new Vector2(0, textHeight);
             }
