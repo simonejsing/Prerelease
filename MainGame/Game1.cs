@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = VectorMath.Vector2;
 
@@ -17,7 +18,9 @@ namespace Prerelease.Main
         private ISceene activeSceene = null;
         private readonly IMonoInput playerInput;
         private readonly InputMask inputMask = new InputMask();
-
+        private ActionQueue actionQueue = new ActionQueue();
+        private Action[] actionMap;
+             
         private Renderer renderer;
         private int updateFrame = 0;
         private int renderFrame = 0;
@@ -40,9 +43,15 @@ namespace Prerelease.Main
         /// </summary>
         protected override void Initialize()
         {
-            //player = new Player() {Position = new Vector2(20, -150)};
-
+            SetupActionMap();
             base.Initialize();
+        }
+
+        private void SetupActionMap()
+        {
+            actionMap = new Action[Enum.GetNames(typeof(ActionType)).Length];
+
+            actionMap[(int)ActionType.Quit] = this.Exit;
         }
 
         /// <summary>
@@ -56,7 +65,7 @@ namespace Prerelease.Main
 
             renderer = new Renderer(this.Content, this.GraphicsDevice);
 
-            this.menu = new GameMenu(renderer, spriteBatch);
+            this.menu = new GameMenu(renderer, spriteBatch, actionQueue);
             this.activeSceene = this.menu;
         }
 
@@ -84,6 +93,8 @@ namespace Prerelease.Main
             playerInput.Update();
             inputMask.Apply(playerInput);
             activeSceene.ProcessInput(gameTime, inputMask);
+
+            ProcessActions();
 
             base.Update(gameTime);
         }
@@ -120,6 +131,15 @@ namespace Prerelease.Main
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        private void ProcessActions()
+        {
+            while (actionQueue.Count > 0)
+            {
+                var action = actionQueue.Dequeue();
+                actionMap[(int)action.Type]();
+            }
         }
     }
 }

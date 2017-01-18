@@ -14,6 +14,7 @@ namespace Prerelease.Main
         private const float textHeight = 50f;
         private Renderer renderer;
         private SpriteBatch spriteBatch;
+        private ActionQueue actionQueue;
 
         private int selectedOption = 0;
 
@@ -24,10 +25,11 @@ namespace Prerelease.Main
             "Quit"
         };
 
-        public GameMenu(Renderer renderer, SpriteBatch spriteBatch)
+        public GameMenu(Renderer renderer, SpriteBatch spriteBatch, ActionQueue actionQueue)
         {
             this.renderer = renderer;
             this.spriteBatch = spriteBatch;
+            this.actionQueue = actionQueue;
         }
 
         private int resetFrameCounter = 0;
@@ -68,6 +70,7 @@ namespace Prerelease.Main
                     return;
                 case 2:
                     // Dispatch game quit action to main
+                    actionQueue.Enqueue(new GameAction(ActionType.Quit));
                     return;
             }
         }
