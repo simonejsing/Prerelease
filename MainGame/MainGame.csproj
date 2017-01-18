@@ -17,12 +17,11 @@
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>
-    </PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>MainGame_TemporaryKey.pfx</PackageCertificateKeyFile>
     <MonoGamePlatform>WindowsStoreApp</MonoGamePlatform>
     <MonoGameContentBuilderExe>
     </MonoGameContentBuilderExe>
-    <PackageCertificateThumbprint>CA4E8D8E983C0E3C44CF2FD8AD862C92AC327240</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>EC2B3CDECC55E287B1C363E323585C5F30F62A5E</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -104,6 +103,8 @@
     <Content Include="Content\DefaultFont.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Content\Fonts\ConsoleFont.spritefont" />
+    <None Include="MainGame_TemporaryKey.pfx" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
@@ -116,6 +117,7 @@
     </Compile>
     <Compile Include="Game1.cs" />
     <Compile Include="IMonoInput.cs" />
+    <Compile Include="InputMask.cs" />
     <Compile Include="ISceene.cs" />
     <Compile Include="MonoControllerInput.cs" />
     <Compile Include="MonoKeyboardInput.cs" />

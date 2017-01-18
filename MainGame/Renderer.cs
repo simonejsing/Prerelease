@@ -24,7 +24,8 @@ namespace Prerelease.Main
             sprites.LoadSprite(SpriteLibrary.SpriteIdentifier.Block, @"Sprites\block");
             sprites.LoadSprite(SpriteLibrary.SpriteIdentifier.Spikes, @"Sprites\spikes");
 
-            DefaultFont = manager.Load<SpriteFont>("DefaultFont");
+            //DefaultFont = manager.Load<SpriteFont>("DefaultFont");
+            DefaultFont = manager.Load<SpriteFont>(@"Fonts\ConsoleFont");
 
             this.viewport = new Vector2(device.Viewport.Width, -device.Viewport.Height);
             ResetTransform(device);

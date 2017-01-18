@@ -1,10 +1,12 @@
-﻿namespace Prerelease.Main
+﻿using Microsoft.Xna.Framework;
+
+namespace Prerelease.Main
 {
     internal interface ISceene
     {
-        void ProcessInput(IMonoInput inputs);
+        void ProcessInput(GameTime gameTime, InputMask inputMask);
         void Activate();
-        void Render();
+        void Render(GameTime gameTime);
         void Deactivate();
     }
 }

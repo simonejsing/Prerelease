@@ -30,21 +30,30 @@ namespace Prerelease.Main
             this.spriteBatch = spriteBatch;
         }
 
-
-        public void ProcessInput(IMonoInput inputs)
+        private int resetFrameCounter = 0;
+        public void ProcessInput(GameTime gameTime, InputMask inputMask)
         {
-            // TODO: Throttle inputs.
-            if (inputs.Up())
+            if (resetFrameCounter > 0)
             {
-                selectedOption = selectedOption == 0 ? mainMenu.Length - 1 : selectedOption - 1;
+                resetFrameCounter--;
+                inputMask.Reset();
+                return;
             }
-            if (inputs.Down())
+
+            if (inputMask.Input.Up)
             {
-                selectedOption = selectedOption == mainMenu.Length - 1 ? 0 : selectedOption + 1;
+                selectedOption = selectedOption == 0 ? 0 : selectedOption - 1;
+                resetFrameCounter = 15;
             }
-            if (inputs.Select())
+            if (inputMask.Input.Down)
+            {
+                selectedOption = selectedOption == mainMenu.Length - 1 ? mainMenu.Length - 1 : selectedOption + 1;
+                resetFrameCounter = 15;
+            }
+            if (inputMask.Input.Select)
             {
                 DispatchCurrentMenuAction();
+                resetFrameCounter = 15;
             }
         }
 
@@ -67,7 +76,7 @@ namespace Prerelease.Main
         {
         }
 
-        public void Render()
+        public void Render(GameTime gameTime)
         {
             // Align center vertically
             var viewport = renderer.GetViewport();

@@ -9,19 +9,26 @@ namespace Prerelease.Main
     /// </summary>
     public class Game1 : Game
     {
+        public const bool DEBUG = true;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         private GameMenu menu;
         private ISceene activeSceene = null;
         private readonly IMonoInput playerInput;
+        private readonly InputMask inputMask = new InputMask();
 
         private Renderer renderer;
+        private int updateFrame = 0;
+        private int renderFrame = 0;
 
         public Game1()
         {
-            playerInput = new MonoKeyboardInput();
-            //playerInput = new MonoControllerInput(PlayerIndex.One);
+            //playerInput = new MonoKeyboardInput();
+            playerInput = new MonoControllerInput(PlayerIndex.One);
             graphics = new GraphicsDeviceManager(this);
+            graphics.ToggleFullScreen();
+
             Content.RootDirectory = "Content";
         }
 
@@ -69,11 +76,14 @@ namespace Prerelease.Main
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            updateFrame++;
+
             var time = (float)gameTime.TotalGameTime.TotalSeconds;
             var deltaT = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             playerInput.Update();
-            activeSceene.ProcessInput(playerInput);
+            inputMask.Apply(playerInput);
+            activeSceene.ProcessInput(gameTime, inputMask);
 
             base.Update(gameTime);
         }
@@ -84,11 +94,28 @@ namespace Prerelease.Main
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            renderFrame++;
+
             GraphicsDevice.Clear(Color.Black);
 
             spriteBatch.Begin();
 
-            activeSceene.Render();
+            activeSceene.Render(gameTime);
+
+            if (DEBUG)
+            {
+                renderer.RenderText(
+                    spriteBatch,
+                    Vector2.Zero,
+                    string.Format(
+                        "U/D: {0}/{1} [{2}{3}{4}]",
+                        updateFrame,
+                        renderFrame,
+                        inputMask.Input.Up ? "U" : (playerInput.Up() ? "u" : "-"),
+                        inputMask.Input.Down ? "D" : (playerInput.Down() ? "d" : "-"),
+                        inputMask.Input.Select ? "S" : (playerInput.Select() ? "s" : "-")),
+                    Color.Red);
+            }
 
             spriteBatch.End();
 
