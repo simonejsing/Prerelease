@@ -11,12 +11,13 @@ namespace Prerelease.Main
 {
     class GameMenu : Sceene
     {
-        private const float textHeight = 50f;
+        private const float TextHeight = 50f;
 
         private IFont menuFont;
         private int selectedOption = 0;
+        private Vector2 menuPosition;
 
-        private string[] mainMenu = new[]
+        private readonly string[] mainMenu = new[]
         {
             "New game",
             "Options",
@@ -75,23 +76,23 @@ namespace Prerelease.Main
         {
             base.Activate();
             menuFont = LoadFont("ConsoleFont");
+
+            // Align center vertically
+            var viewport = Renderer.GetViewport();
+            var textBox = new Vector2(200, -mainMenu.Length * TextHeight);
+            menuPosition = (viewport - textBox) / 2f;
         }
 
         public override void Render(double gameTimeMsec)
         {
-            // Align center vertically
-            var viewport = Renderer.GetViewport();
-            var textBox = new Vector2(200, -mainMenu.Length * textHeight);
-            var position = (viewport - textBox) / 2f;
-
             for(var i = 0; i < mainMenu.Length; i++)
             {
-                Renderer.RenderText(menuFont, position, mainMenu[i], Color.White, 0f, Vector2.Zero, new Vector2(2f, 2f));
+                Renderer.RenderText(menuFont, menuPosition, mainMenu[i], Color.White, 0f, Vector2.Zero, new Vector2(2f, 2f));
                 if (i == selectedOption)
                 {
-                    Renderer.RenderText(menuFont, position - new Vector2(30, 0), "*", Color.Red, 0f, Vector2.Zero, new Vector2(3f, 3f));
+                    Renderer.RenderText(menuFont, menuPosition - new Vector2(30, 0), "*", Color.Red, 0f, Vector2.Zero, new Vector2(3f, 3f));
                 }
-                position -= new Vector2(0, textHeight);
+                menuPosition -= new Vector2(0, TextHeight);
             }
         }
 

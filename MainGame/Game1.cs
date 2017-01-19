@@ -2,7 +2,6 @@
 using Contracts;
 using HubSceene;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Prerelease.Main.Input;
 using Prerelease.Main.Render;
 using Color = Contracts.Color;
@@ -107,7 +106,7 @@ namespace Prerelease.Main
         }
 
         /// <summary>
-        /// Merges inputs from keyboard and controller to support both input types.
+        /// Merges inputs from keyboard and controller to support both input types at the same time.
         /// </summary>
         /// <returns>The merged input set.</returns>
         private InputSet MergeInputs()
