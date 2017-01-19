@@ -1,6 +1,10 @@
 ﻿using System;
+using Contracts;
+using HubSceene;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Prerelease.Main.Render;
+using Color = Contracts.Color;
 using Vector2 = VectorMath.Vector2;
 
 namespace Prerelease.Main
@@ -10,26 +14,26 @@ namespace Prerelease.Main
     /// </summary>
     public class Game1 : Game
     {
-        public const bool DEBUG = true;
+        public const bool Debug = true;
 
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        private GameMenu menu;
         private ISceene activeSceene = null;
         private readonly IMonoInput playerInput;
         private readonly InputMask inputMask = new InputMask();
-        private ActionQueue actionQueue = new ActionQueue();
+        private readonly ActionQueue actionQueue = new ActionQueue();
         private Action[] actionMap;
-             
+        
+        private KeyInputs currentInputs = new KeyInputs();
         private Renderer renderer;
+        private IFont debugFont;
         private int updateFrame = 0;
         private int renderFrame = 0;
 
         public Game1()
         {
-            //playerInput = new MonoKeyboardInput();
-            playerInput = new MonoControllerInput(PlayerIndex.One);
-            graphics = new GraphicsDeviceManager(this);
+            playerInput = new MonoKeyboardInput();
+            //playerInput = new MonoControllerInput(PlayerIndex.One);
+
+            var graphics = new GraphicsDeviceManager(this);
             graphics.ToggleFullScreen();
 
             Content.RootDirectory = "Content";
@@ -52,6 +56,7 @@ namespace Prerelease.Main
             actionMap = new Action[Enum.GetNames(typeof(ActionType)).Length];
 
             actionMap[(int)ActionType.Quit] = this.Exit;
+            actionMap[(int)ActionType.NewGame] = this.NewGame;
         }
 
         /// <summary>
@@ -60,13 +65,12 @@ namespace Prerelease.Main
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-
             renderer = new Renderer(this.Content, this.GraphicsDevice);
 
-            this.menu = new GameMenu(renderer, spriteBatch, actionQueue);
-            this.activeSceene = this.menu;
+            var scope = renderer.ActivateScope("Debug");
+            debugFont = scope.LoadFont("ConsoleFont");
+
+            this.activeSceene = LoadSceene("Menu");
         }
 
         /// <summary>
@@ -90,9 +94,9 @@ namespace Prerelease.Main
             var time = (float)gameTime.TotalGameTime.TotalSeconds;
             var deltaT = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            playerInput.Update();
-            inputMask.Apply(playerInput);
-            activeSceene.ProcessInput(gameTime, inputMask);
+            currentInputs = playerInput.ReadInput();
+            inputMask.Apply(currentInputs);
+            activeSceene.ProcessInput(gameTime.TotalGameTime.TotalMilliseconds, inputMask);
 
             ProcessActions();
 
@@ -107,30 +111,58 @@ namespace Prerelease.Main
         {
             renderFrame++;
 
-            GraphicsDevice.Clear(Color.Black);
+            renderer.Clear(Color.Black);
 
-            spriteBatch.Begin();
+            renderer.Begin();
 
-            activeSceene.Render(gameTime);
+            activeSceene.Render(gameTime.TotalGameTime.TotalMilliseconds);
 
-            if (DEBUG)
+            if (Debug)
             {
                 renderer.RenderText(
-                    spriteBatch,
+                    debugFont,
                     Vector2.Zero,
                     string.Format(
-                        "U/D: {0}/{1} [{2}{3}{4}]",
+                        "U/D: {0}/{1} [{2}{3}{4}{5}{6}]",
                         updateFrame,
                         renderFrame,
-                        inputMask.Input.Up ? "U" : (playerInput.Up() ? "u" : "-"),
-                        inputMask.Input.Down ? "D" : (playerInput.Down() ? "d" : "-"),
-                        inputMask.Input.Select ? "S" : (playerInput.Select() ? "s" : "-")),
+                        inputMask.Input.Up ? "L" : (currentInputs.Up ? "l" : "-"),
+                        inputMask.Input.Up ? "R" : (currentInputs.Up ? "r" : "-"),
+                        inputMask.Input.Up ? "U" : (currentInputs.Up ? "u" : "-"),
+                        inputMask.Input.Down ? "D" : (currentInputs.Down ? "d" : "-"),
+                        inputMask.Input.Select ? "S" : (currentInputs.Select ? "s" : "-")),
                     Color.Red);
             }
 
-            spriteBatch.End();
+            renderer.End();
 
             base.Draw(gameTime);
+        }
+
+        private void NewGame()
+        {
+            this.activeSceene = LoadSceene("Hub");
+        }
+
+        private ISceene LoadSceene(string sceeneName)
+        {
+            activeSceene?.Deactivate();
+            var sceene = CreateSceene(sceeneName);
+            sceene.Activate();
+            return sceene;
+        }
+
+        private ISceene CreateSceene(string sceeneName)
+        {
+            switch (sceeneName)
+            {
+                case "Menu":
+                    return new GameMenu(renderer, actionQueue);
+                case "Hub":
+                    return new HubSceeneFactory().Create(renderer, actionQueue);
+                default:
+                    throw new Exception(string.Format("Attempt to load unknown sceene '{0}'.", sceeneName));
+            }
         }
 
         private void ProcessActions()

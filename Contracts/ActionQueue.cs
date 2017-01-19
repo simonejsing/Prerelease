@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace Prerelease.Main
+namespace Contracts
 {
-    public enum ActionType { Quit };
+    public enum ActionType {
+        Quit,
+        NewGame
+    };
 
     public struct GameAction
     {

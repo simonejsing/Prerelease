@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Contracts;
 using Microsoft.Xna.Framework.Input;
 
 namespace Prerelease.Main
@@ -6,17 +7,23 @@ namespace Prerelease.Main
     class MonoKeyboardInput : IMonoInput
     {
         private Keys[] pressedKeys;
+        private KeyInputs currentInputs = new KeyInputs();
 
         public MonoKeyboardInput()
         {
             pressedKeys = new Keys[0];
         }
 
-        public void Update()
+        public KeyInputs ReadInput()
         {
             KeyboardState kbState = Keyboard.GetState();
             pressedKeys = kbState.GetPressedKeys();
-
+            currentInputs.Left = Left();
+            currentInputs.Right = Right();
+            currentInputs.Up = Up();
+            currentInputs.Down = Down();
+            currentInputs.Select = Select();
+            return currentInputs;
         }
 
         public bool Left()
