@@ -3,6 +3,7 @@ using Contracts;
 using HubSceene;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Prerelease.Main.Input;
 using Prerelease.Main.Render;
 using Color = Contracts.Color;
 using Vector2 = VectorMath.Vector2;

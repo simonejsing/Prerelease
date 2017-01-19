@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Contracts;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Prerelease.Main.Render;
 
-namespace Prerelease.Main
+namespace Prerelease.Main.Render
 {
     class FontLibrary
     {

@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace Prerelease.Main
+namespace Prerelease.Main.Input
 {
     internal class MonoControllerInput : IMonoInput
     {

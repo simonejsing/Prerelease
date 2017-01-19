@@ -2,7 +2,7 @@
 using Contracts;
 using Microsoft.Xna.Framework.Input;
 
-namespace Prerelease.Main
+namespace Prerelease.Main.Input
 {
     class MonoKeyboardInput : IMonoInput
     {

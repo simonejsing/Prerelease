@@ -1,6 +1,6 @@
 using Contracts;
 
-namespace Prerelease.Main
+namespace Prerelease.Main.Input
 {
     internal interface IMonoInput
     {

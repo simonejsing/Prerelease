@@ -2,9 +2,8 @@
 using Contracts;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Prerelease.Main.Render;
 
-namespace Prerelease.Main
+namespace Prerelease.Main.Render
 {
     class SpriteLibrary
     {
