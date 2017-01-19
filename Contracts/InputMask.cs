@@ -1,6 +1,6 @@
 ﻿namespace Contracts
 {
-    public struct KeyInputs
+    public struct InputSet
     {
         public bool Left;
         public bool Right;
@@ -11,14 +11,14 @@
 
     public class InputMask
     {
-        public KeyInputs Input = new KeyInputs();
+        public InputSet Input = new InputSet();
 
         public InputMask()
         {
             Reset();
         }
 
-        public void Apply(KeyInputs gameInput)
+        public void Apply(InputSet gameInput)
         {
             Input.Left |= gameInput.Left;
             Input.Right |= gameInput.Right;

@@ -4,6 +4,6 @@ namespace Prerelease.Main.Input
 {
     internal interface IMonoInput
     {
-        KeyInputs ReadInput();
+        InputSet ReadInput();
     }
 }

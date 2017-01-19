@@ -8,14 +8,14 @@ namespace Prerelease.Main.Input
     {
         private PlayerIndex index;
         private GamePadState state;
-        private KeyInputs currentInputs = new KeyInputs();
+        private InputSet currentInputs = new InputSet();
 
         public MonoControllerInput(PlayerIndex playerIndex)
         {
             index = playerIndex;
         }
 
-        public KeyInputs ReadInput()
+        public InputSet ReadInput()
         {
             state = GamePad.GetState(index);
             currentInputs.Left = Left();

@@ -25,7 +25,7 @@ namespace Prerelease.Main
         private readonly ActionQueue actionQueue = new ActionQueue();
         private Action[] actionMap;
         
-        private KeyInputs currentInputs = new KeyInputs();
+        private InputSet currentInputs = new InputSet();
         private Renderer renderer;
         private IFont debugFont;
         private int updateFrame = 0;
@@ -106,10 +106,11 @@ namespace Prerelease.Main
             base.Update(gameTime);
         }
 
-        /*
-         * Merges inputs from keyboard and controller to support both input types.
-         */
-        private KeyInputs MergeInputs()
+        /// <summary>
+        /// Merges inputs from keyboard and controller to support both input types.
+        /// </summary>
+        /// <returns>The merged input set.</returns>
+        private InputSet MergeInputs()
         {
             inputMergeMask.Reset();
             inputMergeMask.Apply(keyboard.ReadInput());

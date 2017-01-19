@@ -7,14 +7,14 @@ namespace Prerelease.Main.Input
     class MonoKeyboardInput : IMonoInput
     {
         private Keys[] pressedKeys;
-        private KeyInputs currentInputs = new KeyInputs();
+        private InputSet currentInputs = new InputSet();
 
         public MonoKeyboardInput()
         {
             pressedKeys = new Keys[0];
         }
 
-        public KeyInputs ReadInput()
+        public InputSet ReadInput()
         {
             KeyboardState kbState = Keyboard.GetState();
             pressedKeys = kbState.GetPressedKeys();
