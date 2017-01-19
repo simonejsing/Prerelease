@@ -18,7 +18,9 @@ namespace Prerelease.Main
         public const bool Debug = true;
 
         private ISceene activeSceene = null;
-        private readonly IMonoInput playerInput;
+        private readonly IMonoInput keyboard;
+        private readonly IMonoInput controller;
+        private readonly InputMask inputMergeMask = new InputMask();
         private readonly InputMask inputMask = new InputMask();
         private readonly ActionQueue actionQueue = new ActionQueue();
         private Action[] actionMap;
@@ -31,8 +33,8 @@ namespace Prerelease.Main
 
         public Game1()
         {
-            playerInput = new MonoKeyboardInput();
-            //playerInput = new MonoControllerInput(PlayerIndex.One);
+            keyboard = new MonoKeyboardInput();
+            controller = new MonoControllerInput(PlayerIndex.One);
 
             var graphics = new GraphicsDeviceManager(this);
             graphics.ToggleFullScreen();
@@ -95,13 +97,24 @@ namespace Prerelease.Main
             var time = (float)gameTime.TotalGameTime.TotalSeconds;
             var deltaT = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            currentInputs = playerInput.ReadInput();
+            currentInputs = MergeInputs();
             inputMask.Apply(currentInputs);
             activeSceene.ProcessInput(gameTime.TotalGameTime.TotalMilliseconds, inputMask);
 
             ProcessActions();
 
             base.Update(gameTime);
+        }
+
+        /*
+         * Merges inputs from keyboard and controller to support both input types.
+         */
+        private KeyInputs MergeInputs()
+        {
+            inputMergeMask.Reset();
+            inputMergeMask.Apply(keyboard.ReadInput());
+            inputMergeMask.Apply(controller.ReadInput());
+            return inputMergeMask.Input;
         }
 
         /// <summary>
