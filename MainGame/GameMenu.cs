@@ -15,7 +15,7 @@ namespace Prerelease.Main
 
         private IFont menuFont;
         private int selectedOption = 0;
-        private Vector2 menuPosition;
+        private Vector2 menuPosition, viewport, textBox;
 
         private readonly string[] mainMenu = new[]
         {
@@ -41,17 +41,17 @@ namespace Prerelease.Main
             if (inputMask.Input.Up)
             {
                 selectedOption = selectedOption == 0 ? 0 : selectedOption - 1;
-                resetFrameCounter = 15;
+                resetFrameCounter = 10;
             }
             if (inputMask.Input.Down)
             {
                 selectedOption = selectedOption == mainMenu.Length - 1 ? mainMenu.Length - 1 : selectedOption + 1;
-                resetFrameCounter = 15;
+                resetFrameCounter = 10;
             }
             if (inputMask.Input.Select)
             {
                 DispatchCurrentMenuAction();
-                resetFrameCounter = 15;
+                resetFrameCounter = 10;
             }
         }
 
@@ -78,14 +78,17 @@ namespace Prerelease.Main
             menuFont = LoadFont("ConsoleFont");
 
             // Align center vertically
-            var viewport = Renderer.GetViewport();
-            var textBox = new Vector2(200, -mainMenu.Length * TextHeight);
-            menuPosition = (viewport - textBox) / 2f;
+            viewport = Renderer.GetViewport();
+            textBox = new Vector2(200, -mainMenu.Length * TextHeight);
         }
 
         public override void Render(double gameTimeMsec)
         {
-            for(var i = 0; i < mainMenu.Length; i++)
+            Renderer.Clear(Color.Black);
+
+            menuPosition = (viewport - textBox) / 2f;
+
+            for (var i = 0; i < mainMenu.Length; i++)
             {
                 Renderer.RenderText(menuFont, menuPosition, mainMenu[i], Color.White, 0f, Vector2.Zero, new Vector2(2f, 2f));
                 if (i == selectedOption)

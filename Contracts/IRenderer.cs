@@ -6,8 +6,6 @@ namespace Contracts
     {
         Vector2 GetViewport();
         void Clear(Color color);
-        void Begin();
-        void End();
         void DrawVector(Vector2 origin, Vector2 vector, Color color, float thickness = 1.0f);
         void RenderLine(Vector2 point1, Vector2 point2, Color color, float thickness);
         void DrawLine(Vector2 point, float length, float angle, Color color, float thickness);

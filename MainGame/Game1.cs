@@ -125,8 +125,6 @@ namespace Prerelease.Main
         {
             renderFrame++;
 
-            renderer.Clear(Color.Black);
-
             renderer.Begin();
 
             activeSceene.Render(gameTime.TotalGameTime.TotalMilliseconds);
@@ -140,8 +138,8 @@ namespace Prerelease.Main
                         "U/D: {0}/{1} [{2}{3}{4}{5}{6}]",
                         updateFrame,
                         renderFrame,
-                        inputMask.Input.Up ? "L" : (currentInputs.Up ? "l" : "-"),
-                        inputMask.Input.Up ? "R" : (currentInputs.Up ? "r" : "-"),
+                        inputMask.Input.Left ? "L" : (currentInputs.Left ? "l" : "-"),
+                        inputMask.Input.Right ? "R" : (currentInputs.Right ? "r" : "-"),
                         inputMask.Input.Up ? "U" : (currentInputs.Up ? "u" : "-"),
                         inputMask.Input.Down ? "D" : (currentInputs.Down ? "d" : "-"),
                         inputMask.Input.Select ? "S" : (currentInputs.Select ? "s" : "-")),
