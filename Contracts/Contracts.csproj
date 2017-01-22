@@ -43,6 +43,9 @@
   <ItemGroup>
     <Compile Include="ActionQueue.cs" />
     <Compile Include="Color.cs" />
+    <Compile Include="GameAction.cs" />
+    <Compile Include="ICharacter.cs" />
+    <Compile Include="IDialog.cs" />
     <Compile Include="IFont.cs" />
     <Compile Include="InputMask.cs" />
     <Compile Include="IRenderer.cs" />
@@ -50,6 +53,7 @@
     <Compile Include="ISceene.cs" />
     <Compile Include="ISceeneFactory.cs" />
     <Compile Include="ISprite.cs" />
+    <Compile Include="IUserInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sceene.cs" />
   </ItemGroup>

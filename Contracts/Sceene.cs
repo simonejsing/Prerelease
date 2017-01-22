@@ -9,17 +9,18 @@ namespace Contracts
     public abstract class Sceene : ISceene
     {
         protected IRenderer Renderer;
+        protected IUserInterface UI;
         protected ActionQueue ActionQueue;
         protected string Name;
 
         private IRenderScope scope;
 
-        protected Sceene(string sceeneName, IRenderer renderer, ActionQueue actionQueue)
+        protected Sceene(string sceeneName, IRenderer renderer, IUserInterface ui, ActionQueue actionQueue)
         {
             this.Name = sceeneName;
             this.Renderer = renderer;
+            this.UI = ui;
             this.ActionQueue = actionQueue;
-
         }
 
         public abstract void ProcessInput(double gameTimeMsec, InputMask inputMask);

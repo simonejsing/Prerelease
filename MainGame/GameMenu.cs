@@ -24,7 +24,7 @@ namespace Prerelease.Main
             "Quit"
         };
 
-        public GameMenu(Renderer renderer, ActionQueue actionQueue) : base("GameMenu", renderer, actionQueue)
+        public GameMenu(Renderer renderer, ActionQueue actionQueue) : base("GameMenu", renderer, null, actionQueue)
         {
         }
 

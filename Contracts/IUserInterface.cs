@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-    public interface ISceeneFactory
+    public interface IUserInterface
     {
-        ISceene Create(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue);
+        void BeginDialog(IDialog dialog);
     }
 }

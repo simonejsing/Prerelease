@@ -26,6 +26,7 @@ namespace Prerelease.Main
         
         private InputSet currentInputs = new InputSet();
         private Renderer renderer;
+        private UserInterface userInterface;
         private IFont debugFont;
         private int updateFrame = 0;
         private int renderFrame = 0;
@@ -68,6 +69,7 @@ namespace Prerelease.Main
         protected override void LoadContent()
         {
             renderer = new Renderer(this.Content, this.GraphicsDevice);
+            userInterface = new UserInterface(renderer);
 
             var scope = renderer.ActivateScope("Debug");
             debugFont = scope.LoadFont("ConsoleFont");
@@ -128,6 +130,7 @@ namespace Prerelease.Main
             renderer.Begin();
 
             activeSceene.Render(gameTime.TotalGameTime.TotalMilliseconds);
+            userInterface.Render();
 
             if (Debug)
             {
@@ -171,7 +174,7 @@ namespace Prerelease.Main
                 case "Menu":
                     return new GameMenu(renderer, actionQueue);
                 case "Hub":
-                    return new HubSceeneFactory().Create(renderer, actionQueue);
+                    return new HubSceeneFactory().Create(renderer, userInterface, actionQueue);
                 default:
                     throw new Exception(string.Format("Attempt to load unknown sceene '{0}'.", sceeneName));
             }

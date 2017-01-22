@@ -127,6 +127,7 @@
     <Compile Include="Render\Sprite.cs" />
     <Compile Include="Render\SpriteLibrary.cs" />
     <Compile Include="Render\Transformation.cs" />
+    <Compile Include="UserInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
