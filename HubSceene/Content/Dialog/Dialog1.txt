@@ -1,0 +1,8 @@
+﻿This is a story about a developer building a game from scratch, and his struggles to get the game to work just right!
+It is prerelease software in the purest sense, and you should expect lots of glitches, bugs and otherwise awkward moments in this game.
+===
+Did I say bugs? I meant unintended features of course...
+===
+Nevertheless, I hope you will enjoy playing through this game.
+
+If not.... NO REFUNDS!

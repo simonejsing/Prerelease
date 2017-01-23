@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainGame", "MainGame\MainGa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VectorMath", "VectorMath\VectorMath.csproj", "{E28A40E7-8894-4524-B748-8F89E8014E30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubSceene", "..\HubSceene\HubSceene.csproj", "{B6E0C030-09D0-453A-8229-851A2D3D4776}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubSceene", "HubSceene\HubSceene.csproj", "{B6E0C030-09D0-453A-8229-851A2D3D4776}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{1B4E6F20-64F7-4912-BF4A-4CCDF2420CCC}"
 EndProject

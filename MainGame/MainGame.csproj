@@ -154,7 +154,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\HubSceene\HubSceene.csproj">
+    <ProjectReference Include="..\HubSceene\HubSceene.csproj">
       <Project>{b6e0c030-09d0-453a-8229-851a2d3d4776}</Project>
       <Name>HubSceene</Name>
     </ProjectReference>
