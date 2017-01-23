@@ -100,6 +100,7 @@ namespace Prerelease.Main
 
             currentInputs = MergeInputs();
             inputMask.Apply(currentInputs);
+            userInterface.Update(inputMask);
             activeSceene.ProcessInput(gameTime.TotalGameTime.TotalMilliseconds, inputMask);
 
             ProcessActions();

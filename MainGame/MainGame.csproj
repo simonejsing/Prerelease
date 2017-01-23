@@ -111,6 +111,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DialogPage.cs" />
     <Compile Include="Render\FontLibrary.cs" />
     <Compile Include="GameMenu.cs" />
     <Compile Include="GamePage.xaml.cs">

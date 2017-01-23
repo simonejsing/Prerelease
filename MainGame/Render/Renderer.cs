@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Contracts;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = VectorMath.Vector2;
@@ -106,6 +107,12 @@ namespace Prerelease.Main.Render
             spriteBatch.Draw(Pixel, ToXnaVector(transform.Apply(position)), ToXnaColor(color));
         }
 
+        public void RenderRectangle(Vector2 position, Vector2 size, Contracts.Color color)
+        {
+            Rectangle rect = new Rectangle(ToXnaPoint(transform.Apply(position)), ToXnaPoint(transform.Apply(size)));
+            spriteBatch.Draw(Pixel, rect, ToXnaColor(color));
+        }
+
         public void RenderOpagueSprite(ISprite sprite, Vector2 position)
         {
             var xnaVector = ToXnaVector(transform.Apply(position));
@@ -162,6 +169,11 @@ namespace Prerelease.Main.Render
         private Microsoft.Xna.Framework.Vector2 ToXnaVector(Vector2 position)
         {
             return new Microsoft.Xna.Framework.Vector2(position.X, position.Y);
+        }
+
+        private Microsoft.Xna.Framework.Point ToXnaPoint(Vector2 position)
+        {
+            return new Microsoft.Xna.Framework.Point((int)position.X, (int)position.Y);
         }
     }
 }

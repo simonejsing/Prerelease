@@ -10,6 +10,7 @@ namespace Contracts
         void RenderLine(Vector2 point1, Vector2 point2, Color color, float thickness);
         void DrawLine(Vector2 point, float length, float angle, Color color, float thickness);
         void RenderPixel(Vector2 position, Color color);
+        void RenderRectangle(Vector2 position, Vector2 size, Color color);
         void RenderOpagueSprite(ISprite sprite, Vector2 position);
         void RenderText(IFont font, Vector2 position, string text, Color color);
         void RenderText(IFont font, Vector2 position, string text, Color color, float rotation, Vector2 origin, Vector2 scale, float layerDepth = 0f);

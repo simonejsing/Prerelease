@@ -7,7 +7,7 @@ namespace Contracts
         ICharacter SourceCharacter { get; }
         ICharacter TargetCharacter { get; }
         IEnumerable<IDialogOption> Options { get; }
-        string[] Lines { get; }
+        string Text { get; }
         bool Completed { get; }
 
         IDialog ChooseOption(IDialogOption option);
