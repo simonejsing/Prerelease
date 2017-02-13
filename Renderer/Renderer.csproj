@@ -1,20 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E28A40E7-8894-4524-B748-8F89E8014E30}</ProjectGuid>
+    <ProjectGuid>{47AB637F-3D27-4154-ABD9-A89F78DE8B9D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VectorMath</RootNamespace>
-    <AssemblyName>VectorMath</AssemblyName>
+    <RootNamespace>Renderer</RootNamespace>
+    <AssemblyName>Renderer</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile32</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,21 +36,32 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <ProjectReference Include="..\Contracts\Contracts.csproj">
+      <Project>{1b4e6f20-64f7-4912-bf4a-4ccdf2420ccc}</Project>
+      <Name>Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VectorMath\VectorMath.csproj">
+      <Project>{e28a40e7-8894-4524-b748-8f89e8014e30}</Project>
+      <Name>VectorMath</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ComponentizedVector2.cs" />
-    <Compile Include="IReadonlyPoint.cs" />
-    <Compile Include="IReadonlyRectangle.cs" />
-    <Compile Include="IReadonlyVector.cs" />
-    <Compile Include="Line2.cs" />
-    <Compile Include="Matrix2x2.cs" />
-    <Compile Include="Point.cs" />
-    <Compile Include="PointVector2.cs" />
-    <Compile Include="Polygon2.cs" />
+    <Compile Include="Font.cs" />
+    <Compile Include="FontLibrary.cs" />
+    <Compile Include="PointAdaptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Spline2.cs" />
-    <Compile Include="UnitVector2.cs" />
-    <Compile Include="Vector2.cs" />
+    <Compile Include="RectangleAdaptor.cs" />
+    <Compile Include="Engine.cs" />
+    <Compile Include="RenderScope.cs" />
+    <Compile Include="Sprite.cs" />
+    <Compile Include="SpriteLibrary.cs" />
+    <Compile Include="Transformation.cs" />
+    <Compile Include="VectorAdaptor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MonoGame.Framework">
+      <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\WindowsUniversal\MonoGame.Framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

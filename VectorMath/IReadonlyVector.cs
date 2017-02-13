@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Contracts
+namespace VectorMath
 {
-    public interface IUserInterface
+    public interface IReadonlyVector
     {
-        void BeginDialog(IDialog dialog);
-        bool HasActiveDialog { get; }
+        float X { get; }
+        float Y { get; }
     }
 }

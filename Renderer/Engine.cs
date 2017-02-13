@@ -4,14 +4,16 @@ using Contracts;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Vector2 = VectorMath.Vector2;
+using VectorMath;
+using IReadonlyVector = VectorMath.IReadonlyVector;
 using Color = Microsoft.Xna.Framework.Color;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
-namespace Prerelease.Main.Render
+namespace Renderer
 {
-    class Renderer : IRenderer
+    public class Engine : IRenderer
     {
-        private Vector2 viewport;
+        private VectorMath.Vector2 viewport;
         private GraphicsDevice device;
         private SpriteLibrary sprites;
         private FontLibrary fonts;
@@ -19,25 +21,25 @@ namespace Prerelease.Main.Render
         private Transformation transform;
         private Texture2D Pixel;
 
-        public Renderer(ContentManager manager, GraphicsDevice device)
+        public Engine(ContentManager manager, GraphicsDevice device)
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             this.device = device;
             this.spriteBatch = new SpriteBatch(device);
-            Pixel = manager.Load<Texture2D>(@"Sprites\pixel");
+
+            // Create 1x1 white pixel
+            Pixel = new Texture2D(this.device, 1, 1);
+            Color[] pixels = new[] {Color.White};
+            Pixel.SetData(pixels);
 
             sprites = new SpriteLibrary(manager);
-            sprites.Load("player");
-            sprites.Load("block");
-            sprites.Load("spikes");
-
             fonts = new FontLibrary(manager);
 
-            this.viewport = new Vector2(device.Viewport.Width, -device.Viewport.Height);
+            this.viewport = new VectorMath.Vector2(device.Viewport.Width, -device.Viewport.Height);
             ResetTransform();
         }
 
-        public Vector2 GetViewport()
+        public IReadonlyVector GetViewport()
         {
             return this.viewport;
         }
@@ -49,7 +51,7 @@ namespace Prerelease.Main.Render
 
         public void Begin()
         {
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
         }
 
         public void End()
@@ -67,9 +69,9 @@ namespace Prerelease.Main.Render
             //transform.Scale(device.Viewport.Width / 100f, device.Viewport.Height / 100f);
         }
 
-        public void DrawVector(Vector2 origin, Vector2 vector, Contracts.Color color, float thickness = 1.0f)
+        public void DrawVector(IReadonlyVector origin, IReadonlyVector vector, Contracts.Color color, float thickness = 1.0f)
         {
-            var to = origin + vector;
+            var to = new VectorMath.Vector2(origin.X + vector.X, origin.Y + vector.Y);
             RenderLine(
                 transform.Apply(origin),
                 transform.Apply(to),
@@ -77,10 +79,10 @@ namespace Prerelease.Main.Render
                 thickness);
         }
 
-        public void RenderLine(Vector2 point1, Vector2 point2, Contracts.Color color, float thickness)
+        public void RenderLine(IReadonlyVector point1, IReadonlyVector point2, Contracts.Color color, float thickness)
         {
             // calculate the distance between the two vectors
-            float distance = Vector2.DistanceBetween(point1, point2);
+            float distance = VectorMath.Vector2.DistanceBetween(new VectorMath.Vector2(point1), new VectorMath.Vector2(point2));
 
             // calculate the angle between the two vectors
             float angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
@@ -88,7 +90,7 @@ namespace Prerelease.Main.Render
             DrawLine(point1, distance, angle, color, thickness);
         }
 
-        public void DrawLine(Vector2 point, float length, float angle, Contracts.Color color, float thickness)
+        public void DrawLine(IReadonlyVector point, float length, float angle, Contracts.Color color, float thickness)
         {
             // stretch the pixel between the two vectors
             spriteBatch.Draw(Pixel,
@@ -96,36 +98,52 @@ namespace Prerelease.Main.Render
                              null,
                              ToXnaColor(color),
                              angle,
-                             ToXnaVector(Vector2.Zero),
-                             ToXnaVector(new Vector2(length, thickness)),
+                             ToXnaVector(VectorMath.Vector2.Zero),
+                             ToXnaVector(new VectorMath.Vector2(length, thickness)),
                              SpriteEffects.None,
                              0);
         }
 
-        public void RenderPixel(Vector2 position, Contracts.Color color)
+        public void RenderPixel(IReadonlyVector position, Contracts.Color color)
         {
             spriteBatch.Draw(Pixel, ToXnaVector(transform.Apply(position)), ToXnaColor(color));
         }
 
-        public void RenderRectangle(Vector2 position, Vector2 size, Contracts.Color color)
+        public void RenderRectangle(IReadonlyVector position, IReadonlyVector size, Contracts.Color color)
         {
             Rectangle rect = new Rectangle(ToXnaPoint(transform.Apply(position)), ToXnaPoint(transform.Apply(size)));
             spriteBatch.Draw(Pixel, rect, ToXnaColor(color));
         }
 
-        public void RenderOpagueSprite(ISprite sprite, Vector2 position)
+        public void RenderOpagueSprite(ISprite sprite, IReadonlyVector position)
         {
-            var xnaVector = ToXnaVector(transform.Apply(position));
-            spriteBatch.Draw(((Sprite)sprite).Texture, xnaVector, Color.White);
+            var s = (Sprite) sprite;
+            //var xnaVector = ToXnaVector(transform.Apply(position));
+            Rectangle rect = new Rectangle(ToXnaPoint(transform.Apply(position)), ToXnaPoint(transform.Apply(s.Size)));
+            spriteBatch.Draw(s.Texture, rect, ToXnaRect(s.SourceRectangle), Color.White);
         }
 
-        public void RenderText(IFont font, Vector2 position, string text, Contracts.Color color)
+        private static Rectangle? ToXnaRect(IReadonlyRectangle rectangle)
         {
-            RenderText(font, position, text, color, 0f, Vector2.Zero, new Vector2(1f, 1f));
+            if (rectangle == null)
+                return null;
+
+            var adaptor = rectangle as RectangleAdaptor;
+            if (adaptor != null)
+            {
+                return adaptor.Rect;
+            }
+
+            throw new NotImplementedException();
         }
 
-        public void RenderText(IFont font, Vector2 position, string text, Contracts.Color color, float rotation,
-            Vector2 origin, Vector2 scale, float layerDepth = 0f)
+        public void RenderText(IFont font, IReadonlyVector position, string text, Contracts.Color color)
+        {
+            RenderText(font, position, text, color, 0f, VectorMath.Vector2.Zero, new VectorMath.Vector2(1f, 1f));
+        }
+
+        public void RenderText(IFont font, IReadonlyVector position, string text, Contracts.Color color, float rotation,
+            IReadonlyVector origin, IReadonlyVector scale, float layerDepth = 0f)
         {
             spriteBatch.DrawString(
                 ((Font) font).SpriteFont,
@@ -166,12 +184,12 @@ namespace Prerelease.Main.Render
             return new Color(color.r, color.g, color.b);
         }
 
-        private Microsoft.Xna.Framework.Vector2 ToXnaVector(Vector2 position)
+        private Microsoft.Xna.Framework.Vector2 ToXnaVector(IReadonlyVector position)
         {
             return new Microsoft.Xna.Framework.Vector2(position.X, position.Y);
         }
 
-        private Microsoft.Xna.Framework.Point ToXnaPoint(Vector2 position)
+        private Microsoft.Xna.Framework.Point ToXnaPoint(IReadonlyVector position)
         {
             return new Microsoft.Xna.Framework.Point((int)position.X, (int)position.Y);
         }

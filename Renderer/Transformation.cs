@@ -1,6 +1,6 @@
 ﻿using VectorMath;
 
-namespace Prerelease.Main.Render
+namespace Renderer
 {
     class Transformation
     {
@@ -16,7 +16,7 @@ namespace Prerelease.Main.Render
             this.matrix *= new Matrix2x2(scaleX, 0f, 0f, scaleY);
         }
 
-        public Vector2 Apply(Vector2 vector)
+        public Vector2 Apply(IReadonlyVector vector)
         {
             return matrix*vector;
         }

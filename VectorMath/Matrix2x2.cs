@@ -36,7 +36,7 @@ namespace VectorMath
             return new Matrix2x2(new Vector2(1, 0), new Vector2(0, 1));
         }
 
-        public static Vector2 operator *(Matrix2x2 matrix, Vector2 vector)
+        public static Vector2 operator *(Matrix2x2 matrix, IReadonlyVector vector)
         {
             return new Vector2(
                 matrix.X1 * vector.X + matrix.X2 * vector.Y,

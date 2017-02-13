@@ -3,7 +3,7 @@ using Contracts;
 using HubSceene;
 using Microsoft.Xna.Framework;
 using Prerelease.Main.Input;
-using Prerelease.Main.Render;
+using Renderer;
 using Color = Contracts.Color;
 using Vector2 = VectorMath.Vector2;
 
@@ -25,7 +25,7 @@ namespace Prerelease.Main
         private Action[] actionMap;
         
         private InputSet currentInputs = new InputSet();
-        private Renderer renderer;
+        private Engine renderer;
         private UserInterface userInterface;
         private IFont debugFont;
         private int updateFrame = 0;
@@ -68,7 +68,7 @@ namespace Prerelease.Main
         /// </summary>
         protected override void LoadContent()
         {
-            renderer = new Renderer(this.Content, this.GraphicsDevice);
+            renderer = new Engine(this.Content, this.GraphicsDevice);
             userInterface = new UserInterface(renderer);
 
             var scope = renderer.ActivateScope("Debug");
@@ -100,8 +100,8 @@ namespace Prerelease.Main
 
             currentInputs = MergeInputs();
             inputMask.Apply(currentInputs);
-            userInterface.Update(inputMask);
             activeSceene.ProcessInput(gameTime.TotalGameTime.TotalMilliseconds, inputMask);
+            userInterface.Update(inputMask);
 
             ProcessActions();
 

@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Contracts;
+﻿using Contracts;
 using Microsoft.Xna.Framework.Graphics;
+using VectorMath;
 
-namespace Prerelease.Main.Render
+namespace Renderer
 {
-    class Sprite : ISprite
+    public class Sprite : ISprite
     {
         public Texture2D Texture { get; private set; }
+        public IReadonlyRectangle SourceRectangle { get; set; }
+        public Vector2 Size { get; set; }
 
         public Sprite(Texture2D texture)
         {

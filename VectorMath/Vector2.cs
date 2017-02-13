@@ -2,7 +2,7 @@
 
 namespace VectorMath
 {
-    public class Vector2 : IComparable<Vector2>
+    public class Vector2 : IComparable<Vector2>, IReadonlyVector
     {
         public const float VectorLengthPrecission = 0.001f;
 
@@ -44,7 +44,7 @@ namespace VectorMath
             this.Y = y;
         }
 
-        public Vector2(Vector2 v)
+        public Vector2(IReadonlyVector v)
         {
             this.X = v.X;
             this.Y = v.Y;

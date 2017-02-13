@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Contracts;
-using Prerelease.Main.Render;
+using Renderer;
 using VectorMath;
 
 namespace Prerelease.Main
@@ -24,7 +24,7 @@ namespace Prerelease.Main
             "Quit"
         };
 
-        public GameMenu(Renderer renderer, ActionQueue actionQueue) : base("GameMenu", renderer, null, actionQueue)
+        public GameMenu(Engine renderer, ActionQueue actionQueue) : base("GameMenu", renderer, null, actionQueue)
         {
         }
 
@@ -78,7 +78,7 @@ namespace Prerelease.Main
             menuFont = LoadFont("ConsoleFont");
 
             // Align center vertically
-            viewport = Renderer.GetViewport();
+            viewport = new Vector2(Renderer.GetViewport());
             textBox = new Vector2(200, -mainMenu.Length * TextHeight);
         }
 

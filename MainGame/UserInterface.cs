@@ -21,6 +21,8 @@ namespace Prerelease.Main
         private DialogPage[] pages;
         private int currentPage;
 
+        public bool HasActiveDialog => currentDialog?.Completed == false;
+
         public UserInterface(IRenderer renderer)
         {
             Renderer = renderer;
@@ -85,7 +87,7 @@ namespace Prerelease.Main
             }
             
             // Align center vertically
-            var viewport = Renderer.GetViewport();
+            var viewport = new Vector2(Renderer.GetViewport());
             var textBox = new Vector2(MaxLineLength * CharacterWidth, -MaxLines * TextHeight);
             var position = (viewport - textBox) / 2f;
 
@@ -102,7 +104,7 @@ namespace Prerelease.Main
         private DialogPage[] ProcessDialogText(string text)
         {
             var dialogPages = new List<DialogPage>();
-            var blocks = text.Split(new[] { "==="} , StringSplitOptions.RemoveEmptyEntries);
+            var blocks = text.Split(new[] { "===\r\n"} , StringSplitOptions.RemoveEmptyEntries);
             foreach (var block in blocks)
             {
                 var dialogLines = WrapText(block);
