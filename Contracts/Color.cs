@@ -8,13 +8,14 @@ namespace Contracts
 {
     public struct Color
     {
-        public float r, g, b;
+        public float r, g, b, a;
 
-        public Color(float red, float green, float blue)
+        public Color(float red, float green, float blue, float alpha = 0f)
         {
             this.r = red;
             this.g = green;
             this.b = blue;
+            this.a = alpha;
         }
 
         public static Color Black = new Color(0f, 0f, 0f);

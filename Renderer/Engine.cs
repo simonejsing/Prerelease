@@ -51,7 +51,8 @@ namespace Renderer
 
         public void Begin()
         {
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+            spriteBatch.Begin();
+            //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
         }
 
         public void End()
@@ -181,7 +182,7 @@ namespace Renderer
 
         private Color ToXnaColor(Contracts.Color color)
         {
-            return new Color(color.r, color.g, color.b);
+            return new Color(color.r, color.g, color.b, color.a);
         }
 
         private Microsoft.Xna.Framework.Vector2 ToXnaVector(IReadonlyVector position)
@@ -192,6 +193,17 @@ namespace Renderer
         private Microsoft.Xna.Framework.Point ToXnaPoint(IReadonlyVector position)
         {
             return new Microsoft.Xna.Framework.Point((int)position.X, (int)position.Y);
+        }
+
+        public ISprite RenderToTexture(int width, int height, Action renderAction)
+        {
+            var renderTarget = new RenderTarget2D(device, width, height, false, device.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+            device.SetRenderTarget(renderTarget);
+            Begin();
+            renderAction();
+            End();
+            device.SetRenderTarget(null);
+            return new Sprite(renderTarget);
         }
     }
 }

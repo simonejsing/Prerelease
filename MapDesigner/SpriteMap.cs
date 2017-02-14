@@ -65,7 +65,7 @@ namespace MapDesigner
         private Sprite GenerateSpriteTile(int x, int y)
         {
             var s = new Sprite(this.Texture);
-            s.Size = new Vector2(this.tileWidth * 4, -this.tileHeight * 4);
+            s.Size = new Vector2(this.tileWidth, -this.tileHeight);
             s.SourceRectangle = new RectangleAdaptor(this.Tile(x, y));
             return s;
         }

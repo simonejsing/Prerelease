@@ -1,9 +1,11 @@
 ﻿using System.IO;
 using System.Reflection;
+using Contracts;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Renderer;
 using VectorMath;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace MapDesigner
 {
@@ -16,6 +18,7 @@ namespace MapDesigner
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         private SpriteMap map;
+        private ISprite tiledMap;
 
         public Game1()
         {
@@ -32,7 +35,6 @@ namespace MapDesigner
         protected override void Initialize()
         {
             renderer = new Renderer.Engine(this.Content, this.GraphicsDevice);
-            // TODO: Add your initialization logic here
 
             // Load sprites from textures.
             var assembly = typeof(Game1).GetTypeInfo().Assembly;
@@ -40,15 +42,28 @@ namespace MapDesigner
             {
                 map = new SpriteMap(Texture2D.FromStream(graphics.GraphicsDevice, stream), 32, 32);
             }
-            /*using (var reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd();
-            }
 
-            using (FileStream fileStream = new FileStream("Content/sprites/hyptosis_tile-art-batch-1.png", FileMode.Open))
+            tiledMap = renderer.RenderToTexture(500, 500, () =>
             {
-                map = new SpriteMap(Texture2D.FromStream(graphics.GraphicsDevice, fileStream), 32, 32);
-            }*/
+                renderer.Clear(Contracts.Color.Black);
+                var offset = new VectorMath.Vector2(30, -30);
+                for (int x = 0; x < 10; x++)
+                {
+                    for (int y = 0; y < 10; y++)
+                    {
+                        var s = map.Sprite(x, y);
+                        renderer.RenderOpagueSprite(s, offset);
+                        offset.Y += s.Size.Y;
+                        offset.Y -= 15;
+                    }
+
+                    offset.X += map.Sprite(x, 9).Size.X;
+                    offset.X += 15;
+                    offset.Y = -30;
+                }
+            });
+
+            tiledMap.Size *= 2.5f;
 
             base.Initialize();
         }
@@ -96,26 +111,10 @@ namespace MapDesigner
             renderer.Begin();
             renderer.Clear(new Contracts.Color((float)clearColor.R / 255, (float)clearColor.G /255, (float)clearColor.B/ 255));
 
+
             var offset = new VectorMath.Vector2(30, -30);
-
-            //var s = new Sprite(map.Texture);
-            //s.Size = new VectorMath.Vector2(100, -100);
-            //renderer.RenderOpagueSprite(s, new VectorMath.Vector2(100, -100));
-
-            for (int x = 0; x < 10; x++)
-            {
-                for (int y = 0; y < 10; y++)
-                {
-                    var s = map.Sprite(x, y);
-                    renderer.RenderOpagueSprite(s, offset);
-                    offset.Y += s.Size.Y;
-                    offset.Y -= 15;
-                }
-
-                offset.X += map.Sprite(x, 9).Size.X;
-                offset.X += 15;
-                offset.Y = -30;
-            }
+            //renderer.RenderRectangle(offset, new VectorMath.Vector2(100, -100), Contracts.Color.Black);
+            renderer.RenderOpagueSprite(tiledMap, offset);
 
             renderer.End();
 
