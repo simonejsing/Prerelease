@@ -62,12 +62,7 @@ namespace Renderer
 
         private void ResetTransform()
         {
-            // Mirror y-axis
             transform = new Transformation();
-            transform.Scale(1, -1);
-
-            // Scale viewport to 100x100
-            //transform.Scale(device.Viewport.Width / 100f, device.Viewport.Height / 100f);
         }
 
         public void DrawVector(IReadonlyVector origin, IReadonlyVector vector, Contracts.Color color, float thickness = 1.0f)

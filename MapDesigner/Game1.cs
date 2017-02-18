@@ -3,9 +3,12 @@ using System.Reflection;
 using Contracts;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Renderer;
 using VectorMath;
 using Color = Microsoft.Xna.Framework.Color;
+using Point = VectorMath.Point;
+using Vector2 = VectorMath.Vector2;
 
 namespace MapDesigner
 {
@@ -24,6 +27,7 @@ namespace MapDesigner
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            dragState = new DragState();
         }
 
         /// <summary>
@@ -34,6 +38,7 @@ namespace MapDesigner
         /// </summary>
         protected override void Initialize()
         {
+            this.IsMouseVisible = true;
             renderer = new Renderer.Engine(this.Content, this.GraphicsDevice);
 
             // Load sprites from textures.
@@ -46,7 +51,7 @@ namespace MapDesigner
             tiledMap = renderer.RenderToTexture(500, 500, () =>
             {
                 renderer.Clear(Contracts.Color.Black);
-                var offset = new VectorMath.Vector2(30, -30);
+                var offset = new VectorMath.Vector2(30, 30);
                 for (int x = 0; x < 10; x++)
                 {
                     for (int y = 0; y < 10; y++)
@@ -54,12 +59,12 @@ namespace MapDesigner
                         var s = map.Sprite(x, y);
                         renderer.RenderOpagueSprite(s, offset);
                         offset.Y += s.Size.Y;
-                        offset.Y -= 15;
+                        offset.Y += 15;
                     }
 
                     offset.X += map.Sprite(x, 9).Size.X;
                     offset.X += 15;
-                    offset.Y = -30;
+                    offset.Y = 30;
                 }
             });
 
@@ -89,14 +94,13 @@ namespace MapDesigner
             // TODO: Unload any non ContentManager content here
         }
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        private readonly DragState dragState;
+
         protected override void Update(GameTime gameTime)
         {
-            // TODO: Add your update logic here
+            var mouseInput = Mouse.GetState();
+
+            dragState.Update(mouseInput);
 
             base.Update(gameTime);
         }
@@ -111,9 +115,8 @@ namespace MapDesigner
             renderer.Begin();
             renderer.Clear(new Contracts.Color((float)clearColor.R / 255, (float)clearColor.G /255, (float)clearColor.B/ 255));
 
-
-            var offset = new VectorMath.Vector2(30, -30);
-            //renderer.RenderRectangle(offset, new VectorMath.Vector2(100, -100), Contracts.Color.Black);
+            var offset = new VectorMath.Vector2(30, 30);
+            offset -= (dragState.Offset);
             renderer.RenderOpagueSprite(tiledMap, offset);
 
             renderer.End();

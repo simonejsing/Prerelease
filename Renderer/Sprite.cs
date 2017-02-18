@@ -13,7 +13,7 @@ namespace Renderer
         public Sprite(Texture2D texture)
         {
             this.Texture = texture;
-            this.Size = new Vector2(texture.Width, -texture.Height);
+            this.Size = new Vector2(texture.Width, texture.Height);
         }
     }
 }
