@@ -106,8 +106,10 @@
       <DependentUpon>GamePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Game1.cs" />
+    <Compile Include="Map.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpriteMap.cs" />
+    <Compile Include="SpriteReference.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MapDesigner_TemporaryKey.pfx" />

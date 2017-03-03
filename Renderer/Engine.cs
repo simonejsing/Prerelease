@@ -29,8 +29,7 @@ namespace Renderer
 
             // Create 1x1 white pixel
             Pixel = new Texture2D(this.device, 1, 1);
-            Color[] pixels = new[] {Color.White};
-            Pixel.SetData(pixels);
+            Pixel.SetData(new[] {Color.White});
 
             sprites = new SpriteLibrary(manager);
             fonts = new FontLibrary(manager);
@@ -111,11 +110,15 @@ namespace Renderer
             spriteBatch.Draw(Pixel, rect, ToXnaColor(color));
         }
 
-        public void RenderOpagueSprite(ISprite sprite, IReadonlyVector position)
+        public void RenderOpagueSprite(ISprite sprite, IReadonlyVector position, IReadonlyVector size = null)
         {
+            if (size == null)
+            {
+                size = sprite.Size;
+            }
             var s = (Sprite) sprite;
             //var xnaVector = ToXnaVector(transform.Apply(position));
-            Rectangle rect = new Rectangle(ToXnaPoint(transform.Apply(position)), ToXnaPoint(transform.Apply(s.Size)));
+            Rectangle rect = new Rectangle(ToXnaPoint(transform.Apply(position)), ToXnaPoint(transform.Apply(size)));
             spriteBatch.Draw(s.Texture, rect, ToXnaRect(s.SourceRectangle), Color.White);
         }
 

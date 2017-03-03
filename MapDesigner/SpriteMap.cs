@@ -15,27 +15,26 @@ namespace MapDesigner
 {
     class SpriteMap
     {
-        private int tileWidth;
-        private int tileHeight;
-        private int nx;
-        private int ny;
+        private readonly ISprite[,] spriteCache;
 
-        private ISprite[,] spriteCache;
-
-        public Texture2D Texture { get; private set; }
+        public Texture2D Texture { get; }
+        public int TileWidth { get; }
+        public int TileHeight { get; }
+        public int SizeX { get; }
+        public int SizeY { get; }
 
         public SpriteMap(Texture2D texture, int spriteTileWidth, int spriteTileHeight)
         {
             this.Texture = texture;
-            this.tileWidth = spriteTileWidth;
-            this.tileHeight = spriteTileHeight;
+            this.TileWidth = spriteTileWidth;
+            this.TileHeight = spriteTileHeight;
 
-            this.nx = this.Texture.Width / this.tileWidth;
-            this.ny = this.Texture.Height / this.tileHeight;
-            this.spriteCache = new ISprite[nx,ny];
-            for (int y = 0; y < ny; y++)
+            this.SizeX = this.Texture.Width / this.TileWidth;
+            this.SizeY = this.Texture.Height / this.TileHeight;
+            this.spriteCache = new ISprite[SizeX,SizeY];
+            for (int y = 0; y < SizeY; y++)
             {
-                for (int x = 0; x < nx; x++)
+                for (int x = 0; x < SizeX; x++)
                 {
                     this.spriteCache[x, y] = null;
                 }
@@ -44,28 +43,28 @@ namespace MapDesigner
 
         public Rectangle Tile(int x, int y)
         {
-            return new Rectangle(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
+            return new Rectangle(x * TileWidth, y * TileHeight, TileWidth, TileHeight);
         }
 
-        public ISprite Sprite(int x, int y)
+        public ISprite Sprite(SpriteReference reference)
         {
-            if (x >= this.nx || y >= this.ny)
+            if (reference.x >= this.SizeX || reference.y >= this.SizeY)
             {
                 throw new Exception("Invalid sprite index into sprite map.");
             }
 
-            if (this.spriteCache[x, y] == null)
+            if (this.spriteCache[reference.x, reference.y] == null)
             {
-                this.spriteCache[x, y] = GenerateSpriteTile(x,y);
+                this.spriteCache[reference.x, reference.y] = GenerateSpriteTile(reference.x, reference.y);
             }
 
-            return this.spriteCache[x, y];
+            return this.spriteCache[reference.x, reference.y];
         }
 
         private Sprite GenerateSpriteTile(int x, int y)
         {
             var s = new Sprite(this.Texture);
-            s.Size = new Vector2(this.tileWidth, this.tileHeight);
+            s.Size = new Vector2(this.TileWidth, this.TileHeight);
             s.SourceRectangle = new RectangleAdaptor(this.Tile(x, y));
             return s;
         }
