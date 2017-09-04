@@ -22,7 +22,7 @@ namespace HubSceene
             //door.Action = new GameAction(ActionType.Teleport);
         }
 
-        public override void ProcessInput(double gameTimeMsec, InputMask inputMask)
+        public override void ProcessInput(float timestep, InputMask inputMask)
         {
             if (UI.HasActiveDialog)
             {
@@ -65,8 +65,8 @@ namespace HubSceene
         public override void Render(double gameTimeMsec)
         {
             Renderer.Clear(Color.Black);
-            Renderer.RenderOpagueSprite(door.Sprite, doorPosition);
-            Renderer.RenderOpagueSprite(player.Sprite, playerPosition);
+            Renderer.RenderOpagueSprite(door.Sprite, doorPosition, door.Sprite.Size);
+            Renderer.RenderOpagueSprite(player.Sprite, playerPosition, player.Sprite.Size);
         }
 
         public override void Deactivate()

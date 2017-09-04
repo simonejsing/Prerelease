@@ -23,7 +23,7 @@ namespace Contracts
             this.ActionQueue = actionQueue;
         }
 
-        public abstract void ProcessInput(double gameTimeMsec, InputMask inputMask);
+        public abstract void ProcessInput(float timestep, InputMask inputMask);
 
         public virtual void Activate()
         {

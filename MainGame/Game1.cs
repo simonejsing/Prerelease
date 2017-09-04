@@ -59,7 +59,6 @@ namespace Prerelease.Main
             actionMap = new Action[Enum.GetNames(typeof(ActionType)).Length];
 
             actionMap[(int)ActionType.Quit] = this.Exit;
-            actionMap[(int)ActionType.NewGame] = this.NewGame;
         }
 
         /// <summary>
@@ -74,7 +73,8 @@ namespace Prerelease.Main
             var scope = renderer.ActivateScope("Debug");
             debugFont = scope.LoadFont("ConsoleFont");
 
-            this.activeSceene = LoadSceene("Menu");
+            this.activeSceene = new PlatformerSceene(renderer, userInterface, actionQueue);
+            this.activeSceene.Activate();
         }
 
         /// <summary>
@@ -86,6 +86,9 @@ namespace Prerelease.Main
             // TODO: Unload any non ContentManager content here
         }
 
+        private float renderElapsedTimeMsec = 0;
+        const float msecPerFrame = 1000.0f / 60.0f;
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -93,6 +96,16 @@ namespace Prerelease.Main
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            // Cap at 60 fps
+            /*renderElapsedTimeMsec += gameTime.ElapsedGameTime.Milliseconds;
+            if (renderElapsedTimeMsec < msecPerFrame)
+            {
+                return;
+            }
+            renderElapsedTimeMsec -= msecPerFrame;*/
+
+            var timestep = gameTime.ElapsedGameTime.Milliseconds/msecPerFrame;
+
             updateFrame++;
 
             var time = (float)gameTime.TotalGameTime.TotalSeconds;
@@ -100,7 +113,7 @@ namespace Prerelease.Main
 
             currentInputs = MergeInputs();
             inputMask.Apply(currentInputs);
-            activeSceene.ProcessInput(gameTime.TotalGameTime.TotalMilliseconds, inputMask);
+            activeSceene.ProcessInput(timestep, inputMask);
             userInterface.Update(inputMask);
 
             ProcessActions();
@@ -153,32 +166,6 @@ namespace Prerelease.Main
             renderer.End();
 
             base.Draw(gameTime);
-        }
-
-        private void NewGame()
-        {
-            this.activeSceene = LoadSceene("Hub");
-        }
-
-        private ISceene LoadSceene(string sceeneName)
-        {
-            activeSceene?.Deactivate();
-            var sceene = CreateSceene(sceeneName);
-            sceene.Activate();
-            return sceene;
-        }
-
-        private ISceene CreateSceene(string sceeneName)
-        {
-            switch (sceeneName)
-            {
-                case "Menu":
-                    return new GameMenu(renderer, actionQueue);
-                case "Hub":
-                    return new HubSceeneFactory().Create(renderer, userInterface, actionQueue);
-                default:
-                    throw new Exception(string.Format("Attempt to load unknown sceene '{0}'.", sceeneName));
-            }
         }
 
         private void ProcessActions()

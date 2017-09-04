@@ -29,7 +29,7 @@ namespace Prerelease.Main
         }
 
         private int resetFrameCounter = 0;
-        public override void ProcessInput(double gameTimeMsec, InputMask inputMask)
+        public override void ProcessInput(float timestep, InputMask inputMask)
         {
             if (resetFrameCounter > 0)
             {

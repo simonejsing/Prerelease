@@ -3,7 +3,7 @@ using VectorMath;
 
 namespace HubSceene
 {
-    internal class SceeneObject
+    public class SceeneObject
     {
         private readonly ActionQueue actionQueue;
 
