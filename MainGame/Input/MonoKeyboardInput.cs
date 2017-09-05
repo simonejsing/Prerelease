@@ -23,7 +23,13 @@ namespace Prerelease.Main.Input
             currentInputs.Up = Up();
             currentInputs.Down = Down();
             currentInputs.Select = Select();
+            currentInputs.Restart = Restart();
             return currentInputs;
+        }
+
+        private bool Restart()
+        {
+            return pressedKeys.Contains(Keys.Space);
         }
 
         public bool Left()

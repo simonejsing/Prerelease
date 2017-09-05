@@ -11,18 +11,18 @@ namespace HubSceene
 {
     public class HubSceene : Sceene
     {
-        private SceeneObject player, door;
+        private Object player, door;
         private Vector2 playerPosition = new Vector2();
         private Vector2 doorPosition = new Vector2();
 
         public HubSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue) : base("Hub", renderer, ui, actionQueue)
         {
-            player = new SceeneObject(actionQueue);
-            door = new SceeneObject(actionQueue);
+            player = new Object(actionQueue);
+            door = new Object(actionQueue);
             //door.Action = new GameAction(ActionType.Teleport);
         }
 
-        public override void ProcessInput(float timestep, InputMask inputMask)
+        public override void Update(float timestep, InputMask inputMask)
         {
             if (UI.HasActiveDialog)
             {
@@ -74,7 +74,7 @@ namespace HubSceene
             base.Deactivate();
         }
 
-        private void InvokeObjectUnder(SceeneObject obj)
+        private void InvokeObjectUnder(Object obj)
         {
 /*            if (obj.Sprite.Rect.PointInside(door.Sprite.Rect.Center))
             {

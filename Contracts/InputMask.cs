@@ -7,6 +7,7 @@
         public bool Up;
         public bool Down;
         public bool Select;
+        public bool Restart;
     }
 
     public class InputMask
@@ -25,6 +26,7 @@
             Input.Up |= gameInput.Up;
             Input.Down |= gameInput.Down;
             Input.Select |= gameInput.Select;
+            Input.Restart |= gameInput.Restart;
         }
 
         public void Reset()
@@ -34,6 +36,7 @@
             Input.Up = false;
             Input.Down = false;
             Input.Select = false;
+            Input.Restart = false;
         }
     }
 }

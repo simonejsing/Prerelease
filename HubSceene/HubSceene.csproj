@@ -51,7 +51,6 @@
     <Compile Include="HubSceeneFactory.cs" />
     <Compile Include="NoOne.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SceeneObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Content\Dialog\Dialog1.txt" />

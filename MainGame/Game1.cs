@@ -31,6 +31,10 @@ namespace Prerelease.Main
         private int updateFrame = 0;
         private int renderFrame = 0;
 
+        private float renderElapsedTimeMsec = 0;
+        private const float fps = 60.0f;
+        private const float msecPerFrame = 1000.0f / fps;
+
         public Game1()
         {
             keyboard = new MonoKeyboardInput();
@@ -40,6 +44,8 @@ namespace Prerelease.Main
             graphics.ToggleFullScreen();
 
             Content.RootDirectory = "Content";
+
+            TargetElapsedTime = new TimeSpan(0, 0, 0, 0, (int)msecPerFrame);
         }
 
         /// <summary>
@@ -86,9 +92,6 @@ namespace Prerelease.Main
             // TODO: Unload any non ContentManager content here
         }
 
-        private float renderElapsedTimeMsec = 0;
-        const float msecPerFrame = 1000.0f / 60.0f;
-
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -113,7 +116,7 @@ namespace Prerelease.Main
 
             currentInputs = MergeInputs();
             inputMask.Apply(currentInputs);
-            activeSceene.ProcessInput(timestep, inputMask);
+            activeSceene.Update(timestep, inputMask);
             userInterface.Update(inputMask);
 
             ProcessActions();

@@ -23,7 +23,13 @@ namespace Prerelease.Main.Input
             currentInputs.Up = Up();
             currentInputs.Down = Down();
             currentInputs.Select = Select();
+            currentInputs.Restart = Restart();
             return currentInputs;
+        }
+
+        private bool Restart()
+        {
+            return state.Buttons.Start == ButtonState.Pressed;
         }
 
         private bool Left()
@@ -38,7 +44,8 @@ namespace Prerelease.Main.Input
 
         private bool Up()
         {
-            return state.ThumbSticks.Left.Y > 0.0;
+            //return state.ThumbSticks.Left.Y > 0.0;
+            return state.Buttons.A == ButtonState.Pressed;
         }
 
         private bool Down()
