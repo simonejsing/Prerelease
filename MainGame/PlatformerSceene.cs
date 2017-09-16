@@ -242,7 +242,7 @@ namespace Prerelease.Main
                 }
             }
 
-            foreach (var player in players.Where(p => p.Active))l
+            foreach (var player in players.Where(p => p.Active))
             {
                 Renderer.RenderOpagueSprite(player.Sprite, player.Position, player.Size);
             }
