@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Contracts;
 
-namespace HubSceene
+namespace Prerelease.Main
 {
     public class CompletedDialog : IDialog
     {

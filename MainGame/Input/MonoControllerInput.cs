@@ -18,6 +18,7 @@ namespace Prerelease.Main.Input
         public InputSet ReadInput()
         {
             state = GamePad.GetState(index);
+            currentInputs.Active = state.IsConnected;
             currentInputs.Left = Left();
             currentInputs.Right = Right();
             currentInputs.Up = Up();
@@ -55,7 +56,7 @@ namespace Prerelease.Main.Input
 
         private bool Select()
         {
-            return state.Buttons.A == ButtonState.Pressed;
+            return state.Buttons.Y == ButtonState.Pressed;
         }
     }
 }

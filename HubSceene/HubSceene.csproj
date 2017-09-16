@@ -45,11 +45,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompletedDialog.cs" />
     <Compile Include="Dialog.cs" />
     <Compile Include="HubSceene.cs" />
     <Compile Include="HubSceeneFactory.cs" />
-    <Compile Include="NoOne.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,6 +2,7 @@
 {
     public struct InputSet
     {
+        public bool Active;
         public bool Left;
         public bool Right;
         public bool Up;
@@ -21,6 +22,7 @@
 
         public void Apply(InputSet gameInput)
         {
+            Input.Active |= gameInput.Active;
             Input.Left |= gameInput.Left;
             Input.Right |= gameInput.Right;
             Input.Up |= gameInput.Up;
@@ -31,6 +33,7 @@
 
         public void Reset()
         {
+            Input.Active = false;
             Input.Left = false;
             Input.Right = false;
             Input.Up = false;

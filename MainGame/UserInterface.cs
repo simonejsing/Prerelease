@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Windows.UI.Xaml.Navigation;
 using Contracts;
-using HubSceene;
 using VectorMath;
 
 namespace Prerelease.Main
@@ -40,7 +39,7 @@ namespace Prerelease.Main
         }
 
         private int resetFrameCounter = 0;
-        public void Update(InputMask inputMask)
+        public void Update(InputMask[] inputMasks)
         {
             if (currentDialog.Completed)
             {
@@ -51,10 +50,10 @@ namespace Prerelease.Main
             if (resetFrameCounter > 0)
             {
                 resetFrameCounter--;
-                inputMask.Reset();
+                inputMasks[0].Reset();
                 return;
             }
-            if (inputMask.Input.Select)
+            if (inputMasks[0].Input.Select)
             {
                 PageDialog();
                 resetFrameCounter = 10;

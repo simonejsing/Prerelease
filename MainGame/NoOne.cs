@@ -1,6 +1,6 @@
 ﻿using Contracts;
 
-namespace HubSceene
+namespace Prerelease.Main
 {
     public class NoOne : ICharacter
     {

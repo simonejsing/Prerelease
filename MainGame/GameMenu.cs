@@ -29,26 +29,26 @@ namespace Prerelease.Main
         }
 
         private int resetFrameCounter = 0;
-        public override void Update(float timestep, InputMask inputMask)
+        public override void Update(float timestep, InputMask[] inputMasks)
         {
             if (resetFrameCounter > 0)
             {
                 resetFrameCounter--;
-                inputMask.Reset();
+                inputMasks[0].Reset();
                 return;
             }
 
-            if (inputMask.Input.Up)
+            if (inputMasks[0].Input.Up)
             {
                 selectedOption = selectedOption == 0 ? 0 : selectedOption - 1;
                 resetFrameCounter = 10;
             }
-            if (inputMask.Input.Down)
+            if (inputMasks[0].Input.Down)
             {
                 selectedOption = selectedOption == mainMenu.Length - 1 ? mainMenu.Length - 1 : selectedOption + 1;
                 resetFrameCounter = 10;
             }
-            if (inputMask.Input.Select)
+            if (inputMasks[0].Input.Select)
             {
                 DispatchCurrentMenuAction();
                 resetFrameCounter = 10;

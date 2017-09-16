@@ -23,7 +23,7 @@ namespace Contracts
             this.ActionQueue = actionQueue;
         }
 
-        public abstract void Update(float timestep, InputMask inputMask);
+        public abstract void Update(float timestep, InputMask[] inputMasks);
 
         public virtual void Activate()
         {

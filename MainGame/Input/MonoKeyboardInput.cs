@@ -18,6 +18,7 @@ namespace Prerelease.Main.Input
         {
             KeyboardState kbState = Keyboard.GetState();
             pressedKeys = kbState.GetPressedKeys();
+            currentInputs.Active = true;
             currentInputs.Left = Left();
             currentInputs.Right = Right();
             currentInputs.Up = Up();

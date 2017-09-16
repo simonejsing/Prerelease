@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Contracts;
 using Prerelease.Main.Physics;
 using VectorMath;
@@ -7,7 +8,7 @@ namespace Prerelease.Main
 {
     public class PlatformerSceene : Sceene
     {
-        private MovableObject player;
+        private PlayerObject[] players;
         private BlockGrid blocks;
         private ISprite blockSprite;
 
@@ -18,7 +19,14 @@ namespace Prerelease.Main
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue)
             : base("Platformer", renderer, ui, actionQueue)
         {
-            player = new MovableObject(actionQueue, Vector2.Zero, new Vector2(30, 30));
+            players = new[]
+            {
+                new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Red),
+                new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Green),
+                new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Blue),
+                new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Yellow),
+            };
+
             blocks = new BlockGrid(30, 30, 100, 100);
             for (uint i = 0; i < 40; i++)
             {
@@ -45,18 +53,33 @@ namespace Prerelease.Main
             base.Activate();
 
             // Load content in active scope.
-            player.Sprite = LoadSprite("Chicken");
             blockSprite = LoadSprite("Block");
-            player.Sprite.Size = new Vector2(30, 30);
+            foreach (var player in players)
+            {
+                player.Sprite = LoadSprite("Chicken");
+                player.Sprite.Size = new Vector2(30, 30);
+            }
         }
 
-        readonly Vector2 acceleration = Vector2.Zero;
+        public override void Update(float timestep, InputMask[] inputMasks)
+        {
+            for (var i = 0; i < players.Length; i++)
+            {
+                HandlePlayerInput(players[i], inputMasks[i], timestep);
+            }
+        }
+
         readonly Vector2 instantVelocity = Vector2.Zero;
 
-        public override void Update(float timestep, InputMask inputMask)
+        private void HandlePlayerInput(PlayerObject player, InputMask inputMask, float timestep)
         {
-            acceleration.Clear();
+            player.Active = inputMask.Input.Active;
+            if (!inputMask.Input.Active)
+                return;
+
             instantVelocity.Clear();
+
+            player.Acceleration.Clear();
 
             if (inputMask.Input.Restart)
             {
@@ -75,11 +98,11 @@ namespace Prerelease.Main
             var horizontalControl = player.CanAccelerate ? 0.5f : 0.1f;
             if (inputMask.Input.Left)
             {
-                acceleration.X -= horizontalControl;
+                player.Acceleration.X -= horizontalControl;
             }
             if (inputMask.Input.Right)
             {
-                acceleration.X += horizontalControl;
+                player.Acceleration.X += horizontalControl;
             }
 
             if (inputMask.Input.Select)
@@ -88,10 +111,10 @@ namespace Prerelease.Main
             inputMask.Reset();
 
             // Apply gravity
-            acceleration.Y += Gravity;
+            player.Acceleration.Y += Gravity;
 
             // Accelerate player
-            player.Velocity += instantVelocity + acceleration * timestep;
+            player.Velocity += instantVelocity + player.Acceleration * timestep;
 
             // Cap velocity
             if (Math.Abs(player.Velocity.Y) > MaxVerticalVelocity)
@@ -219,7 +242,10 @@ namespace Prerelease.Main
                 }
             }
 
-            Renderer.RenderOpagueSprite(player.Sprite, player.Position, player.Size);
+            foreach (var player in players.Where(p => p.Active))l
+            {
+                Renderer.RenderOpagueSprite(player.Sprite, player.Position, player.Size);
+            }
         }
     }
 }

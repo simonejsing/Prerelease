@@ -111,6 +111,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CompletedDialog.cs" />
+    <Compile Include="NoOne.cs" />
     <Compile Include="Physics\BlockGrid.cs" />
     <Compile Include="DialogPage.cs" />
     <Compile Include="GameMenu.cs" />
@@ -124,6 +126,7 @@
     <Compile Include="Physics\ICollidableObject.cs" />
     <Compile Include="Physics\MovableObject.cs" />
     <Compile Include="Physics\Object.cs" />
+    <Compile Include="Physics\PlayerObject.cs" />
     <Compile Include="PlatformerSceene.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInterface.cs" />
@@ -152,10 +155,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HubSceene\HubSceene.csproj">
-      <Project>{b6e0c030-09d0-453a-8229-851a2d3d4776}</Project>
-      <Name>HubSceene</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Contracts\Contracts.csproj">
       <Project>{1b4e6f20-64f7-4912-bf4a-4ccdf2420ccc}</Project>
       <Name>Contracts</Name>

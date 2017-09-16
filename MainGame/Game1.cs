@@ -1,6 +1,5 @@
 ﻿using System;
 using Contracts;
-using HubSceene;
 using Microsoft.Xna.Framework;
 using Prerelease.Main.Input;
 using Renderer;
@@ -18,9 +17,15 @@ namespace Prerelease.Main
 
         private ISceene activeSceene = null;
         private readonly IMonoInput keyboard;
-        private readonly IMonoInput controller;
+        private readonly IMonoInput[] controllers;
         private readonly InputMask inputMergeMask = new InputMask();
-        private readonly InputMask inputMask = new InputMask();
+        private readonly InputMask[] inputMasks = new InputMask[4]
+        {
+            new InputMask(),
+            new InputMask(),
+            new InputMask(),
+            new InputMask(),
+        };
         private readonly ActionQueue actionQueue = new ActionQueue();
         private Action[] actionMap;
         
@@ -31,14 +36,21 @@ namespace Prerelease.Main
         private int updateFrame = 0;
         private int renderFrame = 0;
 
-        private float renderElapsedTimeMsec = 0;
         private const float fps = 60.0f;
         private const float msecPerFrame = 1000.0f / fps;
 
         public Game1()
         {
+            IsMouseVisible = false;
+
             keyboard = new MonoKeyboardInput();
-            controller = new MonoControllerInput(PlayerIndex.One);
+            controllers = new[]
+            {
+                new MonoControllerInput(PlayerIndex.One),
+                new MonoControllerInput(PlayerIndex.Two),
+                new MonoControllerInput(PlayerIndex.Three),
+                new MonoControllerInput(PlayerIndex.Four),
+            };
 
             var graphics = new GraphicsDeviceManager(this);
             graphics.ToggleFullScreen();
@@ -114,10 +126,13 @@ namespace Prerelease.Main
             var time = (float)gameTime.TotalGameTime.TotalSeconds;
             var deltaT = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            currentInputs = MergeInputs();
-            inputMask.Apply(currentInputs);
-            activeSceene.Update(timestep, inputMask);
-            userInterface.Update(inputMask);
+            currentInputs = MergeInputs(keyboard, controllers[1]);
+            inputMasks[0].Apply(currentInputs);
+            inputMasks[1].Apply(controllers[0].ReadInput());
+            inputMasks[2].Apply(controllers[2].ReadInput());
+            inputMasks[3].Apply(controllers[3].ReadInput());
+            activeSceene.Update(timestep, inputMasks);
+            userInterface.Update(inputMasks);
 
             ProcessActions();
 
@@ -128,11 +143,13 @@ namespace Prerelease.Main
         /// Merges inputs from keyboard and controller to support both input types at the same time.
         /// </summary>
         /// <returns>The merged input set.</returns>
-        private InputSet MergeInputs()
+        private InputSet MergeInputs(params IMonoInput[] inputs)
         {
             inputMergeMask.Reset();
-            inputMergeMask.Apply(keyboard.ReadInput());
-            inputMergeMask.Apply(controller.ReadInput());
+            foreach (var input in inputs)
+            {
+                inputMergeMask.Apply(input.ReadInput());
+            }
             return inputMergeMask.Input;
         }
 
@@ -158,11 +175,11 @@ namespace Prerelease.Main
                         "U/D: {0}/{1} [{2}{3}{4}{5}{6}]",
                         updateFrame,
                         renderFrame,
-                        inputMask.Input.Left ? "L" : (currentInputs.Left ? "l" : "-"),
-                        inputMask.Input.Right ? "R" : (currentInputs.Right ? "r" : "-"),
-                        inputMask.Input.Up ? "U" : (currentInputs.Up ? "u" : "-"),
-                        inputMask.Input.Down ? "D" : (currentInputs.Down ? "d" : "-"),
-                        inputMask.Input.Select ? "S" : (currentInputs.Select ? "s" : "-")),
+                        inputMasks[0].Input.Left ? "L" : (currentInputs.Left ? "l" : "-"),
+                        inputMasks[0].Input.Right ? "R" : (currentInputs.Right ? "r" : "-"),
+                        inputMasks[0].Input.Up ? "U" : (currentInputs.Up ? "u" : "-"),
+                        inputMasks[0].Input.Down ? "D" : (currentInputs.Down ? "d" : "-"),
+                        inputMasks[0].Input.Select ? "S" : (currentInputs.Select ? "s" : "-")),
                     Color.Red);
             }
 
