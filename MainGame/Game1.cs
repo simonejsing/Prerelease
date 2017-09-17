@@ -172,13 +172,14 @@ namespace Prerelease.Main
                     debugFont,
                     Vector2.Zero,
                     string.Format(
-                        "U/D: {0}/{1} [{2}{3}{4}{5}{6}]",
+                        "U/D: {0}/{1} [{2}{3}{4}{5}{6}{7}]",
                         updateFrame,
                         renderFrame,
                         inputMasks[0].Input.Left ? "L" : (currentInputs.Left ? "l" : "-"),
                         inputMasks[0].Input.Right ? "R" : (currentInputs.Right ? "r" : "-"),
                         inputMasks[0].Input.Up ? "U" : (currentInputs.Up ? "u" : "-"),
                         inputMasks[0].Input.Down ? "D" : (currentInputs.Down ? "d" : "-"),
+                        inputMasks[0].Input.Fire ? "F" : (currentInputs.Fire ? "f" : "-"),
                         inputMasks[0].Input.Select ? "S" : (currentInputs.Select ? "s" : "-")),
                     Color.Red);
             }

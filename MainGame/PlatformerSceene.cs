@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Contracts;
 using Prerelease.Main.Physics;
@@ -8,9 +9,11 @@ namespace Prerelease.Main
 {
     public class PlatformerSceene : Sceene
     {
+        private ActionQueue actionQueue;
         private PlayerObject[] players;
         private BlockGrid blocks;
         private ISprite blockSprite;
+        private List<Projectile> projectiles = new List<Projectile>(); 
 
         private const float Gravity = 0.1f;
         private const float MaxVerticalVelocity = 8.0f;
@@ -19,6 +22,7 @@ namespace Prerelease.Main
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue)
             : base("Platformer", renderer, ui, actionQueue)
         {
+            this.actionQueue = actionQueue;
             players = new[]
             {
                 new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Red),
@@ -61,12 +65,23 @@ namespace Prerelease.Main
             }
         }
 
+        // Use a fixed update step size.
+        const float UpdateStep = 1.0f;
+
         public override void Update(float timestep, InputMask[] inputMasks)
         {
             for (var i = 0; i < players.Length; i++)
             {
-                HandlePlayerInput(players[i], inputMasks[i], timestep);
+                HandlePlayerInput(players[i], inputMasks[i], UpdateStep);
             }
+
+            foreach (var projectile in projectiles)
+            {
+                projectile.Update(UpdateStep);
+            }
+
+            // Delete expired projectiles
+            projectiles = projectiles.Where(p => !p.Expired).ToList();
         }
 
         readonly Vector2 instantVelocity = Vector2.Zero;
@@ -85,6 +100,7 @@ namespace Prerelease.Main
             {
                 player.Position.Clear();
                 player.Velocity.Clear();
+                player.Weapon.Cooldown = 0;
             }
 
             if (player.CanAccelerate)
@@ -99,15 +115,25 @@ namespace Prerelease.Main
             if (inputMask.Input.Left)
             {
                 player.Acceleration.X -= horizontalControl;
+                player.Facing.X = -1;
             }
             if (inputMask.Input.Right)
             {
                 player.Acceleration.X += horizontalControl;
+                player.Facing.X = 1;
             }
 
             if (inputMask.Input.Select)
             {
             }
+
+            if (inputMask.Input.Fire && player.Weapon.CanFire)
+            {
+                projectiles.Add(FireWeapon(player));
+            }
+
+            player.Weapon.Update(timestep);
+
             inputMask.Reset();
 
             // Apply gravity
@@ -131,6 +157,12 @@ namespace Prerelease.Main
 
             // Move player
             player.Position += deltaPosition;
+        }
+
+        private Projectile FireWeapon(PlayerObject player)
+        {
+            player.Weapon.Cooldown = 10;
+            return new Projectile(actionQueue, player, player.Position, new Vector2(5.0f*player.Facing.X, 0.0f), new Vector2(1,1));
         }
 
         private ICollidableObject[] neighboringBlocks = null;
@@ -245,6 +277,11 @@ namespace Prerelease.Main
             foreach (var player in players.Where(p => p.Active))
             {
                 Renderer.RenderOpagueSprite(player.Sprite, player.Position, player.Size);
+            }
+
+            foreach (var projectile in projectiles)
+            {
+                Renderer.RenderRectangle(projectile.Position, projectile.Size, Color.Red);
             }
         }
     }

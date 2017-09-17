@@ -23,6 +23,7 @@ namespace Prerelease.Main.Input
             currentInputs.Right = Right();
             currentInputs.Up = Up();
             currentInputs.Down = Down();
+            currentInputs.Fire = Fire();
             currentInputs.Select = Select();
             currentInputs.Restart = Restart();
             return currentInputs;
@@ -51,6 +52,11 @@ namespace Prerelease.Main.Input
         public bool Down()
         {
             return pressedKeys.Contains(Keys.S);
+        }
+
+        public bool Fire()
+        {
+            return pressedKeys.Contains(Keys.E);
         }
 
         public bool Select()
