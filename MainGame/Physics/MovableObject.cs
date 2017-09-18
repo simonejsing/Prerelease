@@ -4,12 +4,13 @@ using Object = Prerelease.Main.Physics.Object;
 
 namespace Prerelease.Main.Physics
 {
-    public class MovableObject : Object
+    public class MovableObject : Object, ICollidableObject
     {
         public bool CanAccelerate { get; set; }
         public Vector2 Acceleration { get; set; }
         public Vector2 Velocity { get; set; }
         public UnitVector2 Facing { get; set; }
+        public bool Occupied => true;
 
         public MovableObject(ActionQueue actionQueue, Vector2 startingPosition, Vector2 size) : base(actionQueue, startingPosition, size)
         {

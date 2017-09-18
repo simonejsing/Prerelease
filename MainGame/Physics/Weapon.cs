@@ -5,7 +5,7 @@
         public bool CanFire => Cooldown <= 0;
         public int Cooldown { get; set; }
 
-        public void Update(float timestep)
+        public void Update()
         {
             if(Cooldown > 0)
                 Cooldown--;

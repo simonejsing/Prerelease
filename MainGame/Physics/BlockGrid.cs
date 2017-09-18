@@ -6,11 +6,13 @@ namespace Prerelease.Main.Physics
 {
     public struct Block : ICollidableObject
     {
-        public IReadonlyVector Position { get; set; }
+        public Vector2 Position { get; set; }
+        public Vector2 Size { get; set; }
+        public Vector2 Center => Position + 0.5f*Size;
         public bool Occupied { get; set; }
     }
 
-    public class BlockGrid
+    public class BlockGrid : ICollidableObjectGrid
     {
         private readonly Block[,] grid;
 
@@ -35,7 +37,7 @@ namespace Prerelease.Main.Physics
 
         public void Insert(uint row, uint column)
         {
-            grid[row, column] = new Block() {Position = new Vector2(column * GridWidth, row * GridHeight), Occupied = true};
+            grid[row, column] = new Block() {Position = new Vector2(column * GridWidth, row * GridHeight), Size = new Vector2(GridWidth, GridHeight), Occupied = true};
             OccupiedBlocks.Add(grid[row, column]);
         }
 

@@ -4,7 +4,9 @@ namespace Prerelease.Main.Physics
 {
     public interface ICollidableObject
     {
-        IReadonlyVector Position { get; }
+        Vector2 Position { get; }
+        Vector2 Size { get; }
+        Vector2 Center { get; }
         bool Occupied { get; }
     }
 }

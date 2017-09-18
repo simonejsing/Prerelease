@@ -14,14 +14,11 @@ namespace Prerelease.Main.Physics
         public Color Color { get; }
         public Weapon Weapon { get; }
 
-        public int ProjectileCount { get; set; }
-
         public PlayerObject(ActionQueue actionQueue, Vector2 startingPosition, Vector2 size, Color color) : base(actionQueue, startingPosition, size)
         {
             Weapon = new Weapon();
             Active = false;
             Color = color;
-            ProjectileCount = 0;
         }
     }
 }

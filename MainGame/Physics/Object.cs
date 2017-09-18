@@ -12,6 +12,8 @@ namespace Prerelease.Main.Physics
         public ISprite Sprite { get; set; }
         public GameAction Action { get; set; }
 
+        public Vector2 Center => Position + 0.5f * Size;
+
         public Object(ActionQueue actionQueue, Vector2 startingPosition, Vector2 size)
         {
             this.actionQueue = actionQueue;
