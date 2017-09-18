@@ -33,8 +33,8 @@ namespace Prerelease.Main
                 new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Yellow),
             };
 
-            //crate = new MovableObject(actionQueue, new Vector2(30 * 22, 0), new Vector2(30, 30));
-            crate = new MovableObject(actionQueue, new Vector2(30 * 5, 30), new Vector2(30, 30));
+            crate = new MovableObject(actionQueue, new Vector2(30 * 22, 0), new Vector2(30, 30));
+            //crate = new MovableObject(actionQueue, new Vector2(30 * 5, 30), new Vector2(30, 30));
             crate2 = new MovableObject(actionQueue, new Vector2(30 * 2.5f, 270 - 45), new Vector2(30, 30));
 
             blocks = new BlockGrid(30, 30, 100, 100);

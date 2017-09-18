@@ -43,6 +43,7 @@ namespace Prerelease.Main.Physics
             }
 
             // Handle collisions with grid
+            obj.CanAccelerate = false;
             var deltaPosition = HandleGridCollisions(obj);
 
             // Handle collisions with collidable objects
@@ -63,63 +64,56 @@ namespace Prerelease.Main.Physics
             bool verticalCollision = false;
             bool horizontalCollision = false;
 
-            var obj_x_min = obj.Position.X;
-            var obj_x_max = obj_x_min + obj.Size.X;
-            var obj_y_min = obj.Position.Y;
-            var obj_y_max = obj_y_min + obj.Size.Y;
+            var obj_min = obj.Position;
+            var obj_max = obj_min + obj.Size;
             var obj_center = obj.Center;
-            var col_x_min = collidableObject.Position.X;
-            var col_x_max = col_x_min + collidableObject.Size.X;
-            var col_y_min = collidableObject.Position.Y;
-            var col_y_max = col_y_min + collidableObject.Size.Y;
+            var col_min = collidableObject.Position;
+            var col_max = col_min + collidableObject.Size;
 
             // If vertical overlap, then check horizontal movement
-            if (obj_y_max > col_y_min && obj_y_min < col_y_max)
+            if (obj_max.Y > col_min.Y && obj_min.Y < col_max.Y)
             {
                 // Test horizontal collision
                 // On the left moving right
-                if (obj_center.X < col_x_min && deltaPosition.X > 0)
+                if (obj_center.X < col_min.X && deltaPosition.X > 0)
                 {
-                    if (obj_x_max + deltaPosition.X > col_x_min)
+                    if (obj_max.X + deltaPosition.X > col_min.X)
                     {
                         horizontalCollision = true;
-                        deltaPosition.X = col_x_min - obj_x_max;
+                        deltaPosition.X = col_min.X - obj_max.X;
                     }
                 }
                 // On the right moving left
-                else if (obj_center.X > col_x_max && deltaPosition.X < 0)
+                else if (obj_center.X > col_max.X && deltaPosition.X < 0)
                 {
-                    if (obj_x_min + deltaPosition.X < col_x_max)
+                    if (obj_min.X + deltaPosition.X < col_max.X)
                     {
                         horizontalCollision = true;
-                        deltaPosition.X = col_x_max - obj_x_min;
+                        deltaPosition.X = col_max.X - obj_min.X;
                     }
                 }
-
-                // Can only collide with another object along one axis (because we are all boxes)
-                //return;
             }
 
             // If horizontal overlap, then check vertical movement
-            if (obj_x_max > col_x_min && obj_x_min < col_x_max)
+            if (obj_max.X > col_min.X && obj_min.X < col_max.X)
             {
                 // Test vertical collision
                 // Above moving down
-                if (obj_center.Y < col_y_min && deltaPosition.Y > 0)
+                if (obj_center.Y < col_min.Y && deltaPosition.Y > 0)
                 {
-                    if (obj_y_max + deltaPosition.Y > col_y_min)
+                    if (obj_max.Y + deltaPosition.Y > col_min.Y)
                     {
                         verticalCollision = true;
-                        deltaPosition.Y = col_y_min - obj_y_max;
+                        deltaPosition.Y = col_min.Y - obj_max.Y;
                     }
                 }
                 // Below moving up
-                else if (obj_center.Y > col_y_max && deltaPosition.Y < 0)
+                else if (obj_center.Y > col_max.Y && deltaPosition.Y < 0)
                 {
-                    if (obj_y_min + deltaPosition.Y < col_y_max)
+                    if (obj_min.Y + deltaPosition.Y < col_max.Y)
                     {
                         verticalCollision = true;
-                        deltaPosition.Y = col_y_max - obj_y_min;
+                        deltaPosition.Y = col_max.Y - obj_min.Y;
                     }
                 }
             }
@@ -214,7 +208,8 @@ namespace Prerelease.Main.Physics
             }
 
             // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
-            obj.CanAccelerate = verticalCollision && obj.Velocity.Y > 0;
+            if (verticalCollision && obj.Velocity.Y > 0)
+                obj.CanAccelerate = true;
 
             // Kill velocity if a collision occured
             if (verticalCollision)
