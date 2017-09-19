@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Contracts;
 using Prerelease.Main.Physics;
 using VectorMath;
@@ -15,7 +17,7 @@ namespace Prerelease.Main
 
         private readonly ActionQueue actionQueue;
         private readonly PlayerObject[] players;
-        private readonly BlockGrid blocks;
+        private BlockGrid blocks;
         private readonly List<Projectile> projectiles = new List<Projectile>();
         private readonly List<MovableObject> crates = new List<MovableObject>();
         private readonly PhysicsEngine physics;
@@ -33,42 +35,54 @@ namespace Prerelease.Main
                 new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Yellow),
             };
 
-            crates.Add(new MovableObject(actionQueue, new Vector2(30 * 30, 0), new Vector2(30, 30)));
-            crates.Add(new MovableObject(actionQueue, new Vector2(30 * 2.5f, 270 - 45), new Vector2(30, 30)));
+            CreateLevel();
 
-            crates.Add(new MovableObject(actionQueue, new Vector2(31 * 30, 30 * 7), new Vector2(30, 30)));
-            crates.Add(new MovableObject(actionQueue, new Vector2(32 * 30, 30 * 7), new Vector2(30, 30)));
-            crates.Add(new MovableObject(actionQueue, new Vector2(33 * 30, 30 * 7), new Vector2(30, 30)));
-
-            blocks = new BlockGrid(30, 30, 100, 100);
             physics = new PhysicsEngine(blocks, UpdateStep);
             foreach (var crate in crates)
             {
                 physics.AddMovableObject(crate);
             }
+        }
 
-            for (uint i = 0; i < 40; i++)
+        private void CreateLevel()
+        {
+            var text = ReadLevelBlocks("Level1");
+
+            var lines = text.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
+            blocks = new BlockGrid(30, 30, (uint)lines.Length, (uint)lines[0].Length);
+
+            for (uint row = 0; row < lines.Length; row++)
             {
-                blocks.Insert(10, i);
-                if (i > 15)
+                if(lines[row].Length > blocks.Columns)
+                    throw new InvalidDataException($"Row number {row} has an invalid column count {lines[row].Length}, it must not be greater than {blocks.Columns}.");
+
+                for (uint col = 0; col < lines[row].Length; col++)
                 {
-                    blocks.Insert(5, i);
+                    switch (lines[row][(int)col])
+                    {
+                        case 'x':
+                        case 'X':
+                            blocks.Insert(row, col);
+                            break;
+                        case 'c':
+                        case 'C':
+                            crates.Add(new MovableObject(actionQueue, new Vector2(30 * col, 30 * row), new Vector2(30, 30)));
+                            break;
+                    }
                 }
             }
+        }
 
-            blocks.Insert(2, 20);
-            blocks.Insert(3, 20);
-            blocks.Insert(4, 20);
+        private string ReadLevelBlocks(string levelName)
+        {
+            var assembly = GetType().GetTypeInfo().Assembly;
+            var resourceName = $"Prerelease.Main.Maps.{levelName}.blocks.txt";
 
-            blocks.Insert(9, 8);
-            blocks.Insert(9, 39);
-
-            blocks.Insert(8, 10);
-            blocks.Insert(7, 11);
-            blocks.Insert(6, 12);
-            blocks.Insert(5, 13);
-            blocks.Insert(4, 14);
-            blocks.Insert(3, 15);
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
         }
 
         public override void Activate()

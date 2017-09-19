@@ -26,6 +26,8 @@ namespace Prerelease.Main.Physics
 
         public void ApplyToObject(MovableObject obj, Vector2 instantVelocity)
         {
+            obj.DeltaPosition.Clear();
+
             // Apply gravity
             obj.Acceleration.Y += Constants.GRAVITY;
 
@@ -48,21 +50,23 @@ namespace Prerelease.Main.Physics
                 obj.Velocity.X = Math.Sign(obj.Velocity.X) * Constants.MAX_HORIZONTAL_VELOCITY;
             }
 
+            obj.DeltaPosition = obj.Velocity * timestep;
+
             // Handle collisions with grid
             obj.OnGround = false;
-            var deltaPosition = HandleGridCollisions(obj);
+            HandleGridCollisions(obj);
 
             // Handle collisions with collidable objects
             foreach (var collidableObject in movableObjects)
             {
-                HandleObjectCollision(obj, collidableObject, deltaPosition);
+                HandleObjectCollision(obj, collidableObject);
             }
 
             // Move object
-            obj.Position += deltaPosition;
+            obj.Position += obj.DeltaPosition;
         }
 
-        private static void HandleObjectCollision(MovableObject obj, MovableObject movableObject, Vector2 deltaPosition)
+        private static void HandleObjectCollision(MovableObject obj, MovableObject movableObject)
         {
             if (movableObject == obj)
                 return;
@@ -81,21 +85,21 @@ namespace Prerelease.Main.Physics
             {
                 // Test horizontal collision
                 // On the left moving right
-                if (obj_center.X < col_min.X && deltaPosition.X > 0)
+                if (obj_center.X < col_min.X && obj.DeltaPosition.X > 0)
                 {
-                    if (obj_max.X + deltaPosition.X > col_min.X)
+                    if (obj_max.X + obj.DeltaPosition.X > col_min.X)
                     {
                         horizontalCollision = true;
-                        deltaPosition.X = col_min.X - obj_max.X;
+                        obj.DeltaPosition.X = col_min.X - obj_max.X;
                     }
                 }
                 // On the right moving left
-                else if (obj_center.X > col_max.X && deltaPosition.X < 0)
+                else if (obj_center.X > col_max.X && obj.DeltaPosition.X < 0)
                 {
-                    if (obj_min.X + deltaPosition.X < col_max.X)
+                    if (obj_min.X + obj.DeltaPosition.X < col_max.X)
                     {
                         horizontalCollision = true;
-                        deltaPosition.X = col_max.X - obj_min.X;
+                        obj.DeltaPosition.X = col_max.X - obj_min.X;
                     }
                 }
             }
@@ -105,29 +109,32 @@ namespace Prerelease.Main.Physics
             {
                 // Test vertical collision
                 // Above moving down
-                if (obj_center.Y < col_min.Y && deltaPosition.Y > 0)
+                if (obj_center.Y < col_min.Y && obj.DeltaPosition.Y > 0)
                 {
-                    if (obj_max.Y + deltaPosition.Y > col_min.Y)
+                    if (obj_max.Y + obj.DeltaPosition.Y > col_min.Y)
                     {
                         verticalCollision = true;
-                        deltaPosition.Y = col_min.Y - obj_max.Y;
+                        obj.DeltaPosition.Y = col_min.Y - obj_max.Y;
                     }
                 }
                 // Below moving up
-                else if (obj_center.Y > col_max.Y && deltaPosition.Y < 0)
+                else if (obj_center.Y > col_max.Y && obj.DeltaPosition.Y < 0)
                 {
-                    if (obj_min.Y + deltaPosition.Y < col_max.Y)
+                    if (obj_min.Y + obj.DeltaPosition.Y < col_max.Y)
                     {
                         verticalCollision = true;
-                        deltaPosition.Y = col_max.Y - obj_min.Y;
+                        obj.DeltaPosition.Y = col_max.Y - obj_min.Y;
                     }
                 }
             }
 
+            movableObject.OnCollision(obj, obj.DeltaPosition);
+            obj.OnCollision(movableObject, movableObject.DeltaPosition);
+
             // Transfer momentum to movable object during collision.
             if (horizontalCollision)
             {
-                movableObject.Velocity.X += Math.Sign(deltaPosition.X)*0.5f;
+                movableObject.Velocity.X += Math.Sign(obj.DeltaPosition.X)*0.5f;
             }
 
             // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
@@ -145,11 +152,10 @@ namespace Prerelease.Main.Physics
             }
         }
 
-        private Vector2 HandleGridCollisions(MovableObject obj)
+        private void HandleGridCollisions(MovableObject obj)
         {
             var neighboringBlocks = grid.Neighbors(obj);
             var centerBlock = neighboringBlocks[4];
-            var deltaPosition = obj.Velocity * timestep;
 
             bool verticalCollision = false;
             bool horizontalCollision = false;
@@ -157,30 +163,30 @@ namespace Prerelease.Main.Physics
             // Vertical collision check
             // Check blocks 0-2 if going up
             // Check blocks 6-8 if going down
-            if (deltaPosition.Y > 0)
+            if (obj.DeltaPosition.Y > 0)
             {
                 // Going down
                 if (neighboringBlocks[7].Occupied || neighboringBlocks[7 + Math.Sign(obj.Position.X - centerBlock.Position.X)].Occupied)
                 {
                     // Check if collision emminent (the 4-index is intentional)
-                    if (deltaPosition.Y > neighboringBlocks[4].Position.Y - obj.Position.Y)
+                    if (obj.DeltaPosition.Y > neighboringBlocks[4].Position.Y - obj.Position.Y)
                     {
                         // Cap vertical movement.
-                        deltaPosition.Y = neighboringBlocks[4].Position.Y - obj.Position.Y;
+                        obj.DeltaPosition.Y = neighboringBlocks[4].Position.Y - obj.Position.Y;
                         verticalCollision = true;
                     }
                 }
             }
-            else if (deltaPosition.Y < 0)
+            else if (obj.DeltaPosition.Y < 0)
             {
                 // Going up
                 if (neighboringBlocks[1].Occupied || neighboringBlocks[1 + Math.Sign(obj.Position.X - centerBlock.Position.X)].Occupied)
                 {
                     // Check if collision emminent
-                    if (-deltaPosition.Y + obj.Size.Y > obj.Position.Y - neighboringBlocks[1].Position.Y)
+                    if (-obj.DeltaPosition.Y + obj.Size.Y > obj.Position.Y - neighboringBlocks[1].Position.Y)
                     {
                         // Cap vertical movement.
-                        deltaPosition.Y = -(obj.Position.Y - obj.Size.Y - neighboringBlocks[1].Position.Y);
+                        obj.DeltaPosition.Y = -(obj.Position.Y - obj.Size.Y - neighboringBlocks[1].Position.Y);
                         verticalCollision = true;
                     }
                 }
@@ -190,30 +196,30 @@ namespace Prerelease.Main.Physics
             // Check blocks 0,3,6 if going left
             // Check blocks 2,5,8 if going right
             // If vertical collision detected, then check only 3 and 5
-            if (deltaPosition.X < 0)
+            if (obj.DeltaPosition.X < 0)
             {
                 // Going left
                 if (neighboringBlocks[3].Occupied || (!verticalCollision && neighboringBlocks[3 + 3 * Math.Sign(obj.Position.Y - centerBlock.Position.Y)].Occupied))
                 {
                     // Check if collision emminent (the 4-index is intentional)
-                    if (-deltaPosition.X > obj.Position.X - neighboringBlocks[4].Position.X)
+                    if (-obj.DeltaPosition.X > obj.Position.X - neighboringBlocks[4].Position.X)
                     {
                         // Cap horizontal movement.
-                        deltaPosition.X = -(obj.Position.X - neighboringBlocks[4].Position.X);
+                        obj.DeltaPosition.X = -(obj.Position.X - neighboringBlocks[4].Position.X);
                         horizontalCollision = true;
                     }
                 }
             }
-            else if (deltaPosition.X > 0)
+            else if (obj.DeltaPosition.X > 0)
             {
                 // Going right
                 if (neighboringBlocks[5].Occupied || (!verticalCollision && neighboringBlocks[5 + 3 * Math.Sign(obj.Position.Y - centerBlock.Position.Y)].Occupied))
                 {
                     // Check if collision emminent
-                    if (deltaPosition.X + obj.Size.X > neighboringBlocks[5].Position.X - obj.Position.X)
+                    if (obj.DeltaPosition.X + obj.Size.X > neighboringBlocks[5].Position.X - obj.Position.X)
                     {
                         // Cap vertical movement.
-                        deltaPosition.X = neighboringBlocks[5].Position.X - obj.Position.X - obj.Size.X;
+                        obj.DeltaPosition.X = neighboringBlocks[5].Position.X - obj.Position.X - obj.Size.X;
                         horizontalCollision = true;
                     }
                 }
@@ -232,19 +238,18 @@ namespace Prerelease.Main.Physics
             {
                 obj.Velocity.X = 0;
             }
-
-            return deltaPosition;
         }
 
         public void ApplyToProjectile(Projectile projectile)
         {
             projectile.DecreaseLifespan();
-            projectile.Position += projectile.Velocity * timestep;
+            projectile.DeltaPosition = projectile.Velocity*timestep;
+            projectile.Position += projectile.DeltaPosition;
 
             var neighbors = grid.Neighbors(projectile);
             if (neighbors[4].Occupied)
             {
-                projectile.OnCollision(neighbors[5]);
+                projectile.OnCollision(neighbors[5], projectile.DeltaPosition);
                 return;
             }
 
@@ -256,8 +261,8 @@ namespace Prerelease.Main.Physics
                     projectile.Position.Y > movableObject.Position.Y &&
                     projectile.Position.Y < movableObject.Position.Y + movableObject.Size.Y)
                 {
-                    projectile.OnCollision(movableObject);
-                    movableObject.OnCollision(projectile);
+                    projectile.OnCollision(movableObject, movableObject.DeltaPosition);
+                    movableObject.OnCollision(projectile, projectile.DeltaPosition);
                     return;
                 }
             }
