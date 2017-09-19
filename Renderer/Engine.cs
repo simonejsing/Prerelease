@@ -110,16 +110,12 @@ namespace Renderer
             spriteBatch.Draw(Pixel, rect, ToXnaColor(color));
         }
 
-        public void RenderOpagueSprite(ISprite sprite, IReadonlyVector position, IReadonlyVector size = null)
+        public void RenderOpagueSprite(ISprite sprite, IReadonlyVector position, IReadonlyVector size, bool flipHorizontally = false)
         {
-            if (size == null)
-            {
-                size = sprite.Size;
-            }
             var s = (Sprite) sprite;
-            //var xnaVector = ToXnaVector(transform.Apply(position));
+            var effect = flipHorizontally ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
             Rectangle rect = new Rectangle(ToXnaPoint(transform.Apply(position)), ToXnaPoint(transform.Apply(size)));
-            spriteBatch.Draw(s.Texture, rect, ToXnaRect(s.SourceRectangle), Color.White);
+            spriteBatch.Draw(s.Texture, rect, ToXnaRect(s.SourceRectangle), Color.White, 0f, Vector2.Zero, effect, 0f);
         }
 
         private static Rectangle? ToXnaRect(IReadonlyRectangle rectangle)

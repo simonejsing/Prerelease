@@ -10,7 +10,7 @@ namespace Prerelease.Main.Physics
     public class PhysicsEngine
     {
         private readonly ICollidableObjectGrid grid;
-        private readonly List<ICollidableObject> collidableObjects = new List<ICollidableObject>();
+        private readonly List<MovableObject> movableObjects = new List<MovableObject>();
         private readonly float timestep;
 
         public PhysicsEngine(ICollidableObjectGrid grid, float timestep)
@@ -19,18 +19,24 @@ namespace Prerelease.Main.Physics
             this.timestep = timestep;
         }
 
-        public void AddCollidableObject(ICollidableObject obj)
+        public void AddMovableObject(MovableObject obj)
         {
-            collidableObjects.Add(obj);
+            movableObjects.Add(obj);
         }
 
-        public void Apply(MovableObject obj, Vector2 instantVelocity)
+        public void ApplyToObject(MovableObject obj, Vector2 instantVelocity)
         {
             // Apply gravity
             obj.Acceleration.Y += Constants.GRAVITY;
 
             // Accelerate object
             obj.Velocity += instantVelocity + obj.Acceleration * timestep;
+
+            // Slow down object when on ground
+            if (obj.OnGround)
+            {
+                obj.Velocity.X *= 0.9f;
+            }
 
             // Cap velocity
             if (Math.Abs(obj.Velocity.Y) > Constants.MAX_VERTICAL_VELOCITY)
@@ -43,11 +49,11 @@ namespace Prerelease.Main.Physics
             }
 
             // Handle collisions with grid
-            obj.CanAccelerate = false;
+            obj.OnGround = false;
             var deltaPosition = HandleGridCollisions(obj);
 
             // Handle collisions with collidable objects
-            foreach (var collidableObject in collidableObjects)
+            foreach (var collidableObject in movableObjects)
             {
                 HandleObjectCollision(obj, collidableObject, deltaPosition);
             }
@@ -56,9 +62,9 @@ namespace Prerelease.Main.Physics
             obj.Position += deltaPosition;
         }
 
-        private static void HandleObjectCollision(MovableObject obj, ICollidableObject collidableObject, Vector2 deltaPosition)
+        private static void HandleObjectCollision(MovableObject obj, MovableObject movableObject, Vector2 deltaPosition)
         {
-            if (collidableObject == obj)
+            if (movableObject == obj)
                 return;
 
             bool verticalCollision = false;
@@ -67,8 +73,8 @@ namespace Prerelease.Main.Physics
             var obj_min = obj.Position;
             var obj_max = obj_min + obj.Size;
             var obj_center = obj.Center;
-            var col_min = collidableObject.Position;
-            var col_max = col_min + collidableObject.Size;
+            var col_min = movableObject.Position;
+            var col_max = col_min + movableObject.Size;
 
             // If vertical overlap, then check horizontal movement
             if (obj_max.Y > col_min.Y && obj_min.Y < col_max.Y)
@@ -118,9 +124,15 @@ namespace Prerelease.Main.Physics
                 }
             }
 
+            // Transfer momentum to movable object during collision.
+            if (horizontalCollision)
+            {
+                movableObject.Velocity.X += Math.Sign(deltaPosition.X)*0.5f;
+            }
+
             // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
             if (verticalCollision && obj.Velocity.Y > 0)
-                obj.CanAccelerate = true;
+                obj.OnGround = true;
 
             // Kill velocity if a collision occured
             if (verticalCollision)
@@ -209,7 +221,7 @@ namespace Prerelease.Main.Physics
 
             // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
             if (verticalCollision && obj.Velocity.Y > 0)
-                obj.CanAccelerate = true;
+                obj.OnGround = true;
 
             // Kill velocity if a collision occured
             if (verticalCollision)
@@ -222,6 +234,33 @@ namespace Prerelease.Main.Physics
             }
 
             return deltaPosition;
+        }
+
+        public void ApplyToProjectile(Projectile projectile)
+        {
+            projectile.DecreaseLifespan();
+            projectile.Position += projectile.Velocity * timestep;
+
+            var neighbors = grid.Neighbors(projectile);
+            if (neighbors[4].Occupied)
+            {
+                projectile.OnCollision(neighbors[5]);
+                return;
+            }
+
+            foreach (var movableObject in movableObjects)
+            {
+                if (
+                    projectile.Position.X > movableObject.Position.X &&
+                    projectile.Position.X < movableObject.Position.X + movableObject.Size.X &&
+                    projectile.Position.Y > movableObject.Position.Y &&
+                    projectile.Position.Y < movableObject.Position.Y + movableObject.Size.Y)
+                {
+                    projectile.OnCollision(movableObject);
+                    movableObject.OnCollision(projectile);
+                    return;
+                }
+            }
         }
     }
 }

@@ -74,7 +74,7 @@ namespace MapDesigner
                 {
                     reference.y = y;
                     var lastSprite = palette.Sprite(reference);
-                    renderer.RenderOpagueSprite(lastSprite, offset);
+                    renderer.RenderOpagueSprite(lastSprite, offset, lastSprite.Size);
                     offset.Y += lastSprite.Size.Y;
                 }
             });

@@ -12,7 +12,7 @@ namespace Contracts
         void DrawLine(IReadonlyVector point, float length, float angle, Color color, float thickness);
         void RenderPixel(IReadonlyVector position, Color color);
         void RenderRectangle(IReadonlyVector position, IReadonlyVector size, Color color);
-        void RenderOpagueSprite(ISprite sprite, IReadonlyVector position, IReadonlyVector size);
+        void RenderOpagueSprite(ISprite sprite, IReadonlyVector position, IReadonlyVector size, bool flipHorizontally = false);
         void RenderText(IFont font, IReadonlyVector position, string text, Color color);
         void RenderText(IFont font, IReadonlyVector position, string text, Color color, float rotation, IReadonlyVector origin, IReadonlyVector scale, float layerDepth = 0f);
         IRenderScope ActivateScope(string scopeName);

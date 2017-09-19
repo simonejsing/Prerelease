@@ -17,9 +17,9 @@ namespace Prerelease.Main
         private readonly PlayerObject[] players;
         private readonly BlockGrid blocks;
         private readonly List<Projectile> projectiles = new List<Projectile>();
-        private readonly MovableObject crate, crate2;
+        private readonly List<MovableObject> crates = new List<MovableObject>();
         private readonly PhysicsEngine physics;
-        private ISprite blockSprite;
+        private ISprite blockSprite, crateSprite;
 
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue)
             : base("Platformer", renderer, ui, actionQueue)
@@ -33,14 +33,19 @@ namespace Prerelease.Main
                 new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Yellow),
             };
 
-            crate = new MovableObject(actionQueue, new Vector2(30 * 22, 0), new Vector2(30, 30));
-            //crate = new MovableObject(actionQueue, new Vector2(30 * 5, 30), new Vector2(30, 30));
-            crate2 = new MovableObject(actionQueue, new Vector2(30 * 2.5f, 270 - 45), new Vector2(30, 30));
+            crates.Add(new MovableObject(actionQueue, new Vector2(30 * 30, 0), new Vector2(30, 30)));
+            crates.Add(new MovableObject(actionQueue, new Vector2(30 * 2.5f, 270 - 45), new Vector2(30, 30)));
+
+            crates.Add(new MovableObject(actionQueue, new Vector2(31 * 30, 30 * 7), new Vector2(30, 30)));
+            crates.Add(new MovableObject(actionQueue, new Vector2(32 * 30, 30 * 7), new Vector2(30, 30)));
+            crates.Add(new MovableObject(actionQueue, new Vector2(33 * 30, 30 * 7), new Vector2(30, 30)));
 
             blocks = new BlockGrid(30, 30, 100, 100);
             physics = new PhysicsEngine(blocks, UpdateStep);
-            physics.AddCollidableObject(crate);
-            physics.AddCollidableObject(crate2);
+            foreach (var crate in crates)
+            {
+                physics.AddMovableObject(crate);
+            }
 
             for (uint i = 0; i < 40; i++)
             {
@@ -72,6 +77,7 @@ namespace Prerelease.Main
 
             // Load content in active scope.
             blockSprite = LoadSprite("Block");
+            crateSprite = LoadSprite("Crate");
             foreach (var player in players)
             {
                 player.Sprite = LoadSprite("Chicken");
@@ -87,11 +93,14 @@ namespace Prerelease.Main
             }
 
             // Apply physics to crate.
-            physics.Apply(crate, ZeroVector);
+            foreach (var crate in crates)
+            {
+                physics.ApplyToObject(crate, ZeroVector);
+            }
 
             foreach (var projectile in projectiles)
             {
-                projectile.Update(UpdateStep);
+                physics.ApplyToProjectile(projectile);
             }
 
             // Delete expired projectiles
@@ -119,7 +128,7 @@ namespace Prerelease.Main
                 player.Weapon.Cooldown = 0;
             }
 
-            if (player.CanAccelerate)
+            if (player.OnGround)
             {
                 if (inputMask.Input.Up)
                 {
@@ -127,7 +136,7 @@ namespace Prerelease.Main
                 }
             }
 
-            var horizontalControl = player.CanAccelerate ? Constants.GROUND_ACCELERATION : Constants.AIR_ACCELERATION;
+            var horizontalControl = player.OnGround ? Constants.GROUND_ACCELERATION : Constants.AIR_ACCELERATION;
             if (inputMask.Input.Left)
             {
                 horizontalInput = true;
@@ -142,7 +151,7 @@ namespace Prerelease.Main
             }
 
             // If player is on the ground and not moving, come to a complete horizontal stop to prevent drift
-            if (player.CanAccelerate && !horizontalInput)
+            if (player.OnGround && !horizontalInput)
             {
                 player.Acceleration.X = 0.0f;
                 player.Velocity.X = 0.0f;
@@ -161,7 +170,7 @@ namespace Prerelease.Main
 
             inputMask.Reset();
 
-            physics.Apply(player, instantVelocity);
+            physics.ApplyToObject(player, instantVelocity);
         }
 
         private Projectile FireWeapon(PlayerObject player)
@@ -179,12 +188,14 @@ namespace Prerelease.Main
                 Renderer.RenderOpagueSprite(blockSprite, block.Position, blocks.GridSize);
             }
 
-            Renderer.RenderRectangle(crate.Position, crate.Size, Color.Blue);
-            Renderer.RenderRectangle(crate2.Position, crate2.Size, Color.Blue);
+            foreach (var crate in crates)
+            {
+                Renderer.RenderOpagueSprite(crateSprite, crate.Position, crate.Size);
+            }
 
             foreach (var player in players.Where(p => p.Active))
             {
-                Renderer.RenderOpagueSprite(player.Sprite, player.Position, player.Size);
+                Renderer.RenderOpagueSprite(player.Sprite, player.Position, player.Size, player.Facing.X < 0);
             }
 
             foreach (var projectile in projectiles)

@@ -41,7 +41,7 @@ namespace MapDesigner
                     for (int y = 0; y < SizeY; y++)
                     {
                         lastSprite = palette.Sprite(map[x, y]);
-                        renderer.RenderOpagueSprite(lastSprite, offset);
+                        renderer.RenderOpagueSprite(lastSprite, offset, lastSprite.Size);
                         offset.Y += lastSprite.Size.Y;
                     }
 

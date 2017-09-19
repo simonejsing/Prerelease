@@ -3,16 +3,15 @@ using VectorMath;
 
 namespace Prerelease.Main.Physics
 {
-    internal class Projectile : MovableObject
+    public class Projectile : MovableObject
     {
         public Object Shooter { get; }
         public bool Expired => lifetime <= 0;
 
         private int lifetime = 200;
 
-        public void Update(float timestep)
+        public void DecreaseLifespan()
         {
-            Position += Velocity*timestep;
             lifetime--;
         }
 
@@ -20,6 +19,7 @@ namespace Prerelease.Main.Physics
         {
             this.Velocity = initialVelocity;
             this.Shooter = shooter;
+            this.Collision += (s, t) => lifetime = 0;
         }
     }
 }
