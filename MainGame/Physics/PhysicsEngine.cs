@@ -10,18 +10,14 @@ namespace Prerelease.Main.Physics
     public class PhysicsEngine
     {
         private readonly ICollidableObjectGrid grid;
-        private readonly List<MovableObject> movableObjects = new List<MovableObject>();
+        private readonly IEnumerable<MovableObject> movableObjects;
         private readonly float timestep;
 
-        public PhysicsEngine(ICollidableObjectGrid grid, float timestep)
+        public PhysicsEngine(ICollidableObjectGrid grid, IEnumerable<MovableObject> movableObjects, float timestep)
         {
             this.grid = grid;
+            this.movableObjects = movableObjects;
             this.timestep = timestep;
-        }
-
-        public void AddMovableObject(MovableObject obj)
-        {
-            movableObjects.Add(obj);
         }
 
         public void ApplyToObject(MovableObject obj, Vector2 instantVelocity)
@@ -35,7 +31,7 @@ namespace Prerelease.Main.Physics
             obj.Velocity += instantVelocity + obj.Acceleration * timestep;
 
             // Slow down object when on ground
-            if (obj.OnGround)
+            if (obj.Grounded)
             {
                 obj.Velocity.X *= 0.9f;
             }
@@ -53,7 +49,7 @@ namespace Prerelease.Main.Physics
             obj.DeltaPosition = obj.Velocity * timestep;
 
             // Handle collisions with grid
-            obj.OnGround = false;
+            obj.Grounded = false;
             HandleGridCollisions(obj);
 
             // Handle collisions with collidable objects
@@ -128,8 +124,11 @@ namespace Prerelease.Main.Physics
                 }
             }
 
-            movableObject.OnCollision(obj, obj.DeltaPosition);
-            obj.OnCollision(movableObject, movableObject.DeltaPosition);
+            if (horizontalCollision || verticalCollision)
+            {
+                movableObject.OnCollision(obj, obj.DeltaPosition);
+                obj.OnCollision(movableObject, movableObject.DeltaPosition);
+            }
 
             // Transfer momentum to movable object during collision.
             if (horizontalCollision)
@@ -139,7 +138,7 @@ namespace Prerelease.Main.Physics
 
             // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
             if (verticalCollision && obj.Velocity.Y > 0)
-                obj.OnGround = true;
+                obj.Grounded = true;
 
             // Kill velocity if a collision occured
             if (verticalCollision)
@@ -227,7 +226,7 @@ namespace Prerelease.Main.Physics
 
             // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
             if (verticalCollision && obj.Velocity.Y > 0)
-                obj.OnGround = true;
+                obj.Grounded = true;
 
             // Kill velocity if a collision occured
             if (verticalCollision)
@@ -262,7 +261,7 @@ namespace Prerelease.Main.Physics
                     projectile.Position.Y < movableObject.Position.Y + movableObject.Size.Y)
                 {
                     projectile.OnCollision(movableObject, movableObject.DeltaPosition);
-                    movableObject.OnCollision(projectile, projectile.DeltaPosition);
+                    movableObject.OnHit(projectile);
                     return;
                 }
             }

@@ -16,18 +16,25 @@ namespace Prerelease.Main
         private readonly Vector2 ZeroVector = Vector2.Zero;
 
         private readonly ActionQueue actionQueue;
-        private readonly PlayerObject[] players;
-        private BlockGrid blocks;
+        private List<PlayerObject> players = new List<PlayerObject>();
+        private List<EnemyObject> enemies = new List<EnemyObject>();
         private readonly List<Projectile> projectiles = new List<Projectile>();
         private readonly List<MovableObject> crates = new List<MovableObject>();
-        private readonly PhysicsEngine physics;
+        private PhysicsEngine physics;
+        private BlockGrid blocks;
         private ISprite blockSprite, crateSprite;
 
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue)
             : base("Platformer", renderer, ui, actionQueue)
         {
             this.actionQueue = actionQueue;
-            players = new[]
+        }
+
+        public override void Activate()
+        {
+            base.Activate();
+
+            players = new List<PlayerObject>()
             {
                 new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Red),
                 new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Green),
@@ -35,26 +42,32 @@ namespace Prerelease.Main
                 new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Yellow),
             };
 
-            CreateLevel();
+            CreateLevel("Level1");
 
-            physics = new PhysicsEngine(blocks, UpdateStep);
-            foreach (var crate in crates)
+            physics = new PhysicsEngine(blocks, crates.Concat(enemies), UpdateStep);
+
+            // Load content in active scope.
+            blockSprite = LoadSprite("Block");
+            crateSprite = LoadSprite("Crate");
+            foreach (var player in players)
             {
-                physics.AddMovableObject(crate);
+                player.Sprite = LoadSprite("Chicken");
+                player.Sprite.Size = new Vector2(30, 30);
             }
         }
 
-        private void CreateLevel()
+        private void CreateLevel(string levelName)
         {
-            var text = ReadLevelBlocks("Level1");
+            var levelEnemies = new List<EnemyObject>();
+            var levelText = ReadLevelBlocks(levelName);
 
-            var lines = text.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
+            var lines = levelText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
             blocks = new BlockGrid(30, 30, (uint)lines.Length, (uint)lines[0].Length);
 
             for (uint row = 0; row < lines.Length; row++)
             {
                 if(lines[row].Length > blocks.Columns)
-                    throw new InvalidDataException($"Row number {row} has an invalid column count {lines[row].Length}, it must not be greater than {blocks.Columns}.");
+                    throw new InvalidDataException($"Row number {row} has an invalid column count {lines[row].Length}, it must not exceed {blocks.Columns}.");
 
                 for (uint col = 0; col < lines[row].Length; col++)
                 {
@@ -68,8 +81,42 @@ namespace Prerelease.Main
                         case 'C':
                             crates.Add(new MovableObject(actionQueue, new Vector2(30 * col, 30 * row), new Vector2(30, 30)));
                             break;
+                        case 'e':
+                        case 'E':
+                            var enemy = CreateEnemy(new Vector2(30 * col, 30 * row), new Vector2(30, 30));
+                            levelEnemies.Add(enemy);
+                            break;
                     }
                 }
+            }
+
+            enemies = levelEnemies;
+        }
+
+        private EnemyObject CreateEnemy(Vector2 position, Vector2 size)
+        {
+            var enemy = new EnemyObject(actionQueue, position, size);
+            enemy.Sprite = LoadSprite("skeleton");
+            enemy.Hit += EnemyOnHit;
+            enemy.Collision += CollisionWithEnemy;
+            return enemy;
+        }
+
+        private void CollisionWithEnemy(object sender, ICollidableObject target, Vector2 deltaPosition)
+        {
+            var p = target as PlayerObject;
+            if (p != null)
+            {
+                p.HitPoints = 0;
+            }
+        }
+
+        private void EnemyOnHit(object sender, IProjectile target)
+        {
+            var e = sender as EnemyObject;
+            if (e != null)
+            {
+                e.HitPoints -= 1;
             }
         }
 
@@ -85,23 +132,9 @@ namespace Prerelease.Main
             }
         }
 
-        public override void Activate()
-        {
-            base.Activate();
-
-            // Load content in active scope.
-            blockSprite = LoadSprite("Block");
-            crateSprite = LoadSprite("Crate");
-            foreach (var player in players)
-            {
-                player.Sprite = LoadSprite("Chicken");
-                player.Sprite.Size = new Vector2(30, 30);
-            }
-        }
-
         public override void Update(float timestep, InputMask[] inputMasks)
         {
-            for (var i = 0; i < players.Length; i++)
+            for (var i = 0; i < players.Count; i++)
             {
                 HandlePlayerInput(players[i], inputMasks[i]);
             }
@@ -112,6 +145,12 @@ namespace Prerelease.Main
                 physics.ApplyToObject(crate, ZeroVector);
             }
 
+            // Apply physics to enemies.
+            foreach (var enemy in enemies)
+            {
+                physics.ApplyToObject(enemy, ZeroVector);
+            }
+
             foreach (var projectile in projectiles)
             {
                 physics.ApplyToProjectile(projectile);
@@ -119,6 +158,9 @@ namespace Prerelease.Main
 
             // Delete expired projectiles
             projectiles.RemoveAll(p => p.Expired);
+
+            // Delete dead enemies
+            enemies.RemoveAll(e => e.Dead);
         }
 
         readonly Vector2 instantVelocity = Vector2.Zero;
@@ -140,9 +182,13 @@ namespace Prerelease.Main
                 player.Position.Clear();
                 player.Velocity.Clear();
                 player.Weapon.Cooldown = 0;
+                player.HitPoints = 1;
             }
 
-            if (player.OnGround)
+            if (player.Dead)
+                return;
+
+            if (player.Grounded)
             {
                 if (inputMask.Input.Up)
                 {
@@ -150,7 +196,7 @@ namespace Prerelease.Main
                 }
             }
 
-            var horizontalControl = player.OnGround ? Constants.GROUND_ACCELERATION : Constants.AIR_ACCELERATION;
+            var horizontalControl = player.Grounded ? Constants.GROUND_ACCELERATION : Constants.AIR_ACCELERATION;
             if (inputMask.Input.Left)
             {
                 horizontalInput = true;
@@ -165,7 +211,7 @@ namespace Prerelease.Main
             }
 
             // If player is on the ground and not moving, come to a complete horizontal stop to prevent drift
-            if (player.OnGround && !horizontalInput)
+            if (player.Grounded && !horizontalInput)
             {
                 player.Acceleration.X = 0.0f;
                 player.Velocity.X = 0.0f;
@@ -207,7 +253,12 @@ namespace Prerelease.Main
                 Renderer.RenderOpagueSprite(crateSprite, crate.Position, crate.Size);
             }
 
-            foreach (var player in players.Where(p => p.Active))
+            foreach (var enemy in enemies)
+            {
+                Renderer.RenderOpagueSprite(enemy.Sprite, enemy.Position, enemy.Size, enemy.Facing.X < 0);
+            }
+
+            foreach (var player in players.Where(p => p.Active && !p.Dead))
             {
                 Renderer.RenderOpagueSprite(player.Sprite, player.Position, player.Size, player.Facing.X < 0);
             }

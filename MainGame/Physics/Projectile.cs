@@ -3,7 +3,7 @@ using VectorMath;
 
 namespace Prerelease.Main.Physics
 {
-    public class Projectile : MovableObject
+    public class Projectile : MovableObject, IProjectile
     {
         public Object Shooter { get; }
         public bool Expired => lifetime <= 0;

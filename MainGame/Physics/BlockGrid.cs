@@ -7,6 +7,7 @@ namespace Prerelease.Main.Physics
     public struct Block : ICollidableObject
     {
         public event CollisionEventHandler Collision;
+        public event HitEventHandler Hit;
 
         public Vector2 Position { get; set; }
         public Vector2 Size { get; set; }
