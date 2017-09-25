@@ -137,10 +137,10 @@ namespace Prerelease.Main.Physics
             }
 
             // Transfer momentum to movable object during collision.
-            if (horizontalCollision)
+            /*if (horizontalCollision)
             {
                 movableObject.Velocity.X += Math.Sign(obj.DeltaPosition.X)*0.5f;
-            }
+            }*/
 
             // Kill velocity if a collision occured
             if (verticalCollision)
