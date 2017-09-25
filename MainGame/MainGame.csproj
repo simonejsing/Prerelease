@@ -112,6 +112,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CompletedDialog.cs" />
+    <Compile Include="Physics\Collision.cs" />
     <Compile Include="Physics\EnemyObject.cs" />
     <Compile Include="NoOne.cs" />
     <Compile Include="Physics\BlockGrid.cs" />

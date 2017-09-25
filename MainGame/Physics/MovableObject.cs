@@ -17,9 +17,9 @@ namespace Prerelease.Main.Physics
         public bool Occupied => true;
         //public bool Stationary
 
-        public void OnCollision(ICollidableObject target, Vector2 deltaPosition)
+        public void OnCollision(ICollidableObject target, Collision collision)
         {
-            Collision?.Invoke(this, target, deltaPosition);
+            Collision?.Invoke(this, target, collision);
         }
 
         public void OnHit(IProjectile target)

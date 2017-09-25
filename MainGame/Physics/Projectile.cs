@@ -19,10 +19,10 @@ namespace Prerelease.Main.Physics
         {
             this.Velocity = initialVelocity;
             this.Shooter = shooter;
-            this.Collision += Expire;
+            this.Collision += ProjectileCollision;
         }
 
-        private void Expire(object sender, ICollidableObject target, Vector2 deltaposition)
+        private void ProjectileCollision(object sender, ICollidableObject target, Collision collision)
         {
             Expire();
         }

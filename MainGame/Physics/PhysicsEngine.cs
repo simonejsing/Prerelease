@@ -124,10 +124,16 @@ namespace Prerelease.Main.Physics
                 }
             }
 
-            if (horizontalCollision || verticalCollision)
+            if (verticalCollision || horizontalCollision)
             {
-                movableObject.OnCollision(obj, obj.DeltaPosition);
-                obj.OnCollision(movableObject, movableObject.DeltaPosition);
+                var collision = new Collision()
+                {
+                    Force = obj.DeltaPosition,
+                    HorizontalCollision = horizontalCollision,
+                    VerticalCollision = verticalCollision
+                };
+                movableObject.OnCollision(obj, collision);
+                obj.OnCollision(movableObject, collision);
             }
 
             // Transfer momentum to movable object during collision.
@@ -224,6 +230,17 @@ namespace Prerelease.Main.Physics
                 }
             }
 
+            if (verticalCollision || horizontalCollision)
+            {
+                var collision = new Collision()
+                {
+                    Force = Vector2.Zero,
+                    HorizontalCollision = horizontalCollision,
+                    VerticalCollision = verticalCollision
+                };
+                obj.OnCollision(null, collision);
+            }
+
             // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
             if (verticalCollision && obj.Velocity.Y > 0)
                 obj.Grounded = true;
@@ -248,19 +265,34 @@ namespace Prerelease.Main.Physics
             var neighbors = grid.Neighbors(projectile);
             if (neighbors[4].Occupied)
             {
-                projectile.OnCollision(neighbors[5], projectile.DeltaPosition);
+                var collision = new Collision()
+                {
+                    Force = projectile.DeltaPosition,
+                    HorizontalCollision = true,
+                    VerticalCollision = false
+                };
+                projectile.OnCollision(neighbors[5], collision);
                 return;
             }
 
             foreach (var movableObject in movableObjects)
             {
+                if (movableObject == projectile.Shooter)
+                    continue;
+
                 if (
                     projectile.Position.X > movableObject.Position.X &&
                     projectile.Position.X < movableObject.Position.X + movableObject.Size.X &&
                     projectile.Position.Y > movableObject.Position.Y &&
                     projectile.Position.Y < movableObject.Position.Y + movableObject.Size.Y)
                 {
-                    projectile.OnCollision(movableObject, movableObject.DeltaPosition);
+                    var collision = new Collision()
+                    {
+                        Force = movableObject.DeltaPosition,
+                        HorizontalCollision = true,
+                        VerticalCollision = false
+                    };
+                    projectile.OnCollision(movableObject, collision);
                     movableObject.OnHit(projectile);
                     return;
                 }

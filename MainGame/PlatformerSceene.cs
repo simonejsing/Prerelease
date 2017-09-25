@@ -44,7 +44,7 @@ namespace Prerelease.Main
 
             CreateLevel("Level1");
 
-            physics = new PhysicsEngine(blocks, crates.Concat(enemies), UpdateStep);
+            physics = new PhysicsEngine(blocks, crates.Concat(enemies).Concat(players), UpdateStep);
 
             // Load content in active scope.
             blockSprite = LoadSprite("Block");
@@ -102,12 +102,19 @@ namespace Prerelease.Main
             return enemy;
         }
 
-        private void CollisionWithEnemy(object sender, ICollidableObject target, Vector2 deltaPosition)
+        private void CollisionWithEnemy(object sender, ICollidableObject target, Collision collision)
         {
             var p = target as PlayerObject;
             if (p != null)
             {
                 p.HitPoints = 0;
+            }
+
+            // When bumping into anything horizontally, switch direction
+            var e = sender as EnemyObject;
+            if (e != null && collision.HorizontalCollision)
+            {
+                e.Facing.X = -e.Facing.X;
             }
         }
 
@@ -148,6 +155,7 @@ namespace Prerelease.Main
             // Apply physics to enemies.
             foreach (var enemy in enemies)
             {
+                enemy.Velocity.X = enemy.Facing.X*Constants.ENEMY_VELOCITY;
                 physics.ApplyToObject(enemy, ZeroVector);
             }
 

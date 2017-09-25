@@ -2,7 +2,7 @@
 
 namespace Prerelease.Main.Physics
 {
-    public delegate void CollisionEventHandler(object sender, ICollidableObject target, Vector2 deltaPosition);
+    public delegate void CollisionEventHandler(object sender, ICollidableObject target, Collision collision);
     public delegate void HitEventHandler(object sender, IProjectile target);
 
     public interface ICollidableObject

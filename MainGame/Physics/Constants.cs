@@ -18,5 +18,6 @@ namespace Prerelease.Main.Physics
         public const float AIR_ACCELERATION = 0.1f;
 
         public const float PROJECTILE_VELOCITY = 5.0f;
+        public const float ENEMY_VELOCITY = 3.0f;
     }
 }
