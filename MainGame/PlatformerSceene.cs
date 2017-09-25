@@ -97,34 +97,7 @@ namespace Prerelease.Main
         {
             var enemy = new EnemyObject(actionQueue, position, size);
             enemy.Sprite = LoadSprite("skeleton");
-            enemy.Hit += EnemyOnHit;
-            enemy.Collision += CollisionWithEnemy;
             return enemy;
-        }
-
-        private void CollisionWithEnemy(object sender, ICollidableObject target, Collision collision)
-        {
-            var p = target as PlayerObject;
-            if (p != null)
-            {
-                p.HitPoints = 0;
-            }
-
-            // When bumping into anything horizontally, switch direction
-            var e = sender as EnemyObject;
-            if (e != null && collision.HorizontalCollision)
-            {
-                e.Facing.X = -e.Facing.X;
-            }
-        }
-
-        private void EnemyOnHit(object sender, IProjectile target)
-        {
-            var e = sender as EnemyObject;
-            if (e != null)
-            {
-                e.HitPoints -= 1;
-            }
         }
 
         private string ReadLevelBlocks(string levelName)

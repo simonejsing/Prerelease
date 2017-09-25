@@ -6,7 +6,8 @@ namespace Prerelease.Main.Physics
 {
     public class MovableObject : Object, ICollidableObject
     {
-        public event CollisionEventHandler Collision;
+        public event ObjectCollisionEventHandler ObjectCollision;
+        public event GridCollisionEventHandler GridCollision;
         public event HitEventHandler Hit;
 
         public bool Grounded { get; set; }
@@ -17,9 +18,14 @@ namespace Prerelease.Main.Physics
         public bool Occupied => true;
         //public bool Stationary
 
-        public void OnCollision(ICollidableObject target, Collision collision)
+        public void OnObjectCollision(ICollidableObject target, Collision collision)
         {
-            Collision?.Invoke(this, target, collision);
+            ObjectCollision?.Invoke(this, target, collision);
+        }
+
+        public void OnGridCollision(ICollidableObject[] target, Collision collision)
+        {
+            GridCollision?.Invoke(this, target, collision);
         }
 
         public void OnHit(IProjectile target)
@@ -34,10 +40,12 @@ namespace Prerelease.Main.Physics
             Velocity = Vector2.Zero;
             DeltaPosition = Vector2.Zero;
             Facing = UnitVector2.GetInstance(1, 0);
-            Collision += HandleGroundCollision;
+
+            ObjectCollision += HandleGroundObjectCollision;
+            GridCollision += (sender, target, collision) => HandleGroundObjectCollision(sender, target[4], collision);
         }
 
-        private static void HandleGroundCollision(object sender, ICollidableObject target, Collision collision)
+        private static void HandleGroundObjectCollision(object sender, ICollidableObject target, Collision collision)
         {
             var obj = sender as MovableObject;
 

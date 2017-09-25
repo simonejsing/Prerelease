@@ -22,10 +22,10 @@ namespace Prerelease.Main.Physics
             Active = false;
             Color = color;
             HitPoints = 1;
-            Collision += OnCollision;
+            ObjectCollision += OnObjectCollision;
         }
 
-        private void OnCollision(object sender, ICollidableObject target, Collision collision)
+        private void OnObjectCollision(object sender, ICollidableObject target, Collision collision)
         {
             // Allow player to push other movable objects
             var obj = target as MovableObject;

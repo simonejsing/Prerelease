@@ -132,8 +132,8 @@ namespace Prerelease.Main.Physics
                     HorizontalCollision = horizontalCollision,
                     VerticalCollision = verticalCollision
                 };
-                movableObject.OnCollision(obj, collision);
-                obj.OnCollision(movableObject, collision);
+                movableObject.OnObjectCollision(obj, collision);
+                obj.OnObjectCollision(movableObject, collision);
             }
 
             // Transfer momentum to movable object during collision.
@@ -234,7 +234,7 @@ namespace Prerelease.Main.Physics
                     HorizontalCollision = horizontalCollision,
                     VerticalCollision = verticalCollision
                 };
-                obj.OnCollision(null, collision);
+                obj.OnGridCollision(neighboringBlocks, collision);
             }
 
             // Kill velocity if a collision occured
@@ -263,7 +263,7 @@ namespace Prerelease.Main.Physics
                     HorizontalCollision = true,
                     VerticalCollision = false
                 };
-                projectile.OnCollision(neighbors[5], collision);
+                projectile.OnObjectCollision(neighbors[5], collision);
                 return;
             }
 
@@ -284,7 +284,7 @@ namespace Prerelease.Main.Physics
                         HorizontalCollision = true,
                         VerticalCollision = false
                     };
-                    projectile.OnCollision(movableObject, collision);
+                    projectile.OnObjectCollision(movableObject, collision);
                     movableObject.OnHit(projectile);
                     return;
                 }

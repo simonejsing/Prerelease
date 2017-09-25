@@ -2,12 +2,14 @@
 
 namespace Prerelease.Main.Physics
 {
-    public delegate void CollisionEventHandler(object sender, ICollidableObject target, Collision collision);
+    public delegate void ObjectCollisionEventHandler(object sender, ICollidableObject target, Collision collision);
+    public delegate void GridCollisionEventHandler(object sender, ICollidableObject[] target, Collision collision);
     public delegate void HitEventHandler(object sender, IProjectile target);
 
     public interface ICollidableObject
     {
-        event CollisionEventHandler Collision;
+        event ObjectCollisionEventHandler ObjectCollision;
+        event GridCollisionEventHandler GridCollision;
         event HitEventHandler Hit;
 
         Vector2 Position { get; }
