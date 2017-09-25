@@ -142,10 +142,6 @@ namespace Prerelease.Main.Physics
                 movableObject.Velocity.X += Math.Sign(obj.DeltaPosition.X)*0.5f;
             }
 
-            // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
-            if (verticalCollision && obj.Velocity.Y > 0)
-                obj.Grounded = true;
-
             // Kill velocity if a collision occured
             if (verticalCollision)
             {
@@ -240,10 +236,6 @@ namespace Prerelease.Main.Physics
                 };
                 obj.OnCollision(null, collision);
             }
-
-            // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
-            if (verticalCollision && obj.Velocity.Y > 0)
-                obj.Grounded = true;
 
             // Kill velocity if a collision occured
             if (verticalCollision)

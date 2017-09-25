@@ -34,6 +34,18 @@ namespace Prerelease.Main.Physics
             Velocity = Vector2.Zero;
             DeltaPosition = Vector2.Zero;
             Facing = UnitVector2.GetInstance(1, 0);
+            Collision += HandleGroundCollision;
+        }
+
+        private static void HandleGroundCollision(object sender, ICollidableObject target, Collision collision)
+        {
+            var obj = sender as MovableObject;
+
+            // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
+            if (obj != null && collision.VerticalCollision && obj.Velocity.Y > 0)
+            {
+                obj.Grounded = true;
+            }
         }
     }
 }
