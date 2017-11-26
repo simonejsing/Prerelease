@@ -9,19 +9,23 @@ namespace Prerelease.Main.Physics
 {
     public class PhysicsEngine
     {
-        private readonly ICollidableObjectGrid grid;
-        private readonly IEnumerable<MovableObject> movableObjects;
+        private readonly GameState state; 
         private readonly float timestep;
 
-        public PhysicsEngine(ICollidableObjectGrid grid, IEnumerable<MovableObject> movableObjects, float timestep)
+        private ICollidableObjectGrid grid;
+        private IEnumerable<MovableObject> movableObjects;
+
+        public PhysicsEngine(GameState state, float timestep)
         {
-            this.grid = grid;
-            this.movableObjects = movableObjects;
+            this.state = state;
             this.timestep = timestep;
         }
 
         public void ApplyToObject(MovableObject obj, Vector2 instantVelocity)
         {
+            // TODO: This is a bad design
+            LoadLevelObjects();
+
             obj.DeltaPosition.Clear();
 
             // Apply gravity
@@ -60,6 +64,13 @@ namespace Prerelease.Main.Physics
 
             // Move object
             obj.Position += obj.DeltaPosition;
+        }
+
+        private void LoadLevelObjects()
+        {
+            var level = state.ActiveLevel;
+            grid = level.Blocks;
+            movableObjects = level.Crates.Concat(level.Enemies).Concat(state.Players).ToArray();
         }
 
         private static void HandleObjectCollision(MovableObject obj, MovableObject movableObject)

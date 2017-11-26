@@ -6,6 +6,7 @@ using System.Reflection;
 using Contracts;
 using Prerelease.Main.Physics;
 using VectorMath;
+using Object = Prerelease.Main.Physics.Object;
 
 namespace Prerelease.Main
 {
@@ -16,13 +17,11 @@ namespace Prerelease.Main
         private readonly Vector2 ZeroVector = Vector2.Zero;
 
         private readonly ActionQueue actionQueue;
-        private List<PlayerObject> players = new List<PlayerObject>();
-        private List<EnemyObject> enemies = new List<EnemyObject>();
-        private readonly List<Projectile> projectiles = new List<Projectile>();
-        private readonly List<MovableObject> crates = new List<MovableObject>();
         private PhysicsEngine physics;
-        private BlockGrid blocks;
-        private ISprite blockSprite, crateSprite;
+        private ISprite blockSprite;
+
+        // Game state
+        private GameState state;
 
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue)
             : base("Platformer", renderer, ui, actionQueue)
@@ -30,25 +29,27 @@ namespace Prerelease.Main
             this.actionQueue = actionQueue;
         }
 
-        public override void Activate()
+        public override void Activate(InputMask[] inputMasks)
         {
-            base.Activate();
+            base.Activate(inputMasks);
 
-            players = new List<PlayerObject>()
+            var level = CreateLevel("Level1");
+
+            var players = new List<PlayerObject>
             {
-                new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Red),
-                new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Green),
-                new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Blue),
-                new PlayerObject(actionQueue, Vector2.Zero, new Vector2(30, 30), Color.Yellow),
+                new PlayerObject(actionQueue, inputMasks[0], level.SpawnPoint, new Vector2(30, 30), Color.Red),
+                new PlayerObject(actionQueue, inputMasks[1], level.SpawnPoint, new Vector2(30, 30), Color.Green),
+                new PlayerObject(actionQueue, inputMasks[2], level.SpawnPoint, new Vector2(30, 30), Color.Blue),
+                new PlayerObject(actionQueue, inputMasks[3], level.SpawnPoint, new Vector2(30, 30), Color.Yellow),
             };
 
-            CreateLevel("Level1");
+            state = new GameState(players);
+            physics = new PhysicsEngine(state, UpdateStep);
 
-            physics = new PhysicsEngine(blocks, crates.Concat(enemies).Concat(players), UpdateStep);
+            state.SetActiveLevel(level);
 
             // Load content in active scope.
             blockSprite = LoadSprite("Block");
-            crateSprite = LoadSprite("Crate");
             foreach (var player in players)
             {
                 player.Sprite = LoadSprite("Chicken");
@@ -56,13 +57,17 @@ namespace Prerelease.Main
             }
         }
 
-        private void CreateLevel(string levelName)
+        private LevelState CreateLevel(string levelName)
         {
             var levelEnemies = new List<EnemyObject>();
+            var levelCrates = new List<MovableObject>();
+            var levelDoors = new List<Door>();
             var levelText = ReadLevelBlocks(levelName);
 
             var lines = levelText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
-            blocks = new BlockGrid(30, 30, (uint)lines.Length, (uint)lines[0].Length);
+            var blocks = new BlockGrid(30, 30, (uint)lines.Length, (uint)lines[0].Length);
+
+            Vector2 spawnPoint = new Vector2();
 
             for (uint row = 0; row < lines.Length; row++)
             {
@@ -71,26 +76,63 @@ namespace Prerelease.Main
 
                 for (uint col = 0; col < lines[row].Length; col++)
                 {
-                    switch (lines[row][(int)col])
+                    var cellValue = lines[row][(int) col];
+                    switch (cellValue)
                     {
+                        case 's':
+                            spawnPoint = new Vector2(30*col, 30*row);
+                            break;
                         case 'x':
                         case 'X':
                             blocks.Insert(row, col);
                             break;
                         case 'c':
                         case 'C':
-                            crates.Add(new MovableObject(actionQueue, new Vector2(30 * col, 30 * row), new Vector2(30, 30)));
+                            var crate = CreateCrate(new Vector2(30*col, 30*row), new Vector2(30, 30));
+                            levelCrates.Add(crate);
                             break;
                         case 'e':
                         case 'E':
                             var enemy = CreateEnemy(new Vector2(30 * col, 30 * row), new Vector2(30, 30));
                             levelEnemies.Add(enemy);
                             break;
+                        case '1':
+                        case '2':
+                        case '3':
+                            // Level door
+                            int levelNumber = (int)char.GetNumericValue(cellValue);
+                            var door = CreateDoorToLevel(new Vector2(30 * col, 30 * row), new Vector2(30, 30), levelNumber);
+                            levelDoors.Add(door);
+                            break;
                     }
                 }
             }
 
-            enemies = levelEnemies;
+            var level = new LevelState(levelName, spawnPoint);
+            level.SetBlocks(blocks);
+            level.AddEnemies(levelEnemies);
+            level.AddCrates(levelCrates);
+            level.AddDoors(levelDoors);
+            return level;
+        }
+
+        private MovableObject CreateCrate(Vector2 position, Vector2 size)
+        {
+            var crate = new MovableObject(actionQueue, position, size);
+            crate.Sprite = LoadSprite("crate");
+            return crate;
+        }
+
+        private Door CreateDoorToLevel(Vector2 position, Vector2 size, int levelNumber)
+        {
+            var door = new Door(actionQueue, position, size);
+            door.Sprite = LoadSprite("door");
+            door.Destination = new Destination()
+            {
+                Type = DestinationType.Level,
+                Identifier = levelNumber
+            };
+            return door;
         }
 
         private EnemyObject CreateEnemy(Vector2 position, Vector2 size)
@@ -112,42 +154,40 @@ namespace Prerelease.Main
             }
         }
 
-        public override void Update(float timestep, InputMask[] inputMasks)
+        public override void Update(float timestep)
         {
-            for (var i = 0; i < players.Count; i++)
+            foreach(var player in state.Players)
             {
-                HandlePlayerInput(players[i], inputMasks[i]);
+                HandlePlayerInput(player);
             }
 
             // Apply physics to crate.
-            foreach (var crate in crates)
+            foreach (var crate in state.ActiveLevel.Crates)
             {
                 physics.ApplyToObject(crate, ZeroVector);
             }
 
             // Apply physics to enemies.
-            foreach (var enemy in enemies)
+            foreach (var enemy in state.ActiveLevel.Enemies)
             {
                 enemy.Velocity.X = enemy.Facing.X*Constants.ENEMY_VELOCITY;
                 physics.ApplyToObject(enemy, ZeroVector);
             }
 
-            foreach (var projectile in projectiles)
+            foreach (var projectile in state.ActiveLevel.Projectiles)
             {
                 physics.ApplyToProjectile(projectile);
             }
 
-            // Delete expired projectiles
-            projectiles.RemoveAll(p => p.Expired);
-
-            // Delete dead enemies
-            enemies.RemoveAll(e => e.Dead);
+            state.ActiveLevel.CleanUp();
         }
 
         readonly Vector2 instantVelocity = Vector2.Zero;
 
-        private void HandlePlayerInput(PlayerObject player, InputMask inputMask)
+        private void HandlePlayerInput(PlayerObject player)
         {
+            var inputMask = player.InputMask;
+
             player.Active = inputMask.Input.Active;
             if (!player.Active)
                 return;
@@ -173,6 +213,13 @@ namespace Prerelease.Main
             {
                 if (inputMask.Input.Up)
                 {
+                    // Enter door if on door sprite
+                    var doorToEnter = state.ActiveLevel.Doors.FirstOrDefault(d => player.BoundingBox.Inside(d.Center));
+                    if(doorToEnter != null)
+                    {
+                        // Enter the door
+                    }
+
                     instantVelocity.Y = Constants.JUMP_SPEED;
                 }
             }
@@ -204,7 +251,7 @@ namespace Prerelease.Main
 
             if (inputMask.Input.Fire && player.Weapon.CanFire)
             {
-                projectiles.Add(FireWeapon(player));
+                state.ActiveLevel.AddProjectiles(FireWeapon(player));
             }
 
             player.Weapon.Update();
@@ -224,27 +271,33 @@ namespace Prerelease.Main
         {
             Renderer.Clear(Color.Black);
 
+            var blocks = state.ActiveLevel.Blocks;
             foreach (var block in blocks.OccupiedBlocks)
             {
                 Renderer.RenderOpagueSprite(blockSprite, block.Position, blocks.GridSize);
             }
 
-            foreach (var crate in crates)
+            foreach (var door in state.ActiveLevel.Doors)
             {
-                Renderer.RenderOpagueSprite(crateSprite, crate.Position, crate.Size);
+                Renderer.RenderOpagueSprite(door.Sprite, door.Position, door.Size);
             }
 
-            foreach (var enemy in enemies)
+            foreach (var crate in state.ActiveLevel.Crates)
+            {
+                Renderer.RenderOpagueSprite(crate.Sprite, crate.Position, crate.Size);
+            }
+
+            foreach (var enemy in state.ActiveLevel.Enemies)
             {
                 Renderer.RenderOpagueSprite(enemy.Sprite, enemy.Position, enemy.Size, enemy.Facing.X < 0);
             }
 
-            foreach (var player in players.Where(p => p.Active && !p.Dead))
+            foreach (var player in state.Players.Where(p => p.Active && !p.Dead))
             {
                 Renderer.RenderOpagueSprite(player.Sprite, player.Position, player.Size, player.Facing.X < 0);
             }
 
-            foreach (var projectile in projectiles)
+            foreach (var projectile in state.ActiveLevel.Projectiles)
             {
                 Renderer.RenderRectangle(projectile.Position, projectile.Size, Color.Red);
             }

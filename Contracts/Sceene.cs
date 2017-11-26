@@ -23,9 +23,9 @@ namespace Contracts
             this.ActionQueue = actionQueue;
         }
 
-        public abstract void Update(float timestep, InputMask[] inputMasks);
+        public abstract void Update(float timestep);
 
-        public virtual void Activate()
+        public virtual void Activate(InputMask[] inputMasks)
         {
             // Create a scope in the renderer and set it active. This allows the renderer to manage resources.
             this.scope = Renderer.ActivateScope(Name);

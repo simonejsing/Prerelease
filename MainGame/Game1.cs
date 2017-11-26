@@ -92,7 +92,7 @@ namespace Prerelease.Main
             debugFont = scope.LoadFont("ConsoleFont");
 
             this.activeSceene = new PlatformerSceene(renderer, userInterface, actionQueue);
-            this.activeSceene.Activate();
+            this.activeSceene.Activate(inputMasks);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Prerelease.Main
             inputMasks[1].Apply(controllers[0].ReadInput());
             inputMasks[2].Apply(controllers[2].ReadInput());
             inputMasks[3].Apply(controllers[3].ReadInput());
-            activeSceene.Update(timestep, inputMasks);
+            activeSceene.Update(timestep);
             userInterface.Update(inputMasks);
 
             ProcessActions();

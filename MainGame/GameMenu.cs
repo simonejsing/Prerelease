@@ -17,6 +17,8 @@ namespace Prerelease.Main
         private int selectedOption = 0;
         private Vector2 menuPosition, viewport, textBox;
 
+        private InputMask MenuInputMask;
+
         private readonly string[] mainMenu = new[]
         {
             "New game",
@@ -29,26 +31,26 @@ namespace Prerelease.Main
         }
 
         private int resetFrameCounter = 0;
-        public override void Update(float timestep, InputMask[] inputMasks)
+        public override void Update(float timestep)
         {
             if (resetFrameCounter > 0)
             {
                 resetFrameCounter--;
-                inputMasks[0].Reset();
+                MenuInputMask.Reset();
                 return;
             }
 
-            if (inputMasks[0].Input.Up)
+            if (MenuInputMask.Input.Up)
             {
                 selectedOption = selectedOption == 0 ? 0 : selectedOption - 1;
                 resetFrameCounter = 10;
             }
-            if (inputMasks[0].Input.Down)
+            if (MenuInputMask.Input.Down)
             {
                 selectedOption = selectedOption == mainMenu.Length - 1 ? mainMenu.Length - 1 : selectedOption + 1;
                 resetFrameCounter = 10;
             }
-            if (inputMasks[0].Input.Select)
+            if (MenuInputMask.Input.Select)
             {
                 DispatchCurrentMenuAction();
                 resetFrameCounter = 10;
@@ -72,9 +74,10 @@ namespace Prerelease.Main
             }
         }
 
-        public override void Activate()
+        public override void Activate(InputMask[] inputMasks)
         {
-            base.Activate();
+            base.Activate(inputMasks);
+            MenuInputMask = inputMasks[0];
             menuFont = LoadFont("ConsoleFont");
 
             // Align center vertically

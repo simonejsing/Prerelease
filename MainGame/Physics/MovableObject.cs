@@ -33,7 +33,7 @@ namespace Prerelease.Main.Physics
             Hit?.Invoke(this, target);
         }
 
-        public MovableObject(ActionQueue actionQueue, Vector2 startingPosition, Vector2 size) : base(actionQueue, startingPosition, size)
+        public MovableObject(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPosition, size)
         {
             Grounded = false;
             Acceleration = Vector2.Zero;

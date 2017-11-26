@@ -12,6 +12,7 @@ namespace Prerelease.Main.Physics
         event GridCollisionEventHandler GridCollision;
         event HitEventHandler Hit;
 
+        Rect2 BoundingBox { get; }
         Vector2 Position { get; }
         Vector2 Size { get; }
         Vector2 Center { get; }

@@ -7,18 +7,29 @@ namespace Prerelease.Main.Physics
     {
         private readonly ActionQueue actionQueue;
 
-        public Vector2 Position { get; set; }
-        public Vector2 Size { get; set; }
+        public Rect2 BoundingBox { get; }
+
+        public Vector2 Position
+        {
+            get { return BoundingBox.TopLeft; }
+            set { BoundingBox.TopLeft = value; }
+        }
+
+        public Vector2 Size
+        {
+            get { return BoundingBox.Size; }
+            set { BoundingBox.Size = value; }
+        }
+
         public ISprite Sprite { get; set; }
         public GameAction Action { get; set; }
 
         public Vector2 Center => Position + 0.5f * Size;
 
-        public Object(ActionQueue actionQueue, Vector2 startingPosition, Vector2 size)
+        public Object(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size)
         {
             this.actionQueue = actionQueue;
-            this.Position = startingPosition;
-            this.Size = size;
+            this.BoundingBox = new Rect2(startingPosition, size);
             this.Action = new GameAction(ActionType.Noop);
         }
 

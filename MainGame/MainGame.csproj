@@ -113,6 +113,7 @@
     </Compile>
     <Compile Include="CompletedDialog.cs" />
     <Compile Include="Physics\Collision.cs" />
+    <Compile Include="Physics\Door.cs" />
     <Compile Include="Physics\EnemyObject.cs" />
     <Compile Include="NoOne.cs" />
     <Compile Include="Physics\BlockGrid.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="Input\MonoControllerInput.cs" />
     <Compile Include="Input\MonoKeyboardInput.cs" />
     <Compile Include="Physics\Constants.cs" />
+    <Compile Include="Physics\GameState.cs" />
     <Compile Include="Physics\ICollidableObjectGrid.cs" />
     <Compile Include="Physics\IProjectile.cs" />
     <Compile Include="Physics\PhysicsEngine.cs" />
