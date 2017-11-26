@@ -18,11 +18,12 @@ namespace Prerelease.Main.Physics
         public int HitPoints { get; set; }
         public bool Dead => HitPoints <= 0;
 
-        public PlayerObject(ActionQueue actionQueue, InputMask inputMask, IReadonlyVector startingPosition, IReadonlyVector size, Color color) : base(actionQueue, startingPosition, size)
+        public PlayerObject(ActionQueue actionQueue, InputMask inputMask, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPosition, size)
         {
             Weapon = new Weapon();
             InputMask = inputMask;
             Active = false;
+            SpriteBinding = new ObjectBinding<ISprite>(spritePath);
             Color = color;
             HitPoints = 1;
             ObjectCollision += OnObjectCollision;

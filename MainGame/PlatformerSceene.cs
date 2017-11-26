@@ -37,15 +37,17 @@ namespace Prerelease.Main
             base.Activate(inputMasks);
 
             var levelFactory = new LevelFactory(actionQueue);
+            spriteResolver = new SpriteResolver(scope);
+
             var players = new List<PlayerObject>
             {
-                new PlayerObject(actionQueue, inputMasks[0], new Vector2(), new Vector2(30, 30), Color.Red),
-                new PlayerObject(actionQueue, inputMasks[1], new Vector2(), new Vector2(30, 30), Color.Green),
-                new PlayerObject(actionQueue, inputMasks[2], new Vector2(), new Vector2(30, 30), Color.Blue),
-                new PlayerObject(actionQueue, inputMasks[3], new Vector2(), new Vector2(30, 30), Color.Yellow),
+                new PlayerObject(actionQueue, inputMasks[0], new Vector2(), new Vector2(30, 30), "Chicken", Color.Red),
+                new PlayerObject(actionQueue, inputMasks[1], new Vector2(), new Vector2(30, 30), "Chicken", Color.Green),
+                new PlayerObject(actionQueue, inputMasks[2], new Vector2(), new Vector2(30, 30), "Chicken", Color.Blue),
+                new PlayerObject(actionQueue, inputMasks[3], new Vector2(), new Vector2(30, 30), "Chicken", Color.Yellow),
             };
+            spriteResolver.ResolveBindings(players);
 
-            spriteResolver = new SpriteResolver(scope);
             objectManager = new ObjectManager(players);
             state = new GameState(players);
             physics = new PhysicsEngine(objectManager, UpdateStep);
@@ -57,13 +59,6 @@ namespace Prerelease.Main
             state.AddLevel(level1);
             state.AddLevel(level2);
             TransitionToLevel(level1.Name);
-
-            // Load content in active scope.
-            foreach (var player in players)
-            {
-                player.SpriteBinding = LoadSprite("Chicken");
-                player.SpriteBinding.Object.Size = new Vector2(30, 30);
-            }
         }
 
         public override void Update(float timestep)
@@ -200,7 +195,7 @@ namespace Prerelease.Main
         private Projectile FireWeapon(PlayerObject player)
         {
             player.Weapon.Cooldown = 10;
-            return new Projectile(actionQueue, player, player.Center, new Vector2(Constants.PROJECTILE_VELOCITY * player.Facing.X, 0.0f), new Vector2(1,1));
+            return new Projectile(actionQueue, player, player.Color, player.Center, new Vector2(Constants.PROJECTILE_VELOCITY * player.Facing.X, 0.0f), new Vector2(1,1));
         }
 
         public override void Render(double gameTimeMsec)
@@ -214,7 +209,7 @@ namespace Prerelease.Main
 
             foreach (var projectile in state.ActiveLevel.Projectiles)
             {
-                Renderer.RenderRectangle(projectile.Position, projectile.Size, Color.Red);
+                Renderer.RenderRectangle(projectile.Position, projectile.Size, projectile.Color);
             }
         }
     }
