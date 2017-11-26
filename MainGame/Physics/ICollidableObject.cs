@@ -12,6 +12,10 @@ namespace Prerelease.Main.Physics
         event GridCollisionEventHandler GridCollision;
         event HitEventHandler Hit;
 
+        void OnObjectCollision(ICollidableObject target, Collision collision);
+        void OnGridCollision(ICollidableObject[] target, Collision collision);
+        void OnHit(IProjectile target);
+
         Rect2 BoundingBox { get; }
         Vector2 Position { get; }
         Vector2 Size { get; }

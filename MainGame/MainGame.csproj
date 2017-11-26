@@ -112,6 +112,8 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CompletedDialog.cs" />
+    <Compile Include="LevelFactory.cs" />
+    <Compile Include="ObjectManager.cs" />
     <Compile Include="Physics\Collision.cs" />
     <Compile Include="Physics\Door.cs" />
     <Compile Include="Physics\EnemyObject.cs" />
@@ -135,6 +137,7 @@
     <Compile Include="Physics\MovableObject.cs" />
     <Compile Include="Physics\Object.cs" />
     <Compile Include="Physics\PlayerObject.cs" />
+    <Compile Include="Physics\StaticObject.cs" />
     <Compile Include="Physics\Weapon.cs" />
     <Compile Include="PlatformerSceene.cs" />
     <Compile Include="Physics\Projectile.cs" />
@@ -148,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Maps\Level1.blocks.txt" />
+    <EmbeddedResource Include="Maps\Level2.blocks.txt" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\Logo.scale-100.png" />
     <Content Include="Assets\SmallLogo.scale-100.png" />

@@ -13,12 +13,12 @@ namespace Prerelease.Main.Physics
     public struct Destination
     {
         public DestinationType Type;
-        public int Identifier;
+        public string Identifier;
     }
 
     public class Door : Object
     {
-        public Door(ActionQueue actionQueue, Vector2 startingPosition, Vector2 size) : base(actionQueue, startingPosition, size)
+        public Door(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPosition, size)
         {
         }
 

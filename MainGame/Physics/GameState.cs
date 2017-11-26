@@ -15,13 +15,19 @@ namespace Prerelease.Main.Physics
         private readonly List<Projectile> projectiles = new List<Projectile>();
         private readonly List<MovableObject> crates = new List<MovableObject>();
         private readonly List<Door> doors = new List<Door>();
+        private readonly List<StaticObject> staticObjects = new List<StaticObject>();
 
         public IReadonlyVector SpawnPoint { get; }
         public BlockGrid Blocks { get; private set; }
+
+        // Objects
         public IEnumerable<EnemyObject> Enemies => enemies;
         public IEnumerable<Projectile> Projectiles => projectiles;
         public IEnumerable<MovableObject> Crates => crates;
         public IEnumerable<Door> Doors => doors;
+        public IEnumerable<StaticObject> StaticObjects => staticObjects;
+
+        public IEnumerable<Object> AllObjects => ((IEnumerable<Object>)enemies).Concat(projectiles).Concat(crates).Concat(doors).Concat(staticObjects);
 
         public LevelState(string name, IReadonlyVector spawnPoint)
         {
@@ -49,6 +55,11 @@ namespace Prerelease.Main.Physics
             doors.AddRange(levelDoors);
         }
 
+        public void AddStaticObjects(IEnumerable<StaticObject> levelStaticObjects)
+        {
+            staticObjects.AddRange(levelStaticObjects);
+        }
+
         public void AddProjectiles(params Projectile[] projectile)
         {
             projectiles.AddRange(projectile);
@@ -72,7 +83,8 @@ namespace Prerelease.Main.Physics
         // Per level state
         private readonly List<LevelState> levels = new List<LevelState>();
 
-        public IEnumerable<PlayerObject> Players => players; 
+        public IEnumerable<PlayerObject> Players => players;
+        public IEnumerable<PlayerObject> ActivePlayers => Players.Where(p => p.Active);
         public IEnumerable<LevelState> Levels => levels;
         public LevelState ActiveLevel { get; private set; }
 
@@ -81,17 +93,14 @@ namespace Prerelease.Main.Physics
             this.players = playerObject.ToArray();
         }
 
-        public void SetActiveLevel(LevelState levelState)
+        public void AddLevel(LevelState level)
         {
-            var existingLevel = levels.FirstOrDefault(l => string.Equals(l.Name, levelState.Name));
-            if (existingLevel != null)
-            {
-                ActiveLevel = existingLevel;
-                return;
-            }
+            levels.Add(level);
+        }
 
-            levels.Add(levelState);
-            ActiveLevel = levelState;
+        public void SetActiveLevel(string levelName)
+        {
+            ActiveLevel = levels.First(l => string.Equals(l.Name, levelName));
         }
     }
 }

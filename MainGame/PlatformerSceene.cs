@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Windows.Storage.Streams;
 using Contracts;
 using Prerelease.Main.Physics;
 using VectorMath;
@@ -18,7 +19,9 @@ namespace Prerelease.Main
 
         private readonly ActionQueue actionQueue;
         private PhysicsEngine physics;
-        private ISprite blockSprite;
+        private ObjectManager objectManager;
+        private IBinding<ISprite> blockSprite;
+        private Door doorToEnter = null;
 
         // Game state
         private GameState state;
@@ -33,130 +36,58 @@ namespace Prerelease.Main
         {
             base.Activate(inputMasks);
 
-            var level = CreateLevel("Level1");
-
+            var levelFactory = new LevelFactory(actionQueue);
             var players = new List<PlayerObject>
             {
-                new PlayerObject(actionQueue, inputMasks[0], level.SpawnPoint, new Vector2(30, 30), Color.Red),
-                new PlayerObject(actionQueue, inputMasks[1], level.SpawnPoint, new Vector2(30, 30), Color.Green),
-                new PlayerObject(actionQueue, inputMasks[2], level.SpawnPoint, new Vector2(30, 30), Color.Blue),
-                new PlayerObject(actionQueue, inputMasks[3], level.SpawnPoint, new Vector2(30, 30), Color.Yellow),
+                new PlayerObject(actionQueue, inputMasks[0], new Vector2(), new Vector2(30, 30), Color.Red),
+                new PlayerObject(actionQueue, inputMasks[1], new Vector2(), new Vector2(30, 30), Color.Green),
+                new PlayerObject(actionQueue, inputMasks[2], new Vector2(), new Vector2(30, 30), Color.Blue),
+                new PlayerObject(actionQueue, inputMasks[3], new Vector2(), new Vector2(30, 30), Color.Yellow),
             };
 
+            objectManager = new ObjectManager(players);
             state = new GameState(players);
-            physics = new PhysicsEngine(state, UpdateStep);
+            physics = new PhysicsEngine(objectManager, UpdateStep);
 
-            state.SetActiveLevel(level);
+            var level1 = levelFactory.Load("Level1");
+            var level2 = levelFactory.Load("Level2");
+            ResolveBindings(level1);
+            ResolveBindings(level2);
+            state.AddLevel(level1);
+            state.AddLevel(level2);
+            TransitionToLevel(level1.Name);
 
             // Load content in active scope.
             blockSprite = LoadSprite("Block");
             foreach (var player in players)
             {
-                player.Sprite = LoadSprite("Chicken");
-                player.Sprite.Size = new Vector2(30, 30);
+                player.SpriteBinding = LoadSprite("Chicken");
+                player.SpriteBinding.Object.Size = new Vector2(30, 30);
             }
         }
 
-        private LevelState CreateLevel(string levelName)
+        private void ResolveBindings(LevelState level)
         {
-            var levelEnemies = new List<EnemyObject>();
-            var levelCrates = new List<MovableObject>();
-            var levelDoors = new List<Door>();
-            var levelText = ReadLevelBlocks(levelName);
+            level.Blocks.SpriteBinding = scope.ResolveSprite(level.Blocks.SpriteBinding);
 
-            var lines = levelText.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
-            var blocks = new BlockGrid(30, 30, (uint)lines.Length, (uint)lines[0].Length);
-
-            Vector2 spawnPoint = new Vector2();
-
-            for (uint row = 0; row < lines.Length; row++)
+            foreach (var obj in level.AllObjects)
             {
-                if(lines[row].Length > blocks.Columns)
-                    throw new InvalidDataException($"Row number {row} has an invalid column count {lines[row].Length}, it must not exceed {blocks.Columns}.");
-
-                for (uint col = 0; col < lines[row].Length; col++)
+                if (!obj.SpriteBinding.Resolved)
                 {
-                    var cellValue = lines[row][(int) col];
-                    switch (cellValue)
-                    {
-                        case 's':
-                            spawnPoint = new Vector2(30*col, 30*row);
-                            break;
-                        case 'x':
-                        case 'X':
-                            blocks.Insert(row, col);
-                            break;
-                        case 'c':
-                        case 'C':
-                            var crate = CreateCrate(new Vector2(30*col, 30*row), new Vector2(30, 30));
-                            levelCrates.Add(crate);
-                            break;
-                        case 'e':
-                        case 'E':
-                            var enemy = CreateEnemy(new Vector2(30 * col, 30 * row), new Vector2(30, 30));
-                            levelEnemies.Add(enemy);
-                            break;
-                        case '1':
-                        case '2':
-                        case '3':
-                            // Level door
-                            int levelNumber = (int)char.GetNumericValue(cellValue);
-                            var door = CreateDoorToLevel(new Vector2(30 * col, 30 * row), new Vector2(30, 30), levelNumber);
-                            levelDoors.Add(door);
-                            break;
-                    }
+                    obj.SpriteBinding = scope.ResolveSprite(obj.SpriteBinding);
                 }
-            }
-
-            var level = new LevelState(levelName, spawnPoint);
-            level.SetBlocks(blocks);
-            level.AddEnemies(levelEnemies);
-            level.AddCrates(levelCrates);
-            level.AddDoors(levelDoors);
-            return level;
-        }
-
-        private MovableObject CreateCrate(Vector2 position, Vector2 size)
-        {
-            var crate = new MovableObject(actionQueue, position, size);
-            crate.Sprite = LoadSprite("crate");
-            return crate;
-        }
-
-        private Door CreateDoorToLevel(Vector2 position, Vector2 size, int levelNumber)
-        {
-            var door = new Door(actionQueue, position, size);
-            door.Sprite = LoadSprite("door");
-            door.Destination = new Destination()
-            {
-                Type = DestinationType.Level,
-                Identifier = levelNumber
-            };
-            return door;
-        }
-
-        private EnemyObject CreateEnemy(Vector2 position, Vector2 size)
-        {
-            var enemy = new EnemyObject(actionQueue, position, size);
-            enemy.Sprite = LoadSprite("skeleton");
-            return enemy;
-        }
-
-        private string ReadLevelBlocks(string levelName)
-        {
-            var assembly = GetType().GetTypeInfo().Assembly;
-            var resourceName = $"Prerelease.Main.Maps.{levelName}.blocks.txt";
-
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
-            using (var reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd();
             }
         }
 
         public override void Update(float timestep)
         {
-            foreach(var player in state.Players)
+            // Enter selected door now
+            if (doorToEnter != null)
+            {
+                HandleTransition();
+            }
+
+            foreach (var player in state.Players)
             {
                 HandlePlayerInput(player);
             }
@@ -180,6 +111,30 @@ namespace Prerelease.Main
             }
 
             state.ActiveLevel.CleanUp();
+        }
+
+        private void HandleTransition()
+        {
+            switch (doorToEnter.Destination.Type)
+            {
+                case DestinationType.Level:
+                    TransitionToLevel(doorToEnter.Destination.Identifier);
+                    break;
+            }
+        }
+
+        private void TransitionToLevel(string levelName)
+        {
+            state.SetActiveLevel(levelName);
+            objectManager.PartitionLevelObjects(state.ActiveLevel);
+
+            // Spawn players at starting location
+            foreach (var player in state.Players)
+            {
+                player.Acceleration.Clear();
+                player.Velocity.Clear();
+                player.Position = new Vector2(state.ActiveLevel.SpawnPoint);
+            }
         }
 
         readonly Vector2 instantVelocity = Vector2.Zero;
@@ -211,15 +166,13 @@ namespace Prerelease.Main
 
             if (player.Grounded)
             {
+                if (inputMask.Input.Select)
+                {
+                    // Enter door if on door sprite (next frame update will carry out the transition
+                    doorToEnter = state.ActiveLevel.Doors.FirstOrDefault(d => player.BoundingBox.Inside(d.Center));
+                }
                 if (inputMask.Input.Up)
                 {
-                    // Enter door if on door sprite
-                    var doorToEnter = state.ActiveLevel.Doors.FirstOrDefault(d => player.BoundingBox.Inside(d.Center));
-                    if(doorToEnter != null)
-                    {
-                        // Enter the door
-                    }
-
                     instantVelocity.Y = Constants.JUMP_SPEED;
                 }
             }
@@ -245,10 +198,6 @@ namespace Prerelease.Main
                 player.Velocity.X = 0.0f;
             }
 
-            if (inputMask.Input.Select)
-            {
-            }
-
             if (inputMask.Input.Fire && player.Weapon.CanFire)
             {
                 state.ActiveLevel.AddProjectiles(FireWeapon(player));
@@ -271,30 +220,9 @@ namespace Prerelease.Main
         {
             Renderer.Clear(Color.Black);
 
-            var blocks = state.ActiveLevel.Blocks;
-            foreach (var block in blocks.OccupiedBlocks)
+            foreach (var obj in objectManager.RenderOrder)
             {
-                Renderer.RenderOpagueSprite(blockSprite, block.Position, blocks.GridSize);
-            }
-
-            foreach (var door in state.ActiveLevel.Doors)
-            {
-                Renderer.RenderOpagueSprite(door.Sprite, door.Position, door.Size);
-            }
-
-            foreach (var crate in state.ActiveLevel.Crates)
-            {
-                Renderer.RenderOpagueSprite(crate.Sprite, crate.Position, crate.Size);
-            }
-
-            foreach (var enemy in state.ActiveLevel.Enemies)
-            {
-                Renderer.RenderOpagueSprite(enemy.Sprite, enemy.Position, enemy.Size, enemy.Facing.X < 0);
-            }
-
-            foreach (var player in state.Players.Where(p => p.Active && !p.Dead))
-            {
-                Renderer.RenderOpagueSprite(player.Sprite, player.Position, player.Size, player.Facing.X < 0);
+                Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, obj.Position, obj.Size, obj.Facing.X < 0);
             }
 
             foreach (var projectile in state.ActiveLevel.Projectiles)

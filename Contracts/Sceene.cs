@@ -13,7 +13,7 @@ namespace Contracts
         protected ActionQueue ActionQueue;
         protected string Name;
 
-        private IRenderScope scope;
+        protected IRenderScope scope;
 
         protected Sceene(string sceeneName, IRenderer renderer, IUserInterface ui, ActionQueue actionQueue)
         {
@@ -38,9 +38,9 @@ namespace Contracts
             Renderer.DeactivateScope(Name);
         }
 
-        public ISprite LoadSprite(string spriteName)
+        public IBinding<ISprite> LoadSprite(string spriteName)
         {
-            return scope.LoadSprite(spriteName);
+            return scope.ResolveSprite(new ObjectBinding<ISprite>(spriteName));
         }
 
         public IFont LoadFont(string fontName)

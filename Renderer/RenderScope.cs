@@ -18,7 +18,12 @@ namespace Renderer
             return fonts.LoadFont(fontName);
         }
 
-        public ISprite LoadSprite(string spriteName)
+        public IBinding<ISprite> ResolveSprite(IBinding<ISprite> spriteBinding)
+        {
+            return new ResolvedBinding<ISprite>(spriteBinding, LoadSprite(spriteBinding.Path));
+        }
+
+        private ISprite LoadSprite(string spriteName)
         {
             return sprites.Load(spriteName);
         }

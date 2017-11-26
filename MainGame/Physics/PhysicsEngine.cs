@@ -9,15 +9,15 @@ namespace Prerelease.Main.Physics
 {
     public class PhysicsEngine
     {
-        private readonly GameState state; 
+        private readonly ObjectManager objectManager; 
         private readonly float timestep;
 
         private ICollidableObjectGrid grid;
-        private IEnumerable<MovableObject> movableObjects;
+        private IEnumerable<ICollidableObject> movableObjects;
 
-        public PhysicsEngine(GameState state, float timestep)
+        public PhysicsEngine(ObjectManager objectManager, float timestep)
         {
-            this.state = state;
+            this.objectManager = objectManager;
             this.timestep = timestep;
         }
 
@@ -68,12 +68,11 @@ namespace Prerelease.Main.Physics
 
         private void LoadLevelObjects()
         {
-            var level = state.ActiveLevel;
-            grid = level.Blocks;
-            movableObjects = level.Crates.Concat(level.Enemies).Concat(state.Players).ToArray();
+            grid = objectManager.Blocks;
+            movableObjects = objectManager.CollisionOrder.ToArray();
         }
 
-        private static void HandleObjectCollision(MovableObject obj, MovableObject movableObject)
+        private static void HandleObjectCollision(MovableObject obj, ICollidableObject movableObject)
         {
             if (movableObject == obj)
                 return;
@@ -283,15 +282,10 @@ namespace Prerelease.Main.Physics
                 if (movableObject == projectile.Shooter)
                     continue;
 
-                if (
-                    projectile.Position.X > movableObject.Position.X &&
-                    projectile.Position.X < movableObject.Position.X + movableObject.Size.X &&
-                    projectile.Position.Y > movableObject.Position.Y &&
-                    projectile.Position.Y < movableObject.Position.Y + movableObject.Size.Y)
+                if (movableObject.BoundingBox.Inside(projectile.Position))
                 {
                     var collision = new Collision()
                     {
-                        Force = movableObject.DeltaPosition,
                         HorizontalCollision = true,
                         VerticalCollision = false
                     };

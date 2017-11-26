@@ -61,7 +61,7 @@ namespace Prerelease.Main.Input
 
         public bool Select()
         {
-            return pressedKeys.Contains(Keys.Enter);
+            return pressedKeys.Contains(Keys.Q);
         }
     }
 }

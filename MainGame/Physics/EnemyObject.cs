@@ -9,7 +9,7 @@ namespace Prerelease.Main.Physics
         public int HitPoints { get; set; }
         public bool Dead => HitPoints <= 0;
 
-        public EnemyObject(ActionQueue actionQueue, Vector2 startingPosition, Vector2 size) : base(actionQueue, startingPosition, size)
+        public EnemyObject(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPosition, size)
         {
             HitPoints = 10;
             Hit += EnemyOnHit;
