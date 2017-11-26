@@ -142,6 +142,7 @@
     <Compile Include="PlatformerSceene.cs" />
     <Compile Include="Physics\Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpriteResolver.cs" />
     <Compile Include="UserInterface.cs" />
   </ItemGroup>
   <ItemGroup>

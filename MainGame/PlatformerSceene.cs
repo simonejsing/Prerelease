@@ -18,9 +18,9 @@ namespace Prerelease.Main
         private readonly Vector2 ZeroVector = Vector2.Zero;
 
         private readonly ActionQueue actionQueue;
+        private SpriteResolver spriteResolver;
         private PhysicsEngine physics;
         private ObjectManager objectManager;
-        private IBinding<ISprite> blockSprite;
         private Door doorToEnter = null;
 
         // Game state
@@ -45,37 +45,24 @@ namespace Prerelease.Main
                 new PlayerObject(actionQueue, inputMasks[3], new Vector2(), new Vector2(30, 30), Color.Yellow),
             };
 
+            spriteResolver = new SpriteResolver(scope);
             objectManager = new ObjectManager(players);
             state = new GameState(players);
             physics = new PhysicsEngine(objectManager, UpdateStep);
 
             var level1 = levelFactory.Load("Level1");
             var level2 = levelFactory.Load("Level2");
-            ResolveBindings(level1);
-            ResolveBindings(level2);
+            spriteResolver.ResolveBindings(level1);
+            spriteResolver.ResolveBindings(level2);
             state.AddLevel(level1);
             state.AddLevel(level2);
             TransitionToLevel(level1.Name);
 
             // Load content in active scope.
-            blockSprite = LoadSprite("Block");
             foreach (var player in players)
             {
                 player.SpriteBinding = LoadSprite("Chicken");
                 player.SpriteBinding.Object.Size = new Vector2(30, 30);
-            }
-        }
-
-        private void ResolveBindings(LevelState level)
-        {
-            level.Blocks.SpriteBinding = scope.ResolveSprite(level.Blocks.SpriteBinding);
-
-            foreach (var obj in level.AllObjects)
-            {
-                if (!obj.SpriteBinding.Resolved)
-                {
-                    obj.SpriteBinding = scope.ResolveSprite(obj.SpriteBinding);
-                }
             }
         }
 
