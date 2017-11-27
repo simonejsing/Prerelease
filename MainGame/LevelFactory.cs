@@ -23,6 +23,7 @@ namespace Prerelease.Main
             var levelEnemies = new List<EnemyObject>();
             var levelCrates = new List<MovableObject>();
             var levelStaticObjects = new List<StaticObject>();
+            var levelCollectableObjects = new List<StaticObject>();
             var levelDoors = new List<Door>();
             var levelText = ReadLevelBlocks(levelName);
 
@@ -54,6 +55,11 @@ namespace Prerelease.Main
                             var hiddenObject = CreateHiddenObject(new Vector2(30 * col, 30 * row), new Vector2(30, 30));
                             levelStaticObjects.Add(hiddenObject);
                             break;
+                        case 'f':
+                        case 'F':
+                            var collectableObject = CreateFlowerObject(new Vector2(30 * col, 30 * row), new Vector2(30, 30));
+                            levelCollectableObjects.Add(collectableObject);
+                            break;
                         case 'c':
                         case 'C':
                             var crate = CreateCrate(new Vector2(30*col, 30*row), new Vector2(30, 30));
@@ -82,7 +88,21 @@ namespace Prerelease.Main
             level.AddCrates(levelCrates);
             level.AddDoors(levelDoors);
             level.AddStaticObjects(levelStaticObjects);
+            level.AddCollectableObjects(levelCollectableObjects);
             return level;
+        }
+
+        private StaticObject CreateFlowerObject(IReadonlyVector position, IReadonlyVector size)
+        {
+            var flowerObject = new StaticObject(actionQueue, position, size);
+            flowerObject.SpriteBinding = new ObjectBinding<ISprite>("flower");
+            flowerObject.Collect += CollectFlower;
+            return flowerObject;
+        }
+
+        private void CollectFlower(object sender, ICollectingObject target)
+        {
+            target.Inventory.Add("flower");
         }
 
         private StaticObject CreateHiddenObject(IReadonlyVector position, IReadonlyVector size)

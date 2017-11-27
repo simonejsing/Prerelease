@@ -8,7 +8,7 @@ using VectorMath;
 
 namespace Prerelease.Main.Physics
 {
-    public class StaticObject : Object, ICollidableObject
+    public class StaticObject : Object, ICollidableObject, ICollectableObject
     {
         public StaticObject(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPosition, size)
         {
@@ -17,6 +17,7 @@ namespace Prerelease.Main.Physics
         public event ObjectCollisionEventHandler ObjectCollision;
         public event GridCollisionEventHandler GridCollision;
         public event HitEventHandler Hit;
+        public event CollectEventHandler Collect;
 
         public void OnObjectCollision(ICollidableObject target, Collision collision)
         {
@@ -33,7 +34,12 @@ namespace Prerelease.Main.Physics
             Hit?.Invoke(this, target);
         }
 
+        public void OnCollect(ICollectingObject target)
+        {
+            Collect?.Invoke(this, target);
+        }
 
         public bool Occupied => true;
+        public bool PickedUp { get; set; }
     }
 }

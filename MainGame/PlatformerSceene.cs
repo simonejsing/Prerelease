@@ -151,7 +151,7 @@ namespace Prerelease.Main
                 if (inputMask.Input.Select)
                 {
                     // Enter door if on door sprite (next frame update will carry out the transition
-                    doorToEnter = state.ActiveLevel.Doors.FirstOrDefault(d => player.BoundingBox.Inside(d.Center));
+                    doorToEnter = state.ActiveLevel.Doors.FirstOrDefault(d => player.BoundingBox.Intersects(d.Center));
                 }
                 if (inputMask.Input.Up)
                 {
@@ -190,6 +190,14 @@ namespace Prerelease.Main
             inputMask.Reset();
 
             physics.ApplyToObject(player, instantVelocity);
+
+            // Check if player is touching any collectable objects
+            // TODO: Quad-tree to partition space such that we don't have to test intersection with every single collectable object on each frame.
+            foreach (var touchedObject in state.ActiveLevel.CollectableObjects.Where(o => o.BoundingBox.Intersects(player.BoundingBox)))
+            {
+                touchedObject.OnCollect(player);
+                touchedObject.PickedUp = true;
+            }
         }
 
         private Projectile FireWeapon(PlayerObject player)

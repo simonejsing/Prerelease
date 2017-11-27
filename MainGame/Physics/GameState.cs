@@ -16,6 +16,7 @@ namespace Prerelease.Main.Physics
         private readonly List<MovableObject> crates = new List<MovableObject>();
         private readonly List<Door> doors = new List<Door>();
         private readonly List<StaticObject> staticObjects = new List<StaticObject>();
+        private readonly List<StaticObject> collectableObjects = new List<StaticObject>();
 
         public IReadonlyVector SpawnPoint { get; }
         public BlockGrid Blocks { get; private set; }
@@ -26,8 +27,9 @@ namespace Prerelease.Main.Physics
         public IEnumerable<MovableObject> Crates => crates;
         public IEnumerable<Door> Doors => doors;
         public IEnumerable<StaticObject> StaticObjects => staticObjects;
+        public IEnumerable<StaticObject> CollectableObjects => collectableObjects;
 
-        public IEnumerable<Object> AllObjects => ((IEnumerable<Object>)enemies).Concat(projectiles).Concat(crates).Concat(doors).Concat(staticObjects);
+        public IEnumerable<Object> AllObjects => ((IEnumerable<Object>)enemies).Concat(projectiles).Concat(crates).Concat(doors).Concat(staticObjects).Concat(collectableObjects);
 
         public LevelState(string name, IReadonlyVector spawnPoint)
         {
@@ -58,6 +60,11 @@ namespace Prerelease.Main.Physics
         public void AddStaticObjects(IEnumerable<StaticObject> levelStaticObjects)
         {
             staticObjects.AddRange(levelStaticObjects);
+        }
+
+        public void AddCollectableObjects(List<StaticObject> levelCollectableObjects)
+        {
+            collectableObjects.AddRange(levelCollectableObjects);
         }
 
         public void AddProjectiles(params Projectile[] projectile)

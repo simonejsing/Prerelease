@@ -130,7 +130,11 @@
     <Compile Include="Input\MonoKeyboardInput.cs" />
     <Compile Include="Physics\Constants.cs" />
     <Compile Include="Physics\GameState.cs" />
+    <Compile Include="Physics\ICollectableObject.cs" />
+    <Compile Include="Physics\ICollectingObject.cs" />
     <Compile Include="Physics\ICollidableObjectGrid.cs" />
+    <Compile Include="Physics\IInventory.cs" />
+    <Compile Include="Physics\Inventory.cs" />
     <Compile Include="Physics\IProjectile.cs" />
     <Compile Include="Physics\PhysicsEngine.cs" />
     <Compile Include="Physics\ICollidableObject.cs" />

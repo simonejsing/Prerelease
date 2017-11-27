@@ -8,7 +8,7 @@ using VectorMath;
 
 namespace Prerelease.Main.Physics
 {
-    public class PlayerObject : MovableObject
+    public class PlayerObject : MovableObject, ICollectingObject
     {
         public InputMask InputMask { get; }
 
@@ -18,9 +18,12 @@ namespace Prerelease.Main.Physics
         public int HitPoints { get; set; }
         public bool Dead => HitPoints <= 0;
 
+        public IInventory Inventory { get; }
+
         public PlayerObject(ActionQueue actionQueue, InputMask inputMask, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPosition, size)
         {
             Weapon = new Weapon();
+            Inventory = new Inventory();
             InputMask = inputMask;
             Active = false;
             SpriteBinding = new ObjectBinding<ISprite>(spritePath);

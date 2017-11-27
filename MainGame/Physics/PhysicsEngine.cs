@@ -282,7 +282,7 @@ namespace Prerelease.Main.Physics
                 if (movableObject == projectile.Shooter)
                     continue;
 
-                if (movableObject.BoundingBox.Inside(projectile.Position))
+                if (movableObject.BoundingBox.Intersects(projectile.Position))
                 {
                     var collision = new Collision()
                     {
