@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Contracts;
-using Prerelease.Main.Physics;
+using CraftingGame.Physics;
 
-namespace Prerelease.Main
+namespace CraftingGame
 {
     public class ObjectManager
     {

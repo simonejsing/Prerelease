@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contracts;
 using VectorMath;
 
-namespace Prerelease.Main.Physics
+namespace CraftingGame.Physics
 {
     public struct Block : ICollidableObject, IRenderableObject
     {

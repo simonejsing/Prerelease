@@ -1,5 +1,6 @@
 ﻿using System;
 using Contracts;
+using CraftingGame;
 using Microsoft.Xna.Framework;
 using Prerelease.Main.Input;
 using Renderer;

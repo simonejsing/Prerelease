@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Contracts;
-using Prerelease.Main.Physics;
+using CraftingGame.Physics;
+using Object = CraftingGame.Physics.Object;
 
-namespace Prerelease.Main
+namespace CraftingGame
 {
     public class SpriteResolver
     {
@@ -10,6 +12,9 @@ namespace Prerelease.Main
 
         public SpriteResolver(IRenderScope scope)
         {
+            if(scope == null)
+                throw new ArgumentNullException(nameof(scope));
+
             this.scope = scope;
         }
 

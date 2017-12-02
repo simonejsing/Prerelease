@@ -112,13 +112,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CompletedDialog.cs" />
-    <Compile Include="LevelFactory.cs" />
-    <Compile Include="ObjectManager.cs" />
-    <Compile Include="Physics\Collision.cs" />
-    <Compile Include="Physics\Door.cs" />
-    <Compile Include="Physics\EnemyObject.cs" />
     <Compile Include="NoOne.cs" />
-    <Compile Include="Physics\BlockGrid.cs" />
     <Compile Include="DialogPage.cs" />
     <Compile Include="GameMenu.cs" />
     <Compile Include="GamePage.xaml.cs">
@@ -128,25 +122,7 @@
     <Compile Include="Input\IMonoInput.cs" />
     <Compile Include="Input\MonoControllerInput.cs" />
     <Compile Include="Input\MonoKeyboardInput.cs" />
-    <Compile Include="Physics\Constants.cs" />
-    <Compile Include="Physics\GameState.cs" />
-    <Compile Include="Physics\ICollectableObject.cs" />
-    <Compile Include="Physics\ICollectingObject.cs" />
-    <Compile Include="Physics\ICollidableObjectGrid.cs" />
-    <Compile Include="Physics\IInventory.cs" />
-    <Compile Include="Physics\Inventory.cs" />
-    <Compile Include="Physics\IProjectile.cs" />
-    <Compile Include="Physics\PhysicsEngine.cs" />
-    <Compile Include="Physics\ICollidableObject.cs" />
-    <Compile Include="Physics\MovableObject.cs" />
-    <Compile Include="Physics\Object.cs" />
-    <Compile Include="Physics\PlayerObject.cs" />
-    <Compile Include="Physics\StaticObject.cs" />
-    <Compile Include="Physics\Weapon.cs" />
-    <Compile Include="PlatformerSceene.cs" />
-    <Compile Include="Physics\Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SpriteResolver.cs" />
     <Compile Include="UserInterface.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -155,8 +131,6 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Maps\Level1.blocks.txt" />
-    <EmbeddedResource Include="Maps\Level2.blocks.txt" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\Logo.scale-100.png" />
     <Content Include="Assets\SmallLogo.scale-100.png" />
@@ -179,9 +153,17 @@
       <Project>{1b4e6f20-64f7-4912-bf4a-4ccdf2420ccc}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CraftingGame\CraftingGame.csproj">
+      <Project>{3e68e3ba-8697-4be6-8722-f25256384ef5}</Project>
+      <Name>CraftingGame</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Renderer\Renderer.csproj">
       <Project>{47ab637f-3d27-4154-abd9-a89f78de8b9d}</Project>
       <Name>Renderer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Terrain\Terrain.csproj">
+      <Project>{94ab4a7b-ec90-4bd8-9634-407e0bd15e1b}</Project>
+      <Name>Terrain</Name>
     </ProjectReference>
     <ProjectReference Include="..\VectorMath\VectorMath.csproj">
       <Project>{e28a40e7-8894-4524-b748-8f89e8014e30}</Project>

@@ -1,7 +1,7 @@
 ﻿using Contracts;
 using VectorMath;
 
-namespace Prerelease.Main.Physics
+namespace CraftingGame.Physics
 {
     public class Projectile : MovableObject, IProjectile
     {

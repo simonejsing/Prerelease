@@ -1,8 +1,7 @@
-﻿using System;
-using Contracts;
+﻿using Contracts;
 using VectorMath;
 
-namespace Prerelease.Main.Physics
+namespace CraftingGame.Physics
 {
     public class EnemyObject : MovableObject
     {

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Contracts;
-using Prerelease.Main.Physics;
+using CraftingGame.Physics;
 using VectorMath;
-using Object = Prerelease.Main.Physics.Object;
 
-namespace Prerelease.Main
+namespace CraftingGame
 {
     public class LevelFactory
     {
@@ -141,7 +140,7 @@ namespace Prerelease.Main
         private string ReadLevelBlocks(string levelName)
         {
             var assembly = GetType().GetTypeInfo().Assembly;
-            var resourceName = $"Prerelease.Main.Maps.{levelName}.blocks.txt";
+            var resourceName = $"CraftingGame.Maps.{levelName}.blocks.txt";
 
             using (var stream = assembly.GetManifestResourceStream(resourceName))
             using (var reader = new StreamReader(stream))

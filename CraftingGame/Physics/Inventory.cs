@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Prerelease.Main.Physics
+namespace CraftingGame.Physics
 {
     internal class Inventory : IInventory
     {

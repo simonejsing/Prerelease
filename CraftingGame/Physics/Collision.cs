@@ -1,6 +1,6 @@
 ﻿using VectorMath;
 
-namespace Prerelease.Main.Physics
+namespace CraftingGame.Physics
 {
     public struct Collision
     {

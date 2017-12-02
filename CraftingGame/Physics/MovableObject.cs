@@ -1,8 +1,7 @@
 ﻿using Contracts;
 using VectorMath;
-using Object = Prerelease.Main.Physics.Object;
 
-namespace Prerelease.Main.Physics
+namespace CraftingGame.Physics
 {
     public class MovableObject : StaticObject
     {

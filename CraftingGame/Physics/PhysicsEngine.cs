@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VectorMath;
 
-namespace Prerelease.Main.Physics
+namespace CraftingGame.Physics
 {
     public class PhysicsEngine
     {

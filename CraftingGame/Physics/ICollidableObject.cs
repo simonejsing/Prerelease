@@ -1,6 +1,6 @@
 ﻿using VectorMath;
 
-namespace Prerelease.Main.Physics
+namespace CraftingGame.Physics
 {
     public delegate void ObjectCollisionEventHandler(object sender, ICollidableObject target, Collision collision);
     public delegate void GridCollisionEventHandler(object sender, ICollidableObject[] target, Collision collision);

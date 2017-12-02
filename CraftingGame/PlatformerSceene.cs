@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using Windows.Storage.Streams;
 using Contracts;
-using Prerelease.Main.Physics;
+using CraftingGame.Physics;
+using Terrain;
 using VectorMath;
-using Object = Prerelease.Main.Physics.Object;
 
-namespace Prerelease.Main
+namespace CraftingGame
 {
     public class PlatformerSceene : Sceene
     {
@@ -23,12 +20,18 @@ namespace Prerelease.Main
         private ObjectManager objectManager;
         private Door doorToEnter = null;
 
+        // Terrain
+        private readonly Vector2 GridSize = new Vector2(30, 30);
+        private readonly Rect2 ActiveView;
+        private readonly Generator terrainGenerator = new Generator();
+
         // Game state
         private GameState state;
 
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue)
             : base("Platformer", renderer, ui, actionQueue)
         {
+            ActiveView = new Rect2(new Vector2(0, 310), renderer.GetViewport());
             this.actionQueue = actionQueue;
         }
 
@@ -129,6 +132,11 @@ namespace Prerelease.Main
             if (!player.Active)
                 return;
 
+            ActiveView.TopLeft.Y += inputMask.Input.Up ? 4 : 0;
+            ActiveView.TopLeft.Y += inputMask.Input.Down ? -4 : 0;
+            ActiveView.TopLeft.X += inputMask.Input.Left ? -4 : 0;
+            ActiveView.TopLeft.X += inputMask.Input.Right ? 4 : 0;
+
             bool horizontalInput = false;
 
             instantVelocity.Clear();
@@ -210,6 +218,38 @@ namespace Prerelease.Main
         {
             Renderer.Clear(Color.Black);
 
+            // Render terrain
+            var sx = (int)Math.Ceiling(ActiveView.TopLeft.X / GridSize.X);
+            var sy = (int)Math.Ceiling(ActiveView.TopLeft.Y / GridSize.Y);
+            var ox = (int)Math.Round(sx * GridSize.X - ActiveView.TopLeft.X);
+            var oy = (int)Math.Round(sy * GridSize.Y - ActiveView.TopLeft.Y);
+            var nx = (int)Math.Ceiling(ActiveView.Size.X / GridSize.X);
+            var ny = (int)Math.Ceiling(ActiveView.Size.Y / GridSize.Y);
+
+            var plane = 0;
+            // view port has negative height
+            for (var y = ny; y <= 0; y++)
+            {
+                for (var x = -1; x < nx; x++)
+                {
+                    var block = terrainGenerator[sx + x, sy + y, plane];
+                    var p = new Vector2(ox + x * GridSize.X, -(oy + y * GridSize.Y));
+                    switch (block.Type)
+                    {
+                        case Generator.TerrainType.Dirt:
+                            Renderer.RenderRectangle(p, GridSize, Color.Red);
+                            break;
+                        case Generator.TerrainType.Bedrock:
+                            Renderer.RenderRectangle(p, GridSize, Color.Black);
+                            break;
+                        case Generator.TerrainType.Free:
+                            Renderer.RenderRectangle(p, GridSize, Color.Blue);
+                            break;
+                    }
+                }
+            }
+
+            /*
             foreach (var obj in objectManager.RenderOrder)
             {
                 Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, obj.Position, obj.Size, obj.Facing.X < 0);
@@ -219,6 +259,7 @@ namespace Prerelease.Main
             {
                 Renderer.RenderRectangle(projectile.Position, projectile.Size, projectile.Color);
             }
+            */
         }
     }
 }
