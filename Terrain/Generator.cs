@@ -6,16 +6,8 @@ using System.Threading.Tasks;
 
 namespace Terrain
 {
-    public class Generator
+    public class Generator : ITerrainGenerator
     {
-        public enum TerrainType { Free = 0, Dirt = 1, Rock = 2, Bedrock = 3 }
-
-        public struct TerrainBlock
-        {
-            public int X, Y;
-            public TerrainType Type;
-        }
-
         public TerrainBlock this[int x, int y, int z]
         {
             get

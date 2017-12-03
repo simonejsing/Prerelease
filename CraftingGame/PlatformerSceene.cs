@@ -20,17 +20,19 @@ namespace CraftingGame
         private ObjectManager objectManager;
         private Door doorToEnter = null;
 
+        public Rect2 ActiveView { get; set; }
+
         // Terrain
         private readonly Vector2 GridSize = new Vector2(30, 30);
-        private readonly Rect2 ActiveView;
-        private readonly Generator terrainGenerator = new Generator();
+        private readonly ITerrainGenerator terrainGenerator;
 
         // Game state
-        private GameState state;
+        public GameState State { get; private set; }
 
-        public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue)
+        public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainGenerator terrain = null)
             : base("Platformer", renderer, ui, actionQueue)
         {
+            this.terrainGenerator = terrain ?? new Generator();
             ActiveView = new Rect2(new Vector2(0, 310), renderer.GetViewport());
             this.actionQueue = actionQueue;
         }
@@ -52,15 +54,15 @@ namespace CraftingGame
             spriteResolver.ResolveBindings(players);
 
             objectManager = new ObjectManager(players);
-            state = new GameState(players);
+            State = new GameState(players);
             physics = new PhysicsEngine(objectManager, UpdateStep);
 
             var level1 = levelFactory.Load("Level1");
             var level2 = levelFactory.Load("Level2");
             spriteResolver.ResolveBindings(level1);
             spriteResolver.ResolveBindings(level2);
-            state.AddLevel(level1);
-            state.AddLevel(level2);
+            State.AddLevel(level1);
+            State.AddLevel(level2);
             TransitionToLevel(level1.Name);
         }
 
@@ -72,30 +74,30 @@ namespace CraftingGame
                 HandleTransition();
             }
 
-            foreach (var player in state.Players)
+            foreach (var player in State.Players)
             {
                 HandlePlayerInput(player);
             }
 
             // Apply physics to crate.
-            foreach (var crate in state.ActiveLevel.Crates)
+            foreach (var crate in State.ActiveLevel.Crates)
             {
                 physics.ApplyToObject(crate, ZeroVector);
             }
 
             // Apply physics to enemies.
-            foreach (var enemy in state.ActiveLevel.Enemies)
+            foreach (var enemy in State.ActiveLevel.Enemies)
             {
                 enemy.Velocity.X = enemy.Facing.X*Constants.ENEMY_VELOCITY;
                 physics.ApplyToObject(enemy, ZeroVector);
             }
 
-            foreach (var projectile in state.ActiveLevel.Projectiles)
+            foreach (var projectile in State.ActiveLevel.Projectiles)
             {
                 physics.ApplyToProjectile(projectile);
             }
 
-            state.ActiveLevel.CleanUp();
+            State.ActiveLevel.CleanUp();
         }
 
         private void HandleTransition()
@@ -110,15 +112,15 @@ namespace CraftingGame
 
         private void TransitionToLevel(string levelName)
         {
-            state.SetActiveLevel(levelName);
-            objectManager.PartitionLevelObjects(state.ActiveLevel);
+            State.SetActiveLevel(levelName);
+            objectManager.PartitionLevelObjects(State.ActiveLevel);
 
             // Spawn players at starting location
-            foreach (var player in state.Players)
+            foreach (var player in State.Players)
             {
                 player.Acceleration.Clear();
                 player.Velocity.Clear();
-                player.Position = new Vector2(state.ActiveLevel.SpawnPoint);
+                player.Position = new Vector2(State.ActiveLevel.SpawnPoint);
             }
         }
 
@@ -159,7 +161,7 @@ namespace CraftingGame
                 if (inputMask.Input.Select)
                 {
                     // Enter door if on door sprite (next frame update will carry out the transition
-                    doorToEnter = state.ActiveLevel.Doors.FirstOrDefault(d => player.BoundingBox.Intersects(d.Center));
+                    doorToEnter = State.ActiveLevel.Doors.FirstOrDefault(d => player.BoundingBox.Intersects(d.Center));
                 }
                 if (inputMask.Input.Up)
                 {
@@ -190,7 +192,7 @@ namespace CraftingGame
 
             if (inputMask.Input.Fire && player.Weapon.CanFire)
             {
-                state.ActiveLevel.AddProjectiles(FireWeapon(player));
+                State.ActiveLevel.AddProjectiles(FireWeapon(player));
             }
 
             player.Weapon.Update();
@@ -201,7 +203,7 @@ namespace CraftingGame
 
             // Check if player is touching any collectable objects
             // TODO: Quad-tree to partition space such that we don't have to test intersection with every single collectable object on each frame.
-            foreach (var touchedObject in state.ActiveLevel.CollectableObjects.Where(o => o.BoundingBox.Intersects(player.BoundingBox)))
+            foreach (var touchedObject in State.ActiveLevel.CollectableObjects.Where(o => o.BoundingBox.Intersects(player.BoundingBox)))
             {
                 touchedObject.OnCollect(player);
                 touchedObject.PickedUp = true;
@@ -236,14 +238,17 @@ namespace CraftingGame
                     var p = new Vector2(ox + x * GridSize.X, -(oy + y * GridSize.Y));
                     switch (block.Type)
                     {
-                        case Generator.TerrainType.Dirt:
+                        case TerrainType.Dirt:
                             Renderer.RenderRectangle(p, GridSize, Color.Red);
                             break;
-                        case Generator.TerrainType.Bedrock:
-                            Renderer.RenderRectangle(p, GridSize, Color.Black);
+                        case TerrainType.Rock:
+                            Renderer.RenderRectangle(p, GridSize, Color.Gray);
                             break;
-                        case Generator.TerrainType.Free:
-                            Renderer.RenderRectangle(p, GridSize, Color.Blue);
+                        case TerrainType.Bedrock:
+                            Renderer.RenderRectangle(p, GridSize, Color.DarkGray);
+                            break;
+                        case TerrainType.Free:
+                            //Renderer.RenderRectangle(p, GridSize, Color.Blue);
                             break;
                     }
                 }

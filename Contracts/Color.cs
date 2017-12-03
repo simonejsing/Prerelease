@@ -24,5 +24,8 @@ namespace Contracts
         public static Color Green = new Color(0f, 1f, 0f, 1f);
         public static Color Blue = new Color(0f, 0f, 1f, 1f);
         public static Color Yellow = new Color(1f, 1f, 0f, 1f);
+        public static Color LightGray = new Color(0.1f, 0.1f, 0.1f, 1f);
+        public static Color Gray = new Color(0.5f, 0.5f, 0.5f, 1f);
+        public static Color DarkGray = new Color(0.8f, 0.8f, 0.8f, 1f);
     }
 }
