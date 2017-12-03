@@ -44,21 +44,39 @@ namespace Terrain
                 return TerrainType.Free;
 
             // The depth (y) determines what type of block it is
-            /*var bedrockHeight = BedrockHeight(x);
-            if(y <= bedrockHeight)
-                return TerrainType.Bedrock;*/
-
-            var rockHeight = RockLevel(x, z + 0.5); // Offset by 0.5 for more randomness
+            var dy = y + MaxDepth;
+            var bedrockHeight = BedrockLevel(x, z + 0.5); // Offset by 0.5 for more randomness
+            var rockHeight = bedrockHeight + RockLevel(x, z + 0.5); // Offset by 0.5 for more randomness
             var dirtHeight = DirtLevel(x, z + 0.5); // Offset by 0.5 for more randomness
-            var maxHeight = Math.Max(rockHeight, dirtHeight);
 
-            if (y > maxHeight)
-                return TerrainType.Free;
+            if (dy <= bedrockHeight)
+                return TerrainType.Bedrock;
 
-            if (dirtHeight > rockHeight)
+            if (dy <= rockHeight)
+                return TerrainType.Rock;
+
+            if (dy <= dirtHeight)
                 return TerrainType.Dirt;
 
-            return TerrainType.Rock;
+            return TerrainType.Free;
+        }
+
+        private double BedrockLevel(double x, double y)
+        {
+            // Noise parameters
+            const double frequency = 1.0 / 512.0;
+            const double amplitude = 1.0;
+            const double exponent = 2.0;
+            const double scale = 2.0;
+            const double phase = 10.0;
+            const double damping = 6.0;
+
+            var value = Clamp(
+                scale * (Math.Pow(rockGenerator.Noise(x, y, amplitude, frequency, phase, damping), exponent) / Math.Pow(amplitude, exponent) - 0.2),
+                0.0,
+                1.0);
+
+            return ScaleLevel(value);
         }
 
         private double RockLevel(double x, double y)
@@ -96,7 +114,7 @@ namespace Terrain
 
         private double ScaleLevel(double y)
         {
-            return y * (MaxHeight + MaxDepth) - MaxDepth;
+            return y * (MaxHeight + MaxDepth);
         }
 
         private static double Clamp(double value, double min, double max)
