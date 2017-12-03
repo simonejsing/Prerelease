@@ -74,9 +74,9 @@ namespace Prerelease.Main
             }
         }
 
-        public override void Activate(InputMask[] inputMasks)
+        public override void Activate(InputMask uiInput, InputMask[] inputMasks)
         {
-            base.Activate(inputMasks);
+            base.Activate(uiInput, inputMasks);
             MenuInputMask = inputMasks[0];
             menuFont = LoadFont("ConsoleFont");
 

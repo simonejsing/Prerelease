@@ -112,6 +112,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CompletedDialog.cs" />
+    <Compile Include="Input\MonoUIKeyboardInput.cs" />
     <Compile Include="NoOne.cs" />
     <Compile Include="DialogPage.cs" />
     <Compile Include="GameMenu.cs" />

@@ -15,6 +15,8 @@ namespace Contracts
 
         protected IRenderScope scope;
 
+        protected InputMask UiInput { get; private set; }
+
         protected Sceene(string sceeneName, IRenderer renderer, IUserInterface ui, ActionQueue actionQueue)
         {
             this.Name = sceeneName;
@@ -25,8 +27,9 @@ namespace Contracts
 
         public abstract void Update(float timestep);
 
-        public virtual void Activate(InputMask[] inputMasks)
+        public virtual void Activate(InputMask uiInput, InputMask[] inputMasks)
         {
+            UiInput = uiInput;
             // Create a scope in the renderer and set it active. This allows the renderer to manage resources.
             this.scope = Renderer.ActivateScope(Name);
         }

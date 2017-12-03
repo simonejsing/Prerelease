@@ -8,6 +8,22 @@ namespace Terrain
 {
     public class Generator : ITerrainGenerator
     {
+        private readonly Random random;
+
+        private readonly double BedrockPhase;
+        private readonly double RockPhase;
+
+        public int MaxDepth { get; }
+
+        public Generator(int maxDepth, int seed = 0)
+        {
+            MaxDepth = maxDepth;
+            random = new Random(seed);
+
+            BedrockPhase = random.NextDouble() * 2 * Math.PI;
+            RockPhase = random.NextDouble() * 2 * Math.PI;
+        }
+
         public TerrainBlock this[int x, int y, int z]
         {
             get
@@ -23,11 +39,39 @@ namespace Terrain
             }
         }
 
-        private static TerrainType GenerateBlock(int x, int y, int z)
+        private TerrainType GenerateBlock(int x, int y, int z)
         {
-            if(x + y == 0)
+            if(y < -MaxDepth)
+                return TerrainType.Free;
+
+            // The depth (y) determines what type of block it is
+            var bedrockHeight = BedrockHeight(x);
+            if(y <= bedrockHeight)
+                return TerrainType.Bedrock;
+
+            var rockHeight = RockHeight(x);
+            if (y <= bedrockHeight + rockHeight)
                 return TerrainType.Rock;
-            return y > 0 ? TerrainType.Free : TerrainType.Dirt;
+
+            if (y <= 0)
+                return TerrainType.Dirt;
+
+            return TerrainType.Free;
+        }
+
+        private double RockHeight(int x)
+        {
+            return 1 + Noise(x, 1.0, amplitude: 140.0, phase: RockPhase);
+        }
+
+        private double BedrockHeight(int x)
+        {
+            return 1 + Noise(x, 1.0, amplitude: 20.0, phase: BedrockPhase);
+        }
+
+        private static double Noise(double x, double frequency, double amplitude, double phase)
+        {
+            return amplitude * Math.Sin(2*Math.PI*frequency*x/600.0 + phase);
         }
     }
 }

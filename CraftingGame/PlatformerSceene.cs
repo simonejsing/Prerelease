@@ -32,14 +32,14 @@ namespace CraftingGame
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainGenerator terrain = null)
             : base("Platformer", renderer, ui, actionQueue)
         {
-            this.terrainGenerator = terrain ?? new Generator();
+            this.terrainGenerator = terrain ?? new Generator(100);
             ActiveView = new Rect2(new Vector2(0, 310), renderer.GetViewport());
             this.actionQueue = actionQueue;
         }
 
-        public override void Activate(InputMask[] inputMasks)
+        public override void Activate(InputMask uiInput, InputMask[] inputMasks)
         {
-            base.Activate(inputMasks);
+            base.Activate(uiInput, inputMasks);
 
             var levelFactory = new LevelFactory(actionQueue);
             spriteResolver = new SpriteResolver(scope);
@@ -74,6 +74,9 @@ namespace CraftingGame
                 HandleTransition();
             }
 
+            // Handle UI inputs
+            HandleUiInput();
+
             foreach (var player in State.Players)
             {
                 HandlePlayerInput(player);
@@ -98,6 +101,15 @@ namespace CraftingGame
             }
 
             State.ActiveLevel.CleanUp();
+        }
+
+        private void HandleUiInput()
+        {
+            const int ScrollSpeed = 50;
+            ActiveView.TopLeft.Y += UiInput.Input.Up ? ScrollSpeed : 0;
+            ActiveView.TopLeft.Y += UiInput.Input.Down ? -ScrollSpeed : 0;
+            ActiveView.TopLeft.X += UiInput.Input.Left ? -ScrollSpeed : 0;
+            ActiveView.TopLeft.X += UiInput.Input.Right ? ScrollSpeed : 0;
         }
 
         private void HandleTransition()
@@ -133,11 +145,6 @@ namespace CraftingGame
             player.Active = inputMask.Input.Active;
             if (!player.Active)
                 return;
-
-            ActiveView.TopLeft.Y += inputMask.Input.Up ? 4 : 0;
-            ActiveView.TopLeft.Y += inputMask.Input.Down ? -4 : 0;
-            ActiveView.TopLeft.X += inputMask.Input.Left ? -4 : 0;
-            ActiveView.TopLeft.X += inputMask.Input.Right ? 4 : 0;
 
             bool horizontalInput = false;
 
@@ -239,7 +246,7 @@ namespace CraftingGame
                     switch (block.Type)
                     {
                         case TerrainType.Dirt:
-                            Renderer.RenderRectangle(p, GridSize, Color.Red);
+                            Renderer.RenderRectangle(p, GridSize, Color.LightGray);
                             break;
                         case TerrainType.Rock:
                             Renderer.RenderRectangle(p, GridSize, Color.Gray);

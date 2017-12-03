@@ -17,8 +17,9 @@ namespace Prerelease.Main
         public const bool Debug = true;
 
         private ISceene activeSceene = null;
-        private readonly IMonoInput keyboard;
+        private readonly IMonoInput keyboard, uiKeyboard;
         private readonly IMonoInput[] controllers;
+        private readonly InputMask uiInput = new InputMask();
         private readonly InputMask inputMergeMask = new InputMask();
         private readonly InputMask[] inputMasks = new InputMask[4]
         {
@@ -45,6 +46,7 @@ namespace Prerelease.Main
             IsMouseVisible = false;
 
             keyboard = new MonoKeyboardInput();
+            uiKeyboard = new MonoUIKeyboardInput();
             controllers = new[]
             {
                 new MonoControllerInput(PlayerIndex.One),
@@ -93,7 +95,7 @@ namespace Prerelease.Main
             debugFont = scope.LoadFont("ConsoleFont");
 
             this.activeSceene = new PlatformerSceene(renderer, userInterface, actionQueue);
-            this.activeSceene.Activate(inputMasks);
+            this.activeSceene.Activate(uiInput, inputMasks);
         }
 
         /// <summary>
@@ -126,6 +128,9 @@ namespace Prerelease.Main
 
             var time = (float)gameTime.TotalGameTime.TotalSeconds;
             var deltaT = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            uiInput.Reset();
+            uiInput.Apply(uiKeyboard.ReadInput());
 
             currentInputs = MergeInputs(keyboard, controllers[1]);
             inputMasks[0].Apply(currentInputs);
