@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainGame", "MainGame\MainGame.csproj", "{F9047A69-93A4-4408-BD57-207CDF294818}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -23,6 +23,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainGame.UnitTests", "MainGame.UnitTests\MainGame.UnitTests.csproj", "{ABED9BB1-81BB-47EE-9825-C489D2870655}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CraftingGame", "CraftingGame\CraftingGame.csproj", "{3E68E3BA-8697-4BE6-8722-F25256384EF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestNoise", "TestNoise\TestNoise.csproj", "{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -192,8 +194,27 @@ Global
 		{3E68E3BA-8697-4BE6-8722-F25256384EF5}.Release|x64.Build.0 = Release|Any CPU
 		{3E68E3BA-8697-4BE6-8722-F25256384EF5}.Release|x86.ActiveCfg = Release|Any CPU
 		{3E68E3BA-8697-4BE6-8722-F25256384EF5}.Release|x86.Build.0 = Release|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Debug|ARM.Build.0 = Debug|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Debug|x64.Build.0 = Debug|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Debug|x86.Build.0 = Debug|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Release|ARM.ActiveCfg = Release|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Release|ARM.Build.0 = Release|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Release|x64.ActiveCfg = Release|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Release|x64.Build.0 = Release|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Release|x86.ActiveCfg = Release|Any CPU
+		{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9DFC3777-12AF-4CB5-9565-811E8D33312A}
 	EndGlobalSection
 EndGlobal

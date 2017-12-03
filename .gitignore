@@ -186,3 +186,5 @@ FakesAssemblies/
 /RobotEnclaves/ActionPlatformer/project.lock.json
 /RobotEnclaves/EasterBunnyMadness/project.lock.json
 /RobotEnclaves/MonoShims/project.lock.json
+/.vs/Prerelease/v15/sqlite3
+/.vs
