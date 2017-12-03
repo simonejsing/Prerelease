@@ -12,8 +12,8 @@ namespace TestNoise
     {
         static void Main(string[] args)
         {
-            var samples = MountainTerrain();
-            //var samples = HillTerrain();
+            //var samples = MountainTerrain();
+            var samples = HillTerrain();
 
             var content = "x,y" + Environment.NewLine + string.Join(Environment.NewLine, samples.Select(s => s.Item1 + "," + s.Item2));
             File.WriteAllText("noise.csv", content);
@@ -22,11 +22,11 @@ namespace TestNoise
         private static Tuple<double, double>[] HillTerrain()
         {
             // Noise parameters
-            const double frequency = 0.5 / 32.0;
+            const double frequency = 1.0 / 512.0;
             const double amplitude = 1.0;
-            const double exponent = 7.0;
+            const double exponent = 1.0;
             const int octaves = 4;
-            const double persistence = 0.5;
+            const double persistence = 0.8;
 
             // Sample area
             const double intervalStart = 10.0; // Phase shift
@@ -38,12 +38,8 @@ namespace TestNoise
             for (int sample = 0; sample < numberOfSamples; sample++)
             {
                 var x = intervalLength / numberOfSamples * sample;
-                //var value = noise.OctavePerlin(x, 0.5, 7, 0.5, 1); // Looks a bit like mountains
-                //var value = noise.OctavePerlin(x, 0.5, 2, 0.5, 1); // Looks like smooth hills
-                var value = Math.Pow(generator.Noise(x, 0.5, amplitude, frequency, intervalStart, 1.0), exponent) /
+                var value = Math.Pow(generator.Noise(x, 0.5, amplitude, frequency, intervalStart, 8.0), exponent) /
                             Math.Pow(amplitude, exponent);
-                //var value = 10.0*Math.Pow(noise.OctavePerlin(x, 0.5, 1, 2.0, 2), 8.0); // Mountain peaks
-                //var value = noise.perlin(x, 0.5);
                 samples[sample] = new Tuple<double, double>(x, value);
             }
             return samples;
@@ -52,11 +48,12 @@ namespace TestNoise
         private static Tuple<double, double>[] MountainTerrain()
         {
             // Noise parameters
-            const double frequency = 0.5/32.0;
+            const double frequency = 1.0/256.0;
             const double amplitude = 1.0;
             const double exponent = 7.0;
             const int octaves = 4;
             const double persistence = 0.5;
+            const double scale = 8.0;
 
             // Sample area
             const double intervalStart = 10.0; // Phase shift
@@ -68,15 +65,20 @@ namespace TestNoise
             for (int sample = 0; sample < numberOfSamples; sample++)
             {
                 var x = intervalLength/numberOfSamples*sample;
-                //var value = noise.OctavePerlin(x, 0.5, 7, 0.5, 1); // Looks a bit like mountains
-                //var value = noise.OctavePerlin(x, 0.5, 2, 0.5, 1); // Looks like smooth hills
-                var value = Math.Pow(generator.Noise(x, 0.5, amplitude, frequency, intervalStart, 1.0), exponent)/
-                            Math.Pow(amplitude, exponent);
-                //var value = 10.0*Math.Pow(noise.OctavePerlin(x, 0.5, 1, 2.0, 2), 8.0); // Mountain peaks
-                //var value = noise.perlin(x, 0.5);
+                var value = Clamp(scale * Math.Pow(generator.Noise(x, 0.5, amplitude, frequency, intervalStart, 1.0), exponent)/
+                            Math.Pow(amplitude, exponent), 0.0, 1.0);
                 samples[sample] = new Tuple<double, double>(x, value);
             }
             return samples;
+        }
+
+        private static double Clamp(double value, double min, double max)
+        {
+            if (value < min)
+                return min;
+            if (value > max)
+                return max;
+            return value;
         }
     }
 }

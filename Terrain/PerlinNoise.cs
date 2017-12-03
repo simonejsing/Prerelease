@@ -86,7 +86,7 @@ namespace Terrain
         }
 
         // Assumes grid size is normalized to 1.
-        public double perlin(double x, double y, double damping = 1.0)
+        private double perlin(double x, double y, double damping = 1.0)
         {
             // Determine grid cell coordinates
             int x0 = (int)Math.Floor(x);
@@ -112,25 +112,6 @@ namespace Terrain
 
             return (value + 1.0) / 2.0;
             //return value;
-        }
-
-        public double OctavePerlin(double x, double y, int octaves, double persistence, double damping)
-        {
-            double total = 0;
-            double frequency = 1;
-            double amplitude = 1;
-            double maxValue = 0;  // Used for normalizing result to 0.0 - 1.0
-            for (int i = 0; i < octaves; i++)
-            {
-                total += perlin(x * frequency, y * frequency, damping) * amplitude;
-
-                maxValue += amplitude;
-
-                amplitude *= persistence;
-                frequency *= 2;
-            }
-
-            return total / maxValue;
         }
 
         public double Noise(double x, double y, double amplitude, double frequency, double phase, double damping)
