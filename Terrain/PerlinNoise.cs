@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Terrain
 {
-    public class PerlinNoise
+    public class PerlinNoise : INoiseGenerator
     {
         private const int GradSize = 2048;
         private double[] GradX;
@@ -131,6 +131,11 @@ namespace Terrain
             }
 
             return total / maxValue;
+        }
+
+        public double Noise(double x, double y, double amplitude, double frequency, double phase, double damping)
+        {
+            return amplitude * perlin(x * frequency + phase, y, damping);
         }
     }
 }

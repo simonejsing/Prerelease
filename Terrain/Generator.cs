@@ -9,6 +9,7 @@ namespace Terrain
     public class Generator : ITerrainGenerator
     {
         private readonly Random random;
+        private readonly INoiseGenerator noiseGenerator;
 
         private readonly double BedrockPhase;
         private readonly double RockPhase;
@@ -19,6 +20,7 @@ namespace Terrain
         {
             MaxDepth = maxDepth;
             random = new Random(seed);
+            noiseGenerator = new SineNoise();
 
             BedrockPhase = random.NextDouble() * 2 * Math.PI;
             RockPhase = random.NextDouble() * 2 * Math.PI;
@@ -69,9 +71,9 @@ namespace Terrain
             return 1 + Noise(x, 1.0, amplitude: 20.0, phase: BedrockPhase);
         }
 
-        private static double Noise(double x, double frequency, double amplitude, double phase)
+        private double Noise(double x, double frequency, double amplitude, double phase)
         {
-            return amplitude * Math.Sin(2*Math.PI*frequency*x/600.0 + phase);
+            return noiseGenerator.Noise(x, 0.5, amplitude, frequency, phase, 1.0);
         }
     }
 }
