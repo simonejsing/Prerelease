@@ -58,16 +58,19 @@ namespace Terrain
             if (dy <= rockHeight)
                 return TerrainType.Rock;
 
-            if (rockHeight <= SeaLevel)
+            /*if (rockHeight <= SeaLevel)
             {
                 if (dy <= SeaLevel)
                     return TerrainType.Sea;
 
                 return TerrainType.Free;
-            }
+            }*/
 
             if (dy <= dirtHeight)
                 return TerrainType.Dirt;
+
+            if (dy <= SeaLevel)
+                return TerrainType.Sea;
 
             return TerrainType.Free;
         }
@@ -131,10 +134,11 @@ namespace Terrain
             const double damping = 4.0;
             const double offset = 0.0;
 
+            var seabed = SeabedLevel(x, y);
             var value = offset + Math.Pow(dirtGenerator.Noise(x, y, amplitude, frequency, phase, damping), exponent) /
                         Math.Pow(amplitude, exponent);
 
-            return ScaleLevel(value);
+            return ScaleLevel(seabed * value);
         }
 
         private double ScaleLevel(double y)
