@@ -32,7 +32,7 @@ namespace CraftingGame
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainGenerator terrain = null)
             : base("Platformer", renderer, ui, actionQueue)
         {
-            this.terrainGenerator = terrain ?? new Generator(100, 100);
+            this.terrainGenerator = terrain ?? new Generator(100, 100, 0);
             ActiveView = new Rect2(new Vector2(0, 310), renderer.GetViewport());
             this.actionQueue = actionQueue;
         }

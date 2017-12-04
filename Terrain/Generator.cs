@@ -8,19 +8,22 @@ namespace Terrain
 {
     public class Generator : ITerrainGenerator
     {
-        private readonly INoiseGenerator rockGenerator, dirtGenerator;
+        private readonly INoiseGenerator rockGenerator, dirtGenerator, seabedGenerator;
 
+        public int SeaLevel { get; }
         public int MaxDepth { get; }
         public int MaxHeight { get; }
 
-        public Generator(int maxDepth, int maxHeight, int seed = 0)
+        public Generator(int maxDepth, int maxHeight, int seaLevel, int seed = 0)
         {
+            SeaLevel = seaLevel;
             MaxDepth = maxDepth;
             MaxHeight = maxHeight;
             var noise = new PerlinNoise(seed);
 
             rockGenerator = new OctaveNoise(noise, 4, 0.5);
             dirtGenerator = new OctaveNoise(noise, 4, 0.8);
+            seabedGenerator = new OctaveNoise(noise, 4, 0.08);
         }
 
         public TerrainBlock this[int x, int y, int z]
@@ -55,13 +58,21 @@ namespace Terrain
             if (dy <= rockHeight)
                 return TerrainType.Rock;
 
+            if (rockHeight <= SeaLevel)
+            {
+                if (dy <= SeaLevel)
+                    return TerrainType.Sea;
+
+                return TerrainType.Free;
+            }
+
             if (dy <= dirtHeight)
                 return TerrainType.Dirt;
 
             return TerrainType.Free;
         }
 
-        private double BedrockLevel(double x, double y)
+        public double BedrockLevel(double x, double y)
         {
             // Noise parameters
             const double frequency = 1.0 / 512.0;
@@ -79,7 +90,21 @@ namespace Terrain
             return ScaleLevel(value);
         }
 
-        private double RockLevel(double x, double y)
+        public double SeabedLevel(double x, double y)
+        {
+            // Noise parameters
+            const double frequency = 1.0 / 4096.0;
+            const double amplitude = 1.0;
+            const double exponent = 7.0;
+            const double damping = 1.0;
+            const double phase = 10.0;
+
+            var value = 10.0 * Math.Pow(seabedGenerator.Noise(x, 0.5, amplitude, frequency, phase, damping), exponent) - 0.5;
+            value = Clamp(1.0 - Softmax(10.0 * value), 0.0, 1.0);
+            return value;
+        }
+
+        public double RockLevel(double x, double y)
         {
             // Noise parameters
             const double frequency = 1.0 / 256.0;
@@ -88,25 +113,25 @@ namespace Terrain
             const double scale = 8.0;
             const double phase = 10.0;
             const double damping = 1.0;
+            const double offset = 1.0 / 4.0;
 
-            var value = Clamp(
-                scale * Math.Pow(rockGenerator.Noise(x, y, amplitude, frequency, phase, damping), exponent) / Math.Pow(amplitude, exponent),
-                0.0,
-                1.0);
+            var seabed = SeabedLevel(x, y);
+            var value = offset + scale * Math.Pow(rockGenerator.Noise(x, y, amplitude, frequency, phase, damping), exponent) / Math.Pow(amplitude, exponent);
 
-            return ScaleLevel(value);
+            return ScaleLevel(seabed * value);
         }
 
-        private double DirtLevel(double x, double y)
+        public double DirtLevel(double x, double y)
         {
             // Noise parameters
             const double frequency = 1.0 / 512.0;
             const double amplitude = 1.0;
             const double exponent = 1.0;
             const double phase = 10.0;
-            const double damping = 8.0;
+            const double damping = 4.0;
+            const double offset = 0.0;
 
-            var value = Math.Pow(dirtGenerator.Noise(x, y, amplitude, frequency, phase, damping), exponent) /
+            var value = offset + Math.Pow(dirtGenerator.Noise(x, y, amplitude, frequency, phase, damping), exponent) /
                         Math.Pow(amplitude, exponent);
 
             return ScaleLevel(value);
@@ -114,7 +139,12 @@ namespace Terrain
 
         private double ScaleLevel(double y)
         {
-            return y * (MaxHeight + MaxDepth);
+            return Clamp(y, 0.0, 1.0) * (MaxHeight + MaxDepth);
+        }
+
+        private static double Softmax(double x)
+        {
+            return 1.0 / (1 + Math.Exp(-x));
         }
 
         private static double Clamp(double value, double min, double max)

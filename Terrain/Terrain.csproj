@@ -37,6 +37,7 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditiveNoise.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="INoiseGenerator.cs" />
     <Compile Include="ITerrainGenerator.cs" />

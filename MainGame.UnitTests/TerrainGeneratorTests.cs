@@ -13,7 +13,7 @@ namespace MainGame.UnitTests
         {
             const int maxDepth = 100;
             const int maxHeight = 200;
-            var generator = new Generator(maxDepth, maxHeight);
+            var generator = new Generator(maxDepth, maxHeight, 0);
             generator[0, -maxDepth - 1, 0].Type.Should().Be(TerrainType.Free);
         }
 
@@ -22,7 +22,7 @@ namespace MainGame.UnitTests
         {
             const int maxDepth = 200;
             const int maxHeight = 100;
-            var generator = new Generator(maxDepth, maxHeight);
+            var generator = new Generator(maxDepth, maxHeight, 0);
             generator[0, maxHeight + 1, 0].Type.Should().Be(TerrainType.Free);
         }
 

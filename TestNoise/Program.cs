@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,11 +13,119 @@ namespace TestNoise
     {
         static void Main(string[] args)
         {
-            //var samples = MountainTerrain();
-            var samples = BedrockTerrain();
+            RenderTerrain();
 
-            var content = "x,y" + Environment.NewLine + string.Join(Environment.NewLine, samples.Select(s => s.Item1 + "," + s.Item2));
+            SaveNoise();
+        }
+
+        private static void SaveNoise()
+        {
+            const int maxHeight = 100;
+            const int maxDepth = 100;
+            const int seaLevel = 100;
+            var generator = new Generator(maxDepth, maxHeight, seaLevel, 0);
+
+            var samples = SeabedTerrain();
+            //var samples = BedrockTerrain();
+            //var samples = SampleNoise(generator.DirtLevel);
+
+            var content = "x,y" + Environment.NewLine +
+                          string.Join(Environment.NewLine, samples.Select(s => s.Item1 + "," + s.Item2));
             File.WriteAllText("noise.csv", content);
+        }
+
+        private static void RenderTerrain()
+        {
+            const int maxHeight = 100;
+            const int maxDepth = 100;
+            const int seaLevel = 80;
+            var generator = new Generator(maxDepth, maxHeight, seaLevel, 0);
+
+            const double scale = 10.0;
+            const int sizeX = 1600;
+            //const int sizeY = (int)(2 * maxHeight / scale);
+            const int sizeY = (int) (maxDepth + maxHeight);
+            var bitmap = new Bitmap(sizeX, sizeY);
+            for (var y = 0; y < sizeY; y++)
+            {
+                for (var x = 0; x < sizeX; x++)
+                {
+                    var px = x * scale;
+                    var py = (y - sizeY / 2); // * scale;
+                    var c = Color.Black;
+                    var block = generator[(int) px, (int) py, 0];
+                    switch (block.Type)
+                    {
+                        case TerrainType.Bedrock:
+                            c = Color.Gray;
+                            break;
+                        case TerrainType.Rock:
+                            c = Color.DarkGray;
+                            break;
+                        case TerrainType.Dirt:
+                            c = Color.SandyBrown;
+                            break;
+                        case TerrainType.Sea:
+                            c = Color.Aqua;
+                            break;
+                    }
+                    bitmap.SetPixel(x, sizeY - y - 1, c);
+                }
+            }
+
+            bitmap.Save("map.bmp");
+        }
+
+        private static Tuple<double, double>[] SampleNoise(Func<double, double, double> noiseFunc)
+        {
+            // Sample area
+            const double intervalLength = 1000.0;
+            const int numberOfSamples = 500;
+
+            var samples = new Tuple<double, double>[numberOfSamples];
+            for (int sample = 0; sample < numberOfSamples; sample++)
+            {
+                var x = intervalLength / numberOfSamples * sample;
+                var value = noiseFunc(x, 0.5);
+                samples[sample] = new Tuple<double, double>(x, value);
+            }
+            return samples;
+        }
+
+        private static Tuple<double, double>[] SeabedTerrain()
+        {
+            // Noise parameters
+            const double frequency = 1.0 / 4096.0;
+            const double amplitude = 1.0;
+            const double exponent = 7.0;
+            const int octaves = 4;
+            const double persistence = 0.08;
+            const double damping = 1.0;
+
+            // Sample area
+            const double intervalStart = 10.0; // Phase shift
+            const double intervalLength = 20000.0;
+            const int numberOfSamples = 500;
+
+            var generator = new OctaveNoise(new PerlinNoise(0), octaves, persistence);
+            var samples = new Tuple<double, double>[numberOfSamples];
+            for (int sample = 0; sample < numberOfSamples; sample++)
+            {
+                var x = intervalLength / numberOfSamples * sample;
+/*                var value =
+                    100.0 * Math.Pow(generator.Noise(x, 0.5, amplitude, frequency, intervalStart, damping), exponent) /
+                    Math.Pow(amplitude, exponent);*/
+                var value =
+                    10.0 * Math.Pow(generator.Noise(x, 0.5, amplitude, frequency, intervalStart, damping), exponent) - 0.5;
+                value = (1.0 - Softmax(10.0*value));
+                samples[sample] = new Tuple<double, double>(x, value);
+            }
+            return samples;
+        }
+
+        private static double Softmax(double x)
+        {
+            return 1.0 / (1 + Math.Exp(-x));
         }
 
         private static Tuple<double, double>[] BedrockTerrain()
