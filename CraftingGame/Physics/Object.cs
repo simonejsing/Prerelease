@@ -14,7 +14,7 @@ namespace CraftingGame.Physics
             get { return BoundingBox.TopLeft; }
             set { BoundingBox.TopLeft = value; }
         }
-        public UnitVector2 Facing { get; set; }
+        public Vector2 Facing { get; set; }
 
         public Vector2 Size
         {
@@ -31,7 +31,7 @@ namespace CraftingGame.Physics
         {
             this.actionQueue = actionQueue;
             this.BoundingBox = new Rect2(startingPosition, size);
-            this.Facing = UnitVector2.GetInstance(1, 0);
+            this.Facing = new Vector2(1, 0);
             this.Action = new GameAction(ActionType.Noop);
         }
 

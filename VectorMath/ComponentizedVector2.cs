@@ -2,7 +2,7 @@
 {
     public class ComponentizedVector2
     {
-        private UnitVector2 _normal;
+        private Vector2 _normal;
         private Vector2 _vector;
 
         public Vector2 NormalComponent { get; private set; }
@@ -40,13 +40,9 @@
             PerpendicularComponent = _vector - NormalComponent;
         }
 
-        public ComponentizedVector2(Vector2 vector, Vector2 normal) : this(vector, normal.Normalize())
+        public ComponentizedVector2(Vector2 vector, Vector2 normal)
         {
-        }
-
-        public ComponentizedVector2(Vector2 vector, UnitVector2 normal)
-        {
-            _normal = normal;
+            _normal = normal.Normalize();
             Vector = vector;
         }
     }

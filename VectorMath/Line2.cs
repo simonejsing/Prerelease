@@ -4,15 +4,11 @@
     {
         public Vector2 Origin { get; set; }
 
-        public UnitVector2 Normal { get; set; }
+        public Vector2 Normal { get; set; }
 
-        public Line2(Vector2 origin, Vector2 normal) : this(origin, normal.Normalize())
+        public Line2(Vector2 origin, Vector2 normal)
         {
-        }
-
-        public Line2(Vector2 origin, UnitVector2 normal)
-        {
-            Normal = normal;
+            Normal = normal.Normalize();
             Origin = origin;
         }
 

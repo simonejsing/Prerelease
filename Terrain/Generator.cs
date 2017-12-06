@@ -58,14 +58,6 @@ namespace Terrain
             if (dy <= rockHeight)
                 return TerrainType.Rock;
 
-            /*if (rockHeight <= SeaLevel)
-            {
-                if (dy <= SeaLevel)
-                    return TerrainType.Sea;
-
-                return TerrainType.Free;
-            }*/
-
             if (dy <= dirtHeight)
                 return TerrainType.Dirt;
 

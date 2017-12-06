@@ -7,7 +7,7 @@ namespace CraftingGame.Physics
 {
     public struct Block : ICollidableObject, IRenderableObject
     {
-        private static readonly UnitVector2 blockFacing = UnitVector2.GetInstance(1, 0);
+        private static readonly Vector2 blockFacing = new Vector2(1, 0);
 
         public event ObjectCollisionEventHandler ObjectCollision;
         public event GridCollisionEventHandler GridCollision;
@@ -27,7 +27,7 @@ namespace CraftingGame.Physics
 
         public Rect2 BoundingBox => new Rect2(Position, Size);
         public Vector2 Position { get; set; }
-        public UnitVector2 Facing => blockFacing;
+        public Vector2 Facing => blockFacing;
         public Vector2 Size { get; set; }
         public IBinding<ISprite> SpriteBinding { get; set; }
         public Vector2 Center => Position + 0.5f*Size;

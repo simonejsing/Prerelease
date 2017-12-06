@@ -24,10 +24,10 @@ namespace CraftingGame.Physics
             // TODO: This is a bad design
             LoadLevelObjects();
 
-            obj.DeltaPosition.Clear();
+            obj.DeltaPosition = Vector2.Zero;
 
             // Apply gravity
-            obj.Acceleration.Y += Constants.GRAVITY;
+            obj.Acceleration += new Vector2(0, Constants.GRAVITY);
 
             // Accelerate object
             obj.Velocity += instantVelocity + obj.Acceleration * timestep;
@@ -35,18 +35,21 @@ namespace CraftingGame.Physics
             // Slow down object when on ground
             if (obj.Grounded)
             {
-                obj.Velocity.X *= 0.9f;
+                obj.Velocity *= new Vector2(0.9f, 1.0f);
             }
 
             // Cap velocity
+            var velocityCapY = obj.Velocity.Y;
+            var velocityCapX = obj.Velocity.X;
             if (Math.Abs(obj.Velocity.Y) > Constants.MAX_VERTICAL_VELOCITY)
             {
-                obj.Velocity.Y = Math.Sign(obj.Velocity.Y) * Constants.MAX_VERTICAL_VELOCITY;
+                velocityCapY = Math.Sign(obj.Velocity.Y) * Constants.MAX_VERTICAL_VELOCITY;
             }
             if (Math.Abs(obj.Velocity.X) > Constants.MAX_HORIZONTAL_VELOCITY)
             {
-                obj.Velocity.X = Math.Sign(obj.Velocity.X) * Constants.MAX_HORIZONTAL_VELOCITY;
+                velocityCapX = Math.Sign(obj.Velocity.X) * Constants.MAX_HORIZONTAL_VELOCITY;
             }
+            obj.Velocity = new Vector2(velocityCapX, velocityCapY);
 
             obj.DeltaPosition = obj.Velocity * timestep;
 
@@ -94,7 +97,7 @@ namespace CraftingGame.Physics
                     if (obj_max.X + obj.DeltaPosition.X > col_min.X)
                     {
                         horizontalCollision = true;
-                        obj.DeltaPosition.X = col_min.X - obj_max.X;
+                        obj.DeltaPosition = obj.DeltaPosition.ReplaceX(col_min.X - obj_max.X);
                     }
                 }
                 // On the right moving left
@@ -103,7 +106,7 @@ namespace CraftingGame.Physics
                     if (obj_min.X + obj.DeltaPosition.X < col_max.X)
                     {
                         horizontalCollision = true;
-                        obj.DeltaPosition.X = col_max.X - obj_min.X;
+                        obj.DeltaPosition = obj.DeltaPosition.ReplaceX(col_max.X - obj_min.X);
                     }
                 }
             }
@@ -118,7 +121,7 @@ namespace CraftingGame.Physics
                     if (obj_max.Y + obj.DeltaPosition.Y > col_min.Y)
                     {
                         verticalCollision = true;
-                        obj.DeltaPosition.Y = col_min.Y - obj_max.Y;
+                        obj.DeltaPosition = obj.DeltaPosition.ReplaceY(col_min.Y - obj_max.Y);
                     }
                 }
                 // Below moving up
@@ -127,7 +130,7 @@ namespace CraftingGame.Physics
                     if (obj_min.Y + obj.DeltaPosition.Y < col_max.Y)
                     {
                         verticalCollision = true;
-                        obj.DeltaPosition.Y = col_max.Y - obj_min.Y;
+                        obj.DeltaPosition = obj.DeltaPosition.ReplaceY(col_max.Y - obj_min.Y);
                     }
                 }
             }
@@ -153,11 +156,11 @@ namespace CraftingGame.Physics
             // Kill velocity if a collision occured
             if (verticalCollision)
             {
-                obj.Velocity.Y = 0;
+                obj.Velocity = obj.Velocity.ReplaceY(0);
             }
             if (horizontalCollision)
             {
-                obj.Velocity.X = 0;
+                obj.Velocity = obj.Velocity.ReplaceX(0);
             }
         }
 
@@ -181,7 +184,7 @@ namespace CraftingGame.Physics
                     if (obj.DeltaPosition.Y > neighboringBlocks[4].Position.Y - obj.Position.Y)
                     {
                         // Cap vertical movement.
-                        obj.DeltaPosition.Y = neighboringBlocks[4].Position.Y - obj.Position.Y;
+                        obj.DeltaPosition = obj.DeltaPosition.ReplaceY(neighboringBlocks[4].Position.Y - obj.Position.Y);
                         verticalCollision = true;
                     }
                 }
@@ -195,7 +198,7 @@ namespace CraftingGame.Physics
                     if (-obj.DeltaPosition.Y + obj.Size.Y > obj.Position.Y - neighboringBlocks[1].Position.Y)
                     {
                         // Cap vertical movement.
-                        obj.DeltaPosition.Y = -(obj.Position.Y - obj.Size.Y - neighboringBlocks[1].Position.Y);
+                        obj.DeltaPosition = obj.DeltaPosition.ReplaceY(-(obj.Position.Y - obj.Size.Y - neighboringBlocks[1].Position.Y));
                         verticalCollision = true;
                     }
                 }
@@ -214,7 +217,7 @@ namespace CraftingGame.Physics
                     if (-obj.DeltaPosition.X > obj.Position.X - neighboringBlocks[4].Position.X)
                     {
                         // Cap horizontal movement.
-                        obj.DeltaPosition.X = -(obj.Position.X - neighboringBlocks[4].Position.X);
+                        obj.DeltaPosition = obj.DeltaPosition.ReplaceX(-(obj.Position.X - neighboringBlocks[4].Position.X));
                         horizontalCollision = true;
                     }
                 }
@@ -228,7 +231,7 @@ namespace CraftingGame.Physics
                     if (obj.DeltaPosition.X + obj.Size.X > neighboringBlocks[5].Position.X - obj.Position.X)
                     {
                         // Cap vertical movement.
-                        obj.DeltaPosition.X = neighboringBlocks[5].Position.X - obj.Position.X - obj.Size.X;
+                        obj.DeltaPosition = obj.DeltaPosition.ReplaceX(neighboringBlocks[5].Position.X - obj.Position.X - obj.Size.X);
                         horizontalCollision = true;
                     }
                 }
@@ -248,11 +251,11 @@ namespace CraftingGame.Physics
             // Kill velocity if a collision occured
             if (verticalCollision)
             {
-                obj.Velocity.Y = 0;
+                obj.Velocity = obj.Velocity.ReplaceY(0);
             }
             if (horizontalCollision)
             {
-                obj.Velocity.X = 0;
+                obj.Velocity = obj.Velocity.ReplaceX(0);
             }
         }
 

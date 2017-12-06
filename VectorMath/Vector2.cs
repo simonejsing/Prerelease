@@ -2,43 +2,18 @@
 
 namespace VectorMath
 {
-    public class Vector2 : IComparable<Vector2>, IReadonlyVector
+    public struct Vector2 : IComparable<Vector2>, IReadonlyVector, IEquatable<Vector2>
     {
         public const float VectorLengthPrecission = 0.001f;
 
-        public float X { get; set; }
-        public float Y { get; set; }
+        public float X { get; }
+        public float Y { get; }
 
-        public virtual float Length {
-            get
-            {
-                return (float) Math.Sqrt(X*X + Y*Y);
-            }
-        }
+        public float Length => (float) Math.Sqrt(X*X + Y*Y);
+        public float LengthSquared => X * X + Y * Y;
+        public float Angle => (float) Math.Atan2(Y, X);
 
-        public virtual float LengthSquared
-        {
-            get
-            {
-                return X * X + Y * Y;
-            }
-        }
-
-        public float Angle
-        {
-            get
-            {
-                return (float) Math.Atan2(Y, X);
-            }
-        }
-
-        public Vector2()
-        {
-            this.X = 0;
-            this.Y = 0;
-        }
-
-        public Vector2(float x, float y)
+        public Vector2(float x = 0, float y = 0)
         {
             this.X = x;
             this.Y = y;
@@ -50,9 +25,20 @@ namespace VectorMath
             this.Y = v.Y;
         }
 
-        public virtual UnitVector2 Normalize()
+        public Vector2 ReplaceX(float newX)
         {
-            return UnitVector2.GetInstance(this.X, this.Y);
+            return new Vector2(newX, Y);
+        }
+
+        public Vector2 ReplaceY(float newY)
+        {
+            return new Vector2(X, newY);
+        }
+
+        public Vector2 Normalize()
+        {
+            var len = Length;
+            return new Vector2(X / len, Y / len);
         }
 
         public Vector2 Hat()
@@ -81,7 +67,7 @@ namespace VectorMath
             return Dot(this, v) / v.Length;
         }
 
-        public virtual bool TooSmall()
+        public bool TooSmall()
         {
             return LengthSquared < VectorLengthPrecission;
         }
@@ -122,21 +108,25 @@ namespace VectorMath
             return new Vector2(left.X / factor, left.Y / factor);
         }
 
-        // Static properties and methods
-        public static Vector2 Zero
+        public static bool operator ==(Vector2 left, Vector2 right)
         {
-            get
-            {
-                return new Vector2();
-            }
+            return left.Equals(right);
         }
+
+        public static bool operator !=(Vector2 left, Vector2 right)
+        {
+            return !left.Equals(right);
+        }
+
+        // Static properties and methods
+        public static Vector2 Zero = new Vector2();
 
         public static float Dot(Vector2 a, Vector2 b)
         {
             return a.X*b.X + a.Y*b.Y;
         }
 
-        public virtual Vector2 Rotate(float radians)
+        public Vector2 Rotate(float radians)
         {
             float cosAngle = (float)Math.Cos(radians);
             float sinAngle = (float)Math.Sin(radians);
@@ -160,15 +150,6 @@ namespace VectorMath
             return (float) Math.Acos(dotProduct);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-                return false;
-            
-            var v = obj as Vector2;
-            return Equals(v);
-        }
-
         public override int GetHashCode()
         {
             return X.GetHashCode() ^ Y.GetHashCode();
@@ -176,15 +157,19 @@ namespace VectorMath
 
         public bool Equals(Vector2 obj)
         {
-            if (obj == null)
-                return false;
-
             return CompareTo(obj) == 0;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return false;
+            return obj is Vector2 v && Equals(v);
         }
 
         public override string ToString()
         {
-            return String.Format("X: {0}; Y: {1}", X, Y);
+            return string.Format("X: {0}; Y: {1}", X, Y);
         }
 
         public int CompareTo(Vector2 other)
@@ -197,12 +182,6 @@ namespace VectorMath
                 default:
                     return compareToX;
             }
-        }
-
-        public void Clear()
-        {
-            this.X = 0;
-            this.Y = 0;
         }
     }
 }

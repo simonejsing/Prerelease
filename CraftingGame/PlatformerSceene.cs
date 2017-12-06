@@ -91,7 +91,7 @@ namespace CraftingGame
             // Apply physics to enemies.
             foreach (var enemy in State.ActiveLevel.Enemies)
             {
-                enemy.Velocity.X = enemy.Facing.X*Constants.ENEMY_VELOCITY;
+                enemy.Velocity = new Vector2(enemy.Facing.X*Constants.ENEMY_VELOCITY, 0);
                 physics.ApplyToObject(enemy, ZeroVector);
             }
 
@@ -106,10 +106,10 @@ namespace CraftingGame
         private void HandleUiInput()
         {
             const int ScrollSpeed = 50;
-            ActiveView.TopLeft.Y += UiInput.Input.Up ? ScrollSpeed : 0;
-            ActiveView.TopLeft.Y += UiInput.Input.Down ? -ScrollSpeed : 0;
-            ActiveView.TopLeft.X += UiInput.Input.Left ? -ScrollSpeed : 0;
-            ActiveView.TopLeft.X += UiInput.Input.Right ? ScrollSpeed : 0;
+            ActiveView.TopLeft += new Vector2(0, UiInput.Input.Up ? ScrollSpeed : 0);
+            ActiveView.TopLeft += new Vector2(0, UiInput.Input.Down ? -ScrollSpeed : 0);
+            ActiveView.TopLeft += new Vector2(UiInput.Input.Left ? -ScrollSpeed : 0, 0);
+            ActiveView.TopLeft += new Vector2(UiInput.Input.Right ? ScrollSpeed : 0, 0);
         }
 
         private void HandleTransition()
@@ -130,13 +130,13 @@ namespace CraftingGame
             // Spawn players at starting location
             foreach (var player in State.Players)
             {
-                player.Acceleration.Clear();
-                player.Velocity.Clear();
+                player.Acceleration = Vector2.Zero;
+                player.Velocity = Vector2.Zero;
                 player.Position = new Vector2(State.ActiveLevel.SpawnPoint);
             }
         }
 
-        readonly Vector2 instantVelocity = Vector2.Zero;
+        Vector2 instantVelocity = Vector2.Zero;
 
         private void HandlePlayerInput(PlayerObject player)
         {
@@ -148,14 +148,14 @@ namespace CraftingGame
 
             bool horizontalInput = false;
 
-            instantVelocity.Clear();
+            instantVelocity = Vector2.Zero;
 
-            player.Acceleration.Clear();
+            player.Acceleration = Vector2.Zero;
 
             if (inputMask.Input.Restart)
             {
-                player.Position.Clear();
-                player.Velocity.Clear();
+                player.Position = Vector2.Zero;
+                player.Velocity = Vector2.Zero;
                 player.Weapon.Cooldown = 0;
                 player.HitPoints = 1;
             }
@@ -172,7 +172,7 @@ namespace CraftingGame
                 }
                 if (inputMask.Input.Up)
                 {
-                    instantVelocity.Y = Constants.JUMP_SPEED;
+                    instantVelocity = new Vector2(0, Constants.JUMP_SPEED);
                 }
             }
 
@@ -180,21 +180,21 @@ namespace CraftingGame
             if (inputMask.Input.Left)
             {
                 horizontalInput = true;
-                player.Acceleration.X -= horizontalControl;
-                player.Facing.X = -1;
+                player.Acceleration -= new Vector2(horizontalControl, 0);
+                player.Facing = new Vector2(-1, 0);
             }
             if (inputMask.Input.Right)
             {
                 horizontalInput = true;
-                player.Acceleration.X += horizontalControl;
-                player.Facing.X = 1;
+                player.Acceleration += new Vector2(horizontalControl, 0);
+                player.Facing = new Vector2(1, 0);
             }
 
             // If player is on the ground and not moving, come to a complete horizontal stop to prevent drift
             if (player.Grounded && !horizontalInput)
             {
-                player.Acceleration.X = 0.0f;
-                player.Velocity.X = 0.0f;
+                player.Acceleration = new Vector2(0.0f, player.Acceleration.Y);
+                player.Velocity = new Vector2(0.0f, player.Velocity.Y);
             }
 
             if (inputMask.Input.Fire && player.Weapon.CanFire)

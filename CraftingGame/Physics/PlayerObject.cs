@@ -34,7 +34,7 @@ namespace CraftingGame.Physics
             var obj = target as MovableObject;
             if (obj != null && collision.HorizontalCollision)
             {
-                obj.Velocity.X += Math.Sign(collision.Force.X) * 0.5f;
+                obj.Velocity += new Vector2(Math.Sign(collision.Force.X) * 0.5f, 0);
             }
         }
     }

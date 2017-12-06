@@ -24,13 +24,13 @@ namespace CraftingGame.Physics
             {
                 if (obj.Velocity.X < 0 && !target[6].Occupied)
                 {
-                    obj.Facing.X = 1;
+                    obj.Facing = new Vector2(1, 0);
                     return;
                 }
 
                 if (obj.Velocity.X > 0 && !target[8].Occupied)
                 {
-                    obj.Facing.X = -1;
+                    obj.Facing = new Vector2(-1, 0);
                     return;
                 }
             }
@@ -49,7 +49,7 @@ namespace CraftingGame.Physics
             var e = sender as EnemyObject;
             if (e != null && collision.HorizontalCollision)
             {
-                e.Facing.X = -e.Facing.X;
+                e.Facing *= new Vector2(-1, 1);
             }
         }
 
