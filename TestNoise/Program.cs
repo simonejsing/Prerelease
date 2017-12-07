@@ -22,7 +22,7 @@ namespace TestNoise
         {
             const int maxHeight = 100;
             const int maxDepth = 100;
-            const int seaLevel = 100;
+            const int seaLevel = 80;
             var generator = new Generator(maxDepth, maxHeight, seaLevel, 0);
 
             var samples = SeabedTerrain();

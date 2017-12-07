@@ -164,7 +164,7 @@ namespace VectorMath
         {
             if (ReferenceEquals(null, obj))
                 return false;
-            return obj is Vector2 v && Equals(v);
+            return obj is Vector2 && Equals((Vector2)obj);
         }
 
         public override string ToString()

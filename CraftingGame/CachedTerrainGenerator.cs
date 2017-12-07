@@ -12,6 +12,8 @@ namespace CraftingGame
     {
         private readonly ITerrainGenerator terrainGenerator;
         private readonly IList<TerrainSector> sectors = new List<TerrainSector>();
+        private readonly Queue<TerrainSector> sectorLoadingQueue = new Queue<TerrainSector>();
+        private TerrainSector activeLoadingSector;
         private TerrainSector activeSector;
 
         public IEnumerable<TerrainSector> Sectors => sectors;
@@ -37,16 +39,32 @@ namespace CraftingGame
         public void SetActiveSector(int x, int y, int z)
         {
             activeSector = FindSector(x, y, z);
+            if (!activeSector.FullyLoaded)
+            {
+                sectorLoadingQueue.Enqueue(activeSector);
+            }
         }
 
         public void Update(int numberOfTiles)
         {
-            if (activeSector != null)
+            if (activeLoadingSector == null)
             {
-                numberOfTiles -= activeSector.Update(numberOfTiles);
-
-                // Continue to update nearby sectors
+                activeLoadingSector = GetNextLoadingSector();
             }
+
+            while (activeLoadingSector != null && numberOfTiles > 0)
+            {
+                numberOfTiles -= activeLoadingSector.Update(numberOfTiles);
+                if (activeLoadingSector.FullyLoaded)
+                {
+                    activeLoadingSector = GetNextLoadingSector();
+                }
+            }
+        }
+
+        private TerrainSector GetNextLoadingSector()
+        {
+            return sectorLoadingQueue.Any() ? sectorLoadingQueue.Dequeue() : null;
         }
 
         public void Generate(int x, int y, int z)
@@ -61,14 +79,9 @@ namespace CraftingGame
 
         private TerrainSector FindSector(int x, int y, int z)
         {
-            var u = x / TerrainSector.SectorWidth;
-            var v = y / TerrainSector.SectorHeight;
-
             // Handle negative coordinates
-            if (Math.Sign(x) == -1)
-                u--;
-            if (Math.Sign(y) == -1)
-                v--;
+            var u = DivideAndRoundDown(x, TerrainSector.SectorWidth);
+            var v = DivideAndRoundDown(y, TerrainSector.SectorHeight);
 
             if (activeSector?.U == u && activeSector?.V == v && activeSector?.W == z)
                 return activeSector;
@@ -78,9 +91,17 @@ namespace CraftingGame
             {
                 sector = new TerrainSector(terrainGenerator, u, v, z);
                 sectors.Add(sector);
+                sectorLoadingQueue.Enqueue(sector);
             }
 
             return sector;
+        }
+
+        private int DivideAndRoundDown(int numerator, int denominator)
+        {
+            if(numerator >= 0)
+                return numerator/denominator;
+            return (numerator-denominator+1)/denominator;
         }
     }
 }

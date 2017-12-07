@@ -188,6 +188,18 @@ namespace Prerelease.Main
                         inputMasks[0].Input.Fire ? "F" : (currentInputs.Fire ? "f" : "-"),
                         inputMasks[0].Input.Select ? "S" : (currentInputs.Select ? "s" : "-")),
                     Color.Red);
+
+                var cursor = Vector2.Zero;
+                foreach (var diagnosticsString in activeSceene.DiagnosticsString())
+                {
+                    cursor += new Vector2(0, 20);
+
+                    renderer.RenderText(
+                        debugFont,
+                        cursor,
+                        diagnosticsString,
+                        Color.Red);
+                }
             }
 
             renderer.End();

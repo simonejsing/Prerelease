@@ -9,8 +9,8 @@ namespace CraftingGame
      */
     public class TerrainSector
     {
-        public const int SectorHeight = 1000;
-        public const int SectorWidth = 1000;
+        public const int SectorWidth = 100;
+        public const int SectorHeight = 100;
 
         private readonly ITerrainGenerator generator;
         private int updateCount = 0;

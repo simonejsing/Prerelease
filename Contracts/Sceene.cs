@@ -34,6 +34,11 @@ namespace Contracts
             this.scope = Renderer.ActivateScope(Name);
         }
 
+        public virtual string[] DiagnosticsString()
+        {
+            return new string[0];
+        }
+
         public abstract void Render(double gameTimeMsec);
 
         public virtual void Deactivate()

@@ -67,7 +67,7 @@ namespace Terrain
 
         private static int gradientIndex(int ix, int iy)
         {
-            return (ix + iy) % GradSize;
+            return (Math.Abs(ix) + Math.Abs(iy)) % GradSize;
         }
 
         // Assumes grid size is normalized to 1.

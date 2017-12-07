@@ -33,7 +33,8 @@ namespace CraftingGame
             : base("Platformer", renderer, ui, actionQueue)
         {
             this.terrainGenerator = new CachedTerrainGenerator(
-                terrain ?? new Generator(100, 100, 0));
+                terrain ?? new Generator(100, 100, 80));
+            //this.terrainGenerator = terrain ?? new Generator(100, 100, 80);
             ActiveView = new Rect2(new Vector2(0, 310), renderer.GetViewport());
             this.actionQueue = actionQueue;
         }
@@ -69,6 +70,15 @@ namespace CraftingGame
             terrainGenerator.SetActiveSector((int)ActiveView.TopLeft.X, (int)ActiveView.TopLeft.Y, 0);
         }
 
+        public override string[] DiagnosticsString()
+        {
+            return new[]
+            {
+                string.Format("View: {0}", ActiveView.TopLeft),
+                string.Format("Sectors: {0}/{1}", terrainGenerator.Sectors.Count(s => s.FullyLoaded), terrainGenerator.Sectors.Count()),
+            };
+        }
+
         public override void Update(float timestep)
         {
             // Enter selected door now
@@ -77,7 +87,7 @@ namespace CraftingGame
                 HandleTransition();
             }
 
-            terrainGenerator.Update(-1);
+            terrainGenerator.Update(2000);
 
             // Handle UI inputs
             HandleUiInput();
@@ -251,13 +261,16 @@ namespace CraftingGame
                     switch (block.Type)
                     {
                         case TerrainType.Dirt:
-                            Renderer.RenderRectangle(p, GridSize, Color.LightGray);
+                            Renderer.RenderRectangle(p, GridSize, Color.Yellow);
                             break;
                         case TerrainType.Rock:
                             Renderer.RenderRectangle(p, GridSize, Color.Gray);
                             break;
                         case TerrainType.Bedrock:
                             Renderer.RenderRectangle(p, GridSize, Color.DarkGray);
+                            break;
+                        case TerrainType.Sea:
+                            Renderer.RenderRectangle(p, GridSize, Color.Blue);
                             break;
                         case TerrainType.Free:
                             //Renderer.RenderRectangle(p, GridSize, Color.Blue);
@@ -272,7 +285,7 @@ namespace CraftingGame
                 Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, obj.Position, obj.Size, obj.Facing.X < 0);
             }
 
-            foreach (var projectile in state.ActiveLevel.Projectiles)
+            foreach (var projectile in State.ActiveLevel.Projectiles)
             {
                 Renderer.RenderRectangle(projectile.Position, projectile.Size, projectile.Color);
             }

@@ -110,5 +110,16 @@ namespace MainGame.UnitTests
             generator.Sectors.Should().HaveCount(1);
             generator[negativeX, negativeY, 0].Type.Should().Be(TerrainType.Free);
         }
+
+        [TestMethod]
+        public void CachedTerrainWorksWithNegativeCoordinates_OffByOne()
+        {
+            var generator = new CachedTerrainGenerator(new TerrainStub());
+            const int negativeX = -10 - TerrainSector.SectorWidth;
+            const int negativeY = -100;
+            generator.Generate(negativeX, negativeY, 0);
+            generator.Sectors.Should().HaveCount(1);
+            generator[negativeX, negativeY, 0].Type.Should().Be(TerrainType.Free);
+        }
     }
 }

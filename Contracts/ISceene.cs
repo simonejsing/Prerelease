@@ -6,5 +6,6 @@
         void Activate(InputMask uiInput, InputMask[] inputMasks);
         void Render(double gameTimeMsec);
         void Deactivate();
+        string[] DiagnosticsString();
     }
 }
