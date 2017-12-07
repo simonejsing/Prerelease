@@ -24,7 +24,7 @@ namespace CraftingGame
 
         // Terrain
         private readonly Vector2 GridSize = new Vector2(30, 30);
-        private readonly ITerrainGenerator terrainGenerator;
+        private readonly CachedTerrainGenerator terrainGenerator;
 
         // Game state
         public GameState State { get; private set; }
@@ -32,7 +32,8 @@ namespace CraftingGame
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainGenerator terrain = null)
             : base("Platformer", renderer, ui, actionQueue)
         {
-            this.terrainGenerator = terrain ?? new Generator(100, 100, 0);
+            this.terrainGenerator = new CachedTerrainGenerator(
+                terrain ?? new Generator(100, 100, 0));
             ActiveView = new Rect2(new Vector2(0, 310), renderer.GetViewport());
             this.actionQueue = actionQueue;
         }
@@ -64,6 +65,8 @@ namespace CraftingGame
             State.AddLevel(level1);
             State.AddLevel(level2);
             TransitionToLevel(level1.Name);
+
+            terrainGenerator.SetActiveSector((int)ActiveView.TopLeft.X, (int)ActiveView.TopLeft.Y, 0);
         }
 
         public override void Update(float timestep)
@@ -73,6 +76,8 @@ namespace CraftingGame
             {
                 HandleTransition();
             }
+
+            terrainGenerator.Update(-1);
 
             // Handle UI inputs
             HandleUiInput();

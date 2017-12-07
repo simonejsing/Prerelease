@@ -26,11 +26,6 @@ namespace Terrain
             seabedGenerator = new OctaveNoise(noise, 4, 0.08);
         }
 
-        public ITerrainPlane Plane(int z)
-        {
-            return new TerrainPlane(this, z);
-        }
-
         public TerrainBlock this[int x, int y, int z]
         {
             get

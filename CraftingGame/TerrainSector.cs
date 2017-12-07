@@ -12,18 +12,30 @@ namespace CraftingGame
         public const int SectorHeight = 1000;
         public const int SectorWidth = 1000;
 
-        private readonly ITerrainPlane plane;
+        private readonly ITerrainGenerator generator;
         private int updateCount = 0;
+        private TerrainBlock[,] Tiles { get; }
 
-        public int X { get; }
-        public int Y { get; }
-        public TerrainBlock[,] Tiles { get; }
+        public int U { get; }
+        public int V { get; }
+        public int W { get; }
         public bool FullyLoaded { get; private set; }
 
+        public TerrainBlock this[int u, int v] => Tiles[u, v];
+
         // Update a given number of tiles
-        public void Update(int numberOfTiles)
+        public int Update(int numberOfTiles)
         {
-            var numberUpdates = Math.Min(SectorWidth * SectorHeight - updateCount, numberOfTiles);
+            if (FullyLoaded)
+                return 0;
+
+            var originalCount = updateCount;
+            var numberUpdates = SectorWidth * SectorHeight - updateCount;
+            if (numberOfTiles != -1)
+            {
+                numberUpdates = Math.Min(numberUpdates, numberOfTiles);
+            }
+
             for (int i = 0; i < numberUpdates; i++)
             {
                 var y = updateCount / SectorWidth;
@@ -33,27 +45,29 @@ namespace CraftingGame
             }
 
             FullyLoaded = updateCount == SectorWidth * SectorHeight;
+            return updateCount - originalCount;
         }
 
-        public TerrainSector(ITerrainPlane plane, int x, int y)
+        public TerrainSector(ITerrainGenerator generator, int u, int v, int w)
         {
-            this.plane = plane;
+            this.generator = generator;
             FullyLoaded = false;
-            X = x;
-            Y = y;
+            U = u;
+            V = v;
+            W = w;
             Tiles = new TerrainBlock[SectorWidth, SectorHeight];
-            for (int sy = 0; sy < SectorHeight; sy++)
+            for (int y = 0; y < SectorHeight; y++)
             {
-                for (int sx = 0; sx < SectorWidth; sx++)
+                for (int x = 0; x < SectorWidth; x++)
                 {
-                    Tiles[sx,sy] = new TerrainBlock() { Type = TerrainType.NotGenerated, X = X * SectorWidth + sx, Y = Y * SectorHeight + sy };
+                    Tiles[x,y] = new TerrainBlock() { Type = TerrainType.NotGenerated, X = U * SectorWidth + x, Y = V * SectorHeight + y };
                 }
             }
         }
 
-        public void Generate(int x, int y)
+        public void Generate(int u, int v)
         {
-            Tiles[x, y] = plane[X * SectorWidth + x, Y * SectorHeight + y];
+            Tiles[u, v] = generator[U * SectorWidth + u, V * SectorHeight + v, W];
         }
     }
 }

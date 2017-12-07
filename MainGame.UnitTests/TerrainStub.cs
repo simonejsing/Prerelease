@@ -7,13 +7,27 @@ namespace MainGame.UnitTests
 {
     public struct TerrainPoint : IEquatable<TerrainPoint>
     {
-        public int X, Y, Z;
+        public readonly int X, Y, Z;
 
         public TerrainPoint(int x, int y, int z)
         {
             X = x;
             Y = y;
-            Z = y;
+            Z = z;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 31 + X;
+            hash = hash * 31 + Y;
+            hash = hash * 31 + Z;
+            return hash;
+        }
+
+        public override bool Equals(object other)
+        {
+            return other is TerrainPoint ? Equals((TerrainPoint)other) : false;
         }
 
         public bool Equals(TerrainPoint other)
@@ -25,6 +39,7 @@ namespace MainGame.UnitTests
     public class TerrainStub : ITerrainGenerator
     {
         private readonly Dictionary<TerrainPoint, TerrainBlock> blocks = new Dictionary<TerrainPoint, TerrainBlock>();
+        private int generationCounter = 0;
 
         public void AddBlock(int x, int y, int z, TerrainBlock block)
         {
@@ -38,13 +53,14 @@ namespace MainGame.UnitTests
             get
             {
                 var p = new TerrainPoint(x, y, z);
+                generationCounter++;
                 return blocks.FirstOrDefault(b => b.Key.Equals(p)).Value;
             }
         }
 
-        public ITerrainPlane Plane(int z)
+        public int GenerationCounter()
         {
-            return new TerrainPlane(this, z);
+            return generationCounter;
         }
     }
 }
