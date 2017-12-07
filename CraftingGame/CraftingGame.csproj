@@ -62,7 +62,8 @@
     <Compile Include="Physics\Weapon.cs" />
     <Compile Include="PlatformerSceene.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SectorManager.cs" />
+    <Compile Include="TerrainSector.cs" />
+    <Compile Include="CachedTerrainGenerator.cs" />
     <Compile Include="SpriteResolver.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Terrain
 {
-    public enum TerrainType { Free = 0, Dirt = 1, Rock = 2, Bedrock = 3, Sea = 4 }
+    public enum TerrainType { NotGenerated = -1, Free = 0, Dirt = 1, Rock = 2, Bedrock = 3, Sea = 4 }
 
     public struct TerrainBlock
     {

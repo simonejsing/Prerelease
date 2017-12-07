@@ -41,5 +41,10 @@ namespace MainGame.UnitTests
                 return blocks.FirstOrDefault(b => b.Key.Equals(p)).Value;
             }
         }
+
+        public ITerrainPlane Plane(int z)
+        {
+            return new TerrainPlane(this, z);
+        }
     }
 }
