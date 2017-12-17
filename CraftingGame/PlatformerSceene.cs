@@ -39,7 +39,7 @@ namespace CraftingGame
                 terrain ?? new Generator(100, 100, 80));
             //this.terrainGenerator = terrain ?? new Generator(100, 100, 80);
             var viewPort = renderer.GetViewport();
-            ActiveView = new Rect2(new Vector2(100, viewPort.Y), viewPort);
+            ActiveView = new Rect2(new Vector2(-viewPort.X/2, viewPort.Y/2), viewPort);
             renderer.Scale(1, -1);
             this.actionQueue = actionQueue;
         }
@@ -179,8 +179,6 @@ namespace CraftingGame
             if (!player.Active)
                 return;
 
-            return;
-            // TODO: Fix physics engine and collisions after swapping y-axis. E.g. gravity should now be negative
             bool horizontalInput = false;
 
             instantVelocity = Vector2.Zero;
@@ -338,6 +336,7 @@ namespace CraftingGame
             // Dynamic grid...
             var gridTop = (int)Math.Floor(ActiveView.TopLeft.Y / 1000);
             var gridBottom = (int)Math.Floor(ActiveView.BottomLeft.Y / 1000);
+
             for (var y = gridBottom; y <= gridTop; y += 1)
             {
                 var c = y >= 0 ? Color.Blue : Color.Red;
@@ -345,6 +344,13 @@ namespace CraftingGame
                     c = Color.DarkGray;
                 var p = TransformPointToScreen(new Vector2(0, y * 1000));
                 Renderer.RenderVector(new Vector2(0, p.Y), new Vector2(ActiveView.Size.X, 0), c, 3);
+
+                // Render y-labels
+                Renderer.RenderText(
+                    debugFont, 
+                    TransformPointToScreen(new Vector2(0, y * 1000)),
+                    $"(0,{y * 1000})",
+                    c);
             }
 
             var gridLeft = (int)Math.Floor(ActiveView.TopLeft.X / 1000);
@@ -356,13 +362,20 @@ namespace CraftingGame
                     c = Color.DarkGray;
                 var p = TransformPointToScreen(new Vector2(x * 1000, 0));
                 Renderer.RenderVector(new Vector2(p.X, 0), new Vector2(0, -ActiveView.Size.Y), c, 3);
+
+                // Render x-labels
+                Renderer.RenderText(
+                    debugFont,
+                    TransformPointToScreen(new Vector2(x * 1000, 0)),
+                    $"({x * 1000},0)",
+                    c);
             }
 
-            Renderer.RenderText(debugFont, TransformPointToScreen(Vector2.Zero), "(0,0)", Color.Blue);
+            /*Renderer.RenderText(debugFont, TransformPointToScreen(Vector2.Zero), "(0,0)", Color.Blue);
             Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(1000, 0)), "(1000,0)", Color.Blue);
             Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(0, 1000)), "(0,1000)", Color.Blue);
             Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(-1000, 0)), "(-1000,0)", Color.Blue);
-            Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(0, -1000)), "(0,-1000)", Color.Blue);
+            Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(0, -1000)), "(0,-1000)", Color.Blue);*/
         }
 
         private Vector2 TransformPointToScreen(Vector2 point)

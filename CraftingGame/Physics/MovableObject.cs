@@ -26,7 +26,7 @@ namespace CraftingGame.Physics
             var obj = sender as MovableObject;
 
             // If a vertical collision is detected going downwards, the player has "landed" and he may accelerate
-            if (obj != null && collision.VerticalCollision && obj.Velocity.Y > 0)
+            if (obj != null && collision.VerticalCollision && obj.Velocity.Y < 0)
             {
                 obj.Grounded = true;
             }
