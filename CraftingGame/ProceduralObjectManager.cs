@@ -10,14 +10,14 @@ namespace CraftingGame
 {
     internal class ProceduralObjectGrid : ICollidableObjectGrid
     {
-        private Vector2 gridSize;
+        private readonly Grid grid;
         private readonly ITerrainGenerator terrainGenerator;
-        private int plane;
+        private readonly Plane plane;
 
-        public ProceduralObjectGrid(ITerrainGenerator terrainGenerator, Vector2 gridSize, int plane)
+        public ProceduralObjectGrid(ITerrainGenerator terrainGenerator, Grid grid, Plane plane)
         {
             this.terrainGenerator = terrainGenerator;
-            this.gridSize = gridSize;
+            this.grid = grid;
             this.plane = plane;
         }
 
@@ -25,21 +25,21 @@ namespace CraftingGame
         {
             var neighbors = new ICollidableObject[9];
 
-            int gridU = (int)Math.Floor((obj.Center.X) / gridSize.X);
-            int gridV = (int)Math.Floor((200 /* arbitrary height... */ - obj.Center.Y) / gridSize.Y);
+            var centerCoord = grid.PointToGridCoordinate(obj.Center);
             int localIndex = 0;
 
-            for (int v = gridV - 1; v <= gridV + 1; v++)
+            for (var v = centerCoord.V - 1; v <= centerCoord.V + 1; v++)
             {
-                for (int u = gridU - 1; u <= gridU + 1; u++)
+                for (var u = centerCoord.U - 1; u <= centerCoord.U + 1; u++)
                 {
+                    var coord = new Coordinate(u, v);
                     var occupied = false;
-                    var type = terrainGenerator[u, v, plane].Type;
+                    var type = terrainGenerator[coord, plane].Type;
                     if (type == TerrainType.NotGenerated)
                     {
                         // Force generate
-                        terrainGenerator.Generate(u, v, plane);
-                        type = terrainGenerator[u, v, plane].Type;
+                        terrainGenerator.Generate(coord, plane);
+                        type = terrainGenerator[coord, plane].Type;
                     }
                     switch (type)
                     {
@@ -57,7 +57,7 @@ namespace CraftingGame
 
                     neighbors[localIndex] = new Block()
                     {
-                        Position = new Vector2(u * gridSize.X, v * gridSize.Y),
+                        Position = grid.GridCoordinateToPoint(coord),
                         Occupied = occupied
                     };
 
@@ -71,9 +71,9 @@ namespace CraftingGame
 
     internal class ProceduralObjectManager : IObjectManager
     {
-        public ProceduralObjectManager(ITerrainGenerator terrainGenerator, Vector2 gridSize, int plane)
+        public ProceduralObjectManager(ITerrainGenerator terrainGenerator, Grid grid, Plane plane)
         {
-            this.Blocks = new ProceduralObjectGrid(terrainGenerator, gridSize, plane);
+            this.Blocks = new ProceduralObjectGrid(terrainGenerator, grid, plane);
         }
 
         public ICollidableObjectGrid Blocks { get; }

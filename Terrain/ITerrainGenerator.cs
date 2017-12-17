@@ -6,8 +6,8 @@
         int MaxDepth { get; }
         int MaxHeight { get; }
 
-        TerrainBlock this[int x, int y, int z] { get; }
+        TerrainBlock this[Coordinate c, Plane p] { get; }
 
-        void Generate(int x, int y, int z);
+        void Generate(Coordinate c, Plane p);
     }
 }

@@ -41,28 +41,35 @@ namespace MainGame.UnitTests
         private readonly Dictionary<TerrainPoint, TerrainBlock> blocks = new Dictionary<TerrainPoint, TerrainBlock>();
         private int generationCounter = 0;
 
-        public void AddBlock(int x, int y, int z, TerrainBlock block)
+        public void AddBlock(int u, int v, int w, TerrainBlock block)
         {
-            block.X = x;
-            block.Y = y;
-            blocks.Add(new TerrainPoint(x, y, z), block);
+            AddBlock(
+                new Coordinate(u, v),
+                new Plane(w),
+                block);
+        }
+
+        public void AddBlock(Coordinate c, Plane p, TerrainBlock block)
+        {
+            block.Coord = c;
+            blocks.Add(new TerrainPoint(c.U, c.V, p.W), block);
         }
 
         public int SeaLevel => 80;
         public int MaxDepth => 100;
         public int MaxHeight => 100;
 
-        public TerrainBlock this[int x, int y, int z]
+        public TerrainBlock this[Coordinate c, Plane p]
         {
             get
             {
-                var p = new TerrainPoint(x, y, z);
+                var point = new TerrainPoint(c.U, c.V, p.W);
                 generationCounter++;
-                return blocks.FirstOrDefault(b => b.Key.Equals(p)).Value;
+                return blocks.FirstOrDefault(b => b.Key.Equals(point)).Value;
             }
         }
 
-        public void Generate(int x, int y, int z)
+        public void Generate(Coordinate c, Plane p)
         {
         }
 

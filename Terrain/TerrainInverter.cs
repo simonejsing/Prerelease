@@ -8,8 +8,8 @@ namespace Terrain
 {
     public class TerrainInverter : ITerrainGenerator
     {
+        private static readonly Coordinate Inv = new Coordinate(1, -1);
         private readonly ITerrainGenerator generator;
-        private readonly int height;
 
         public int SeaLevel => generator.SeaLevel;
         public int MaxDepth => generator.MaxDepth;
@@ -18,14 +18,13 @@ namespace Terrain
         public TerrainInverter(ITerrainGenerator generator)
         {
             this.generator = generator;
-            this.height = generator.MaxDepth;
         }
 
-        public TerrainBlock this[int x, int y, int z] => generator[x, -y, z];
+        public TerrainBlock this[Coordinate c, Plane p] => generator[c * Inv, p];
 
-        public void Generate(int x, int y, int z)
+        public void Generate(Coordinate c, Plane p)
         {
-            generator.Generate(x, -y, z);
+            generator.Generate(c * Inv, p);
         }
     }
 }

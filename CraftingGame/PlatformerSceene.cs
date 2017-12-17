@@ -24,8 +24,9 @@ namespace CraftingGame
         public Rect2 ActiveView { get; set; }
 
         // Terrain
-        private int Plane = 0;
-        private readonly Vector2 GridSize = new Vector2(30, 30);
+        private int plane = 0;
+        //private readonly Vector2 GridSize = new Vector2(30, 30);
+        private readonly Grid grid = new Grid(30, 30);
         private readonly CachedTerrainGenerator terrainGenerator;
 
         // Game state
@@ -63,7 +64,7 @@ namespace CraftingGame
             objectManager = new ObjectManager(players);
             State = new GameState(players);
 
-            var proceduralManager = new ProceduralObjectManager(terrainGenerator, GridSize, Plane);
+            var proceduralManager = new ProceduralObjectManager(terrainGenerator, grid, new Plane(plane));
             //physics = new PhysicsEngine(objectManager, UpdateStep);
             physics = new PhysicsEngine(proceduralManager, UpdateStep);
 
@@ -76,7 +77,7 @@ namespace CraftingGame
             TransitionToLevel(level1.Name);
             //TransitionToProceduralLevel();
 
-            terrainGenerator.SetActiveSector((int)ActiveView.TopLeft.X, (int)ActiveView.TopLeft.Y, Plane);
+            terrainGenerator.SetActiveSector((int)ActiveView.TopLeft.X, (int)ActiveView.TopLeft.Y, plane);
         }
 
         private void TransitionToProceduralLevel()
@@ -179,7 +180,7 @@ namespace CraftingGame
                 return;
 
             return;
-
+            // TODO: Fix physics engine and collisions after swapping y-axis. E.g. gravity should now be negative
             bool horizontalInput = false;
 
             instantVelocity = Vector2.Zero;
@@ -262,30 +263,29 @@ namespace CraftingGame
             Renderer.Clear(Color.Black);
 
             // Render terrain
-            var start_u = (int)Math.Floor(ActiveView.BottomLeft.X / GridSize.X);
-            var start_v = (int)Math.Floor(ActiveView.BottomLeft.Y / GridSize.Y);
-            var number_u = (int)Math.Ceiling(ActiveView.Size.X / GridSize.X);
-            var number_v = (int)Math.Ceiling(ActiveView.Size.Y / GridSize.Y);
+            var startCoord = grid.PointToGridCoordinate(ActiveView.BottomLeft);
+            var numberCells = grid.PointToGridCoordinate(ActiveView.Size);
 
-            for (var v = 0; v < number_v; v++)
+            for (var v = 0; v <= numberCells.V; v++)
             {
-                for (var u = 0; u < number_u; u++)
+                for (var u = 0; u <= numberCells.U; u++)
                 {
-                    var block = terrainGenerator[start_u + u, start_v + v, Plane];
-                    var p = new Vector2((start_u + u) * GridSize.X, (start_v + v) * GridSize.Y);
+                    var coord = startCoord + new Coordinate(u, v);
+                    var block = terrainGenerator[coord, new Plane(plane)];
+                    var position = grid.GridCoordinateToPoint(coord);
                     switch (block.Type)
                     {
                         case TerrainType.Dirt:
-                            RenderRectangle(p, GridSize, Color.Yellow);
+                            RenderRectangle(position, grid.Size, Color.Yellow);
                             break;
                         case TerrainType.Rock:
-                            RenderRectangle(p, GridSize, Color.Gray);
+                            RenderRectangle(position, grid.Size, Color.Gray);
                             break;
                         case TerrainType.Bedrock:
-                            RenderRectangle(p, GridSize, Color.DarkGray);
+                            RenderRectangle(position, grid.Size, Color.DarkGray);
                             break;
                         case TerrainType.Sea:
-                            RenderRectangle(p, GridSize, Color.Blue);
+                            RenderRectangle(position, grid.Size, Color.Blue);
                             break;
                         case TerrainType.Free:
                             break;

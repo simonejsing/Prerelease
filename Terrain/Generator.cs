@@ -26,22 +26,21 @@ namespace Terrain
             seabedGenerator = new OctaveNoise(noise, 4, 0.08);
         }
 
-        public TerrainBlock this[int x, int y, int z]
+        public TerrainBlock this[Coordinate c, Plane p]
         {
             get
             {
-                var type = GenerateBlock(x, y, z);
+                var type = GenerateBlock(c.U, c.V, p.W);
 
                 return new TerrainBlock()
                 {
-                    X = x,
-                    Y = y,
+                    Coord = c,
                     Type = type,
                 };
             }
         }
 
-        public void Generate(int x, int y, int z)
+        public void Generate(Coordinate c, Plane p)
         {
         }
 

@@ -50,11 +50,10 @@ namespace TestNoise
             {
                 for (var x = 0; x < sizeX; x++)
                 {
-                    var px = x * scale;
-                    var py = (y - sizeY / 2); // * scale;
+                    var coord = new Coordinate((int)(x * scale), y - sizeY / 2);
                     //var py = y; // * scale;
                     var c = Color.Black;
-                    var block = generator[(int) px, (int) py, 0];
+                    var block = generator[coord, new Plane(0)];
                     switch (block.Type)
                     {
                         case TerrainType.Bedrock:

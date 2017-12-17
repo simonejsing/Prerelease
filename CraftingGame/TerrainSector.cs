@@ -13,15 +13,18 @@ namespace CraftingGame
         public const int SectorHeight = 100;
 
         private readonly ITerrainGenerator generator;
+        private readonly TerrainBlock[,] tiles;
         private int updateCount = 0;
-        private TerrainBlock[,] Tiles { get; }
+
+        private readonly Coordinate topLeft;
+        private readonly Plane plane;
 
         public int U { get; }
         public int V { get; }
         public int W { get; }
         public bool FullyLoaded { get; private set; }
 
-        public TerrainBlock this[int u, int v] => Tiles[u, v];
+        public TerrainBlock this[int u, int v] => tiles[u, v];
 
         // Update a given number of tiles
         public int Update(int numberOfTiles)
@@ -55,19 +58,25 @@ namespace CraftingGame
             U = u;
             V = v;
             W = w;
-            Tiles = new TerrainBlock[SectorWidth, SectorHeight];
+            this.topLeft = new Coordinate(U, V) * new Coordinate(SectorWidth, SectorHeight);
+            this.plane = new Plane(w);
+            tiles = new TerrainBlock[SectorWidth, SectorHeight];
             for (int y = 0; y < SectorHeight; y++)
             {
                 for (int x = 0; x < SectorWidth; x++)
                 {
-                    Tiles[x,y] = new TerrainBlock() { Type = TerrainType.NotGenerated, X = U * SectorWidth + x, Y = V * SectorHeight + y };
+                    tiles[x,y] = new TerrainBlock()
+                    {
+                        Coord = new Coordinate(U * SectorWidth + x, V * SectorHeight + y),
+                        Type = TerrainType.NotGenerated,
+                    };
                 }
             }
         }
 
         public void Generate(int u, int v)
         {
-            Tiles[u, v] = generator[U * SectorWidth + u, V * SectorHeight + v, W];
+            tiles[u, v] = generator[this.topLeft + new Coordinate(u, v), this.plane];
         }
     }
 }

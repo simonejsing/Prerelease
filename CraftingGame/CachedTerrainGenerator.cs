@@ -27,15 +27,15 @@ namespace CraftingGame
         public int MaxDepth => terrainGenerator.MaxDepth;
         public int MaxHeight => terrainGenerator.MaxHeight;
 
-        public TerrainBlock this[int x, int y, int z]
+        public TerrainBlock this[Coordinate c, Plane p]
         {
             get
             {
-                activeSector = FindSector(x, y, z);
+                activeSector = FindSector(c.U, c.V, p.W);
 
                 // Convert to sector u,v coordinates
-                var u = x - activeSector.U * TerrainSector.SectorWidth;
-                var v = y - activeSector.V * TerrainSector.SectorHeight;
+                var u = c.U - activeSector.U * TerrainSector.SectorWidth;
+                var v = c.V - activeSector.V * TerrainSector.SectorHeight;
                 return activeSector[u, v];
             }
         }
@@ -71,13 +71,13 @@ namespace CraftingGame
             return sectorLoadingQueue.Any() ? sectorLoadingQueue.Dequeue() : null;
         }
 
-        public void Generate(int x, int y, int z)
+        public void Generate(Coordinate c, Plane p)
         {
-            activeSector = FindSector(x, y, z);
+            activeSector = FindSector(c.U, c.V, p.W);
 
             // Convert to sector u,v coordinates
-            var u = x - activeSector.U * TerrainSector.SectorWidth;
-            var v = y - activeSector.V * TerrainSector.SectorHeight;
+            var u = c.U - activeSector.U * TerrainSector.SectorWidth;
+            var v = c.V - activeSector.V * TerrainSector.SectorHeight;
             activeSector.Generate(u, v);
         }
 

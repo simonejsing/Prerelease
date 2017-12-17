@@ -10,7 +10,7 @@ namespace Terrain
 
     public struct TerrainBlock
     {
-        public int X, Y;
+        public Coordinate Coord;
         public TerrainType Type;
     }
 

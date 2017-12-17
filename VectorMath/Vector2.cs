@@ -120,6 +120,7 @@ namespace VectorMath
 
         // Static properties and methods
         public static Vector2 Zero = new Vector2();
+        public static Vector2 Ones = new Vector2(1, 1);
 
         public static float Dot(Vector2 a, Vector2 b)
         {
