@@ -335,20 +335,26 @@ namespace CraftingGame
 
         private void RenderGrid()
         {
-            for (var y = -10000; y <= 10000; y += 500)
+            // Dynamic grid...
+            var gridTop = (int)Math.Floor(ActiveView.TopLeft.Y / 1000);
+            var gridBottom = (int)Math.Floor(ActiveView.BottomLeft.Y / 1000);
+            for (var y = gridBottom; y <= gridTop; y += 1)
             {
                 var c = y >= 0 ? Color.Blue : Color.Red;
                 if (y == 0)
                     c = Color.DarkGray;
-                var p = TransformPointToScreen(new Vector2(0, y));
+                var p = TransformPointToScreen(new Vector2(0, y * 1000));
                 Renderer.RenderVector(new Vector2(0, p.Y), new Vector2(ActiveView.Size.X, 0), c, 3);
             }
-            for (var x = -10000; x <= 10000; x += 500)
+
+            var gridLeft = (int)Math.Floor(ActiveView.TopLeft.X / 1000);
+            var gridRight = (int)Math.Floor(ActiveView.TopRight.X / 1000);
+            for (var x = gridLeft; x <= gridRight; x += 1)
             {
                 var c = x >= 0 ? Color.Blue : Color.Red;
-                if(x == 0)
+                if (x == 0)
                     c = Color.DarkGray;
-                var p = TransformPointToScreen(new Vector2(x, 0));
+                var p = TransformPointToScreen(new Vector2(x * 1000, 0));
                 Renderer.RenderVector(new Vector2(p.X, 0), new Vector2(0, -ActiveView.Size.Y), c, 3);
             }
 
