@@ -10,8 +10,8 @@ namespace VectorMath
     {
         public Vector2 TopLeft { get; set; }
         public Vector2 TopRight => new Vector2(TopLeft.X + Size.X, TopLeft.Y);
-        public Vector2 BottomLeft => new Vector2(TopLeft.X, TopLeft.Y + Size.Y);
-        public Vector2 BottomRight => TopLeft + Size;
+        public Vector2 BottomLeft => new Vector2(TopLeft.X, TopLeft.Y - Size.Y);
+        public Vector2 BottomRight => new Vector2(TopLeft.X + Size.X, TopLeft.Y - Size.Y);
         public Vector2 Size { get; set;  }
 
         public Rect2(IReadonlyVector position, IReadonlyVector size)

@@ -19,10 +19,12 @@ namespace CraftingGame
         private PhysicsEngine physics;
         private ObjectManager objectManager;
         private Door doorToEnter = null;
+        private IFont debugFont = null;
 
         public Rect2 ActiveView { get; set; }
 
         // Terrain
+        private int Plane = 0;
         private readonly Vector2 GridSize = new Vector2(30, 30);
         private readonly CachedTerrainGenerator terrainGenerator;
 
@@ -35,7 +37,9 @@ namespace CraftingGame
             this.terrainGenerator = new CachedTerrainGenerator(
                 terrain ?? new Generator(100, 100, 80));
             //this.terrainGenerator = terrain ?? new Generator(100, 100, 80);
-            ActiveView = new Rect2(new Vector2(0, 310), renderer.GetViewport());
+            var viewPort = renderer.GetViewport();
+            ActiveView = new Rect2(new Vector2(100, viewPort.Y), viewPort);
+            renderer.Scale(1, -1);
             this.actionQueue = actionQueue;
         }
 
@@ -45,6 +49,7 @@ namespace CraftingGame
 
             var levelFactory = new LevelFactory(actionQueue);
             spriteResolver = new SpriteResolver(scope);
+            debugFont = scope.LoadFont("ConsoleFont");
 
             var players = new List<PlayerObject>
             {
@@ -57,7 +62,10 @@ namespace CraftingGame
 
             objectManager = new ObjectManager(players);
             State = new GameState(players);
-            physics = new PhysicsEngine(objectManager, UpdateStep);
+
+            var proceduralManager = new ProceduralObjectManager(terrainGenerator, GridSize, Plane);
+            //physics = new PhysicsEngine(objectManager, UpdateStep);
+            physics = new PhysicsEngine(proceduralManager, UpdateStep);
 
             var level1 = levelFactory.Load("Level1");
             var level2 = levelFactory.Load("Level2");
@@ -66,16 +74,25 @@ namespace CraftingGame
             State.AddLevel(level1);
             State.AddLevel(level2);
             TransitionToLevel(level1.Name);
+            //TransitionToProceduralLevel();
 
-            terrainGenerator.SetActiveSector((int)ActiveView.TopLeft.X, (int)ActiveView.TopLeft.Y, 0);
+            terrainGenerator.SetActiveSector((int)ActiveView.TopLeft.X, (int)ActiveView.TopLeft.Y, Plane);
+        }
+
+        private void TransitionToProceduralLevel()
+        {
+            //objectManager
         }
 
         public override string[] DiagnosticsString()
         {
+            var player = State.Players.FirstOrDefault();
+            var playerPos = player?.Position ?? Vector2.Zero;
             return new[]
             {
                 string.Format("View: {0}", ActiveView.TopLeft),
                 string.Format("Sectors: {0}/{1}", terrainGenerator.Sectors.Count(s => s.FullyLoaded), terrainGenerator.Sectors.Count()),
+                string.Format("Player: {0}", playerPos),
             };
         }
 
@@ -87,7 +104,7 @@ namespace CraftingGame
                 HandleTransition();
             }
 
-            terrainGenerator.Update(2000);
+            terrainGenerator.Update(200);
 
             // Handle UI inputs
             HandleUiInput();
@@ -160,6 +177,8 @@ namespace CraftingGame
             player.Active = inputMask.Input.Active;
             if (!player.Active)
                 return;
+
+            return;
 
             bool horizontalInput = false;
 
@@ -243,40 +262,40 @@ namespace CraftingGame
             Renderer.Clear(Color.Black);
 
             // Render terrain
-            var sx = (int)Math.Ceiling(ActiveView.TopLeft.X / GridSize.X);
-            var sy = (int)Math.Ceiling(ActiveView.TopLeft.Y / GridSize.Y);
-            var ox = (int)Math.Round(sx * GridSize.X - ActiveView.TopLeft.X);
-            var oy = (int)Math.Round(sy * GridSize.Y - ActiveView.TopLeft.Y);
-            var nx = (int)Math.Ceiling(ActiveView.Size.X / GridSize.X);
-            var ny = (int)Math.Ceiling(ActiveView.Size.Y / GridSize.Y);
+            var start_u = (int)Math.Floor(ActiveView.BottomLeft.X / GridSize.X);
+            var start_v = (int)Math.Floor(ActiveView.BottomLeft.Y / GridSize.Y);
+            var number_u = (int)Math.Ceiling(ActiveView.Size.X / GridSize.X);
+            var number_v = (int)Math.Ceiling(ActiveView.Size.Y / GridSize.Y);
 
-            var plane = 0;
-            // view port has negative height
-            for (var y = ny; y <= 0; y++)
+            for (var v = 0; v < number_v; v++)
             {
-                for (var x = -1; x < nx; x++)
+                for (var u = 0; u < number_u; u++)
                 {
-                    var block = terrainGenerator[sx + x, sy + y, plane];
-                    var p = new Vector2(ox + x * GridSize.X, -(oy + y * GridSize.Y));
+                    var block = terrainGenerator[start_u + u, start_v + v, Plane];
+                    var p = new Vector2((start_u + u) * GridSize.X, (start_v + v) * GridSize.Y);
                     switch (block.Type)
                     {
                         case TerrainType.Dirt:
-                            Renderer.RenderRectangle(p, GridSize, Color.Yellow);
+                            RenderRectangle(p, GridSize, Color.Yellow);
                             break;
                         case TerrainType.Rock:
-                            Renderer.RenderRectangle(p, GridSize, Color.Gray);
+                            RenderRectangle(p, GridSize, Color.Gray);
                             break;
                         case TerrainType.Bedrock:
-                            Renderer.RenderRectangle(p, GridSize, Color.DarkGray);
+                            RenderRectangle(p, GridSize, Color.DarkGray);
                             break;
                         case TerrainType.Sea:
-                            Renderer.RenderRectangle(p, GridSize, Color.Blue);
+                            RenderRectangle(p, GridSize, Color.Blue);
                             break;
                         case TerrainType.Free:
-                            //Renderer.RenderRectangle(p, GridSize, Color.Blue);
                             break;
                     }
                 }
+            }
+
+            foreach (var obj in State.Players.Where(p => p.Active && !p.Dead))
+            {
+                RenderObject(obj);
             }
 
             /*
@@ -290,6 +309,64 @@ namespace CraftingGame
                 Renderer.RenderRectangle(projectile.Position, projectile.Size, projectile.Color);
             }
             */
+
+            RenderGrid();
+        }
+
+        private void RenderRectangle(Vector2 point, Vector2 size, Color color)
+        {
+            // The renderer expects to get the top left screen pixel and a positive size (after scale)
+            // since we have flipped the y axis, we must correct by giving a negative height size
+            // and add the height to the origin.
+            point = new Vector2(point.X, point.Y + size.Y);
+            size = new Vector2(size.X, -size.Y);
+            Renderer.RenderRectangle(TransformPointToScreen(point), TransformSize(size), color);
+        }
+
+        private void RenderObject(IRenderableObject obj)
+        {
+            // The renderer expects to get the top left screen pixel and a positive size (after scale)
+            // since we have flipped the y axis, we must correct by giving a negative height size
+            // and add the height to the origin.
+            var origin = new Vector2(obj.Position.X, obj.Position.Y + obj.Size.Y);
+            var size = new Vector2(obj.Size.X, -obj.Size.Y);
+            Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, TransformPointToScreen(origin), TransformSize(size), obj.Facing.X < 0);
+        }
+
+        private void RenderGrid()
+        {
+            for (var y = -10000; y <= 10000; y += 500)
+            {
+                var c = y >= 0 ? Color.Blue : Color.Red;
+                if (y == 0)
+                    c = Color.DarkGray;
+                var p = TransformPointToScreen(new Vector2(0, y));
+                Renderer.RenderVector(new Vector2(0, p.Y), new Vector2(ActiveView.Size.X, 0), c, 3);
+            }
+            for (var x = -10000; x <= 10000; x += 500)
+            {
+                var c = x >= 0 ? Color.Blue : Color.Red;
+                if(x == 0)
+                    c = Color.DarkGray;
+                var p = TransformPointToScreen(new Vector2(x, 0));
+                Renderer.RenderVector(new Vector2(p.X, 0), new Vector2(0, -ActiveView.Size.Y), c, 3);
+            }
+
+            Renderer.RenderText(debugFont, TransformPointToScreen(Vector2.Zero), "(0,0)", Color.Blue);
+            Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(1000, 0)), "(1000,0)", Color.Blue);
+            Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(0, 1000)), "(0,1000)", Color.Blue);
+            Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(-1000, 0)), "(-1000,0)", Color.Blue);
+            Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(0, -1000)), "(0,-1000)", Color.Blue);
+        }
+
+        private Vector2 TransformPointToScreen(Vector2 point)
+        {
+            return point - ActiveView.TopLeft;
+        }
+
+        private IReadonlyVector TransformSize(Vector2 size)
+        {
+            return size;
         }
     }
 }

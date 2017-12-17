@@ -41,6 +41,10 @@ namespace Terrain
             }
         }
 
+        public void Generate(int x, int y, int z)
+        {
+        }
+
         private TerrainType GenerateBlock(int x, int y, int z)
         {
             if(y < -MaxDepth || y > MaxHeight)

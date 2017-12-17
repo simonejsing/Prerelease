@@ -23,6 +23,10 @@ namespace CraftingGame
             this.terrainGenerator = terrainGenerator;
         }
 
+        public int SeaLevel => terrainGenerator.SeaLevel;
+        public int MaxDepth => terrainGenerator.MaxDepth;
+        public int MaxHeight => terrainGenerator.MaxHeight;
+
         public TerrainBlock this[int x, int y, int z]
         {
             get

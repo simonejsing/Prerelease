@@ -48,6 +48,10 @@ namespace MainGame.UnitTests
             blocks.Add(new TerrainPoint(x, y, z), block);
         }
 
+        public int SeaLevel => 80;
+        public int MaxDepth => 100;
+        public int MaxHeight => 100;
+
         public TerrainBlock this[int x, int y, int z]
         {
             get
@@ -56,6 +60,10 @@ namespace MainGame.UnitTests
                 generationCounter++;
                 return blocks.FirstOrDefault(b => b.Key.Equals(p)).Value;
             }
+        }
+
+        public void Generate(int x, int y, int z)
+        {
         }
 
         public int GenerationCounter()

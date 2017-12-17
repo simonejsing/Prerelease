@@ -7,13 +7,13 @@ namespace CraftingGame.Physics
 {
     public class PhysicsEngine
     {
-        private readonly ObjectManager objectManager; 
+        private readonly IObjectManager objectManager; 
         private readonly float timestep;
 
         private ICollidableObjectGrid grid;
         private IEnumerable<ICollidableObject> movableObjects;
 
-        public PhysicsEngine(ObjectManager objectManager, float timestep)
+        public PhysicsEngine(IObjectManager objectManager, float timestep)
         {
             this.objectManager = objectManager;
             this.timestep = timestep;

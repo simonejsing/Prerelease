@@ -39,7 +39,7 @@ namespace TestNoise
             const int maxHeight = 100;
             const int maxDepth = 100;
             const int seaLevel = 80;
-            var generator = new Generator(maxDepth, maxHeight, seaLevel, 0);
+            var generator = new TerrainInverter(new Generator(maxDepth, maxHeight, seaLevel, 0));
 
             const double scale = 10.0;
             const int sizeX = 1600;
@@ -52,6 +52,7 @@ namespace TestNoise
                 {
                     var px = x * scale;
                     var py = (y - sizeY / 2); // * scale;
+                    //var py = y; // * scale;
                     var c = Color.Black;
                     var block = generator[(int) px, (int) py, 0];
                     switch (block.Type)
@@ -69,7 +70,7 @@ namespace TestNoise
                             c = Color.Aqua;
                             break;
                     }
-                    bitmap.SetPixel(x, sizeY - y - 1, c);
+                    bitmap.SetPixel(x, y, c);
                 }
             }
 

@@ -5,9 +5,13 @@ namespace Contracts
 {
     public interface IRenderer
     {
+
+        void ResetTransform();
+        void Scale(float x, float y);
+
         IReadonlyVector GetViewport();
         void Clear(Color color);
-        void DrawVector(IReadonlyVector origin, IReadonlyVector vector, Color color, float thickness = 1.0f);
+        void RenderVector(IReadonlyVector origin, IReadonlyVector vector, Color color, float thickness = 1.0f);
         void RenderLine(IReadonlyVector point1, IReadonlyVector point2, Color color, float thickness);
         void DrawLine(IReadonlyVector point, float length, float angle, Color color, float thickness);
         void RenderPixel(IReadonlyVector position, Color color);

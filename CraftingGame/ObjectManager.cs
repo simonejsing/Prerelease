@@ -5,14 +5,14 @@ using CraftingGame.Physics;
 
 namespace CraftingGame
 {
-    public class ObjectManager
+    public class ObjectManager : IObjectManager
     {
         private readonly Dictionary<int, IEnumerable<IRenderableObject>> renderLayers = new Dictionary<int, IEnumerable<IRenderableObject>>();
         private readonly Dictionary<int, IEnumerable<ICollidableObject>> collisionLayers = new Dictionary<int, IEnumerable<ICollidableObject>>();
         private readonly Dictionary<int, IEnumerable<ICollectableObject>> collectableLayers = new Dictionary<int, IEnumerable<ICollectableObject>>();
         private readonly List<PlayerObject> players;
 
-        public BlockGrid Blocks { get; private set; }
+        public ICollidableObjectGrid Blocks { get; private set; }
         private IEnumerable<PlayerObject> ActivePlayers => players.Where(p => p.Active && !p.Dead);
         public IEnumerable<IRenderableObject> RenderOrder => renderLayers.SelectMany(objs => objs.Value).Concat(ActivePlayers);
         public IEnumerable<ICollidableObject> CollisionOrder => collisionLayers.SelectMany(objs => objs.Value).Concat(ActivePlayers);

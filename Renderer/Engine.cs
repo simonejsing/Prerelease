@@ -34,7 +34,7 @@ namespace Renderer
             sprites = new SpriteLibrary(manager);
             fonts = new FontLibrary(manager);
 
-            this.viewport = new VectorMath.Vector2(device.Viewport.Width, -device.Viewport.Height);
+            this.viewport = new VectorMath.Vector2(device.Viewport.Width, device.Viewport.Height);
             ResetTransform();
         }
 
@@ -59,12 +59,17 @@ namespace Renderer
             spriteBatch.End();
         }
 
-        private void ResetTransform()
+        public void ResetTransform()
         {
             transform = new Transformation();
         }
 
-        public void DrawVector(IReadonlyVector origin, IReadonlyVector vector, Contracts.Color color, float thickness = 1.0f)
+        public void Scale(float x, float y)
+        {
+            transform.Scale(x, y);
+        }
+
+        public void RenderVector(IReadonlyVector origin, IReadonlyVector vector, Contracts.Color color, float thickness = 1.0f)
         {
             var to = new VectorMath.Vector2(origin.X + vector.X, origin.Y + vector.Y);
             RenderLine(

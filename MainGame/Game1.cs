@@ -192,7 +192,7 @@ namespace Prerelease.Main
                 var cursor = Vector2.Zero;
                 foreach (var diagnosticsString in activeSceene.DiagnosticsString())
                 {
-                    cursor += new Vector2(0, 20);
+                    cursor -= new Vector2(0, 20);
 
                     renderer.RenderText(
                         debugFont,
