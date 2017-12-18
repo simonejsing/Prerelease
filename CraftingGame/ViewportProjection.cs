@@ -49,22 +49,22 @@ namespace CraftingGame
             Projection = new Rect2(MapToWorld(Vector2.Zero), MapSizeToWorld(viewPort));
         }
 
-        public IReadonlyVector MapToWorld(IReadonlyVector viewPortPixel)
+        public Vector2 MapToWorld(IReadonlyVector viewPortPixel)
         {
             return viewTranslation + viewTransform * viewPortPixel;
         }
 
-        public IReadonlyVector MapSizeToWorld(IReadonlyVector size)
+        public Vector2 MapSizeToWorld(IReadonlyVector size)
         {
             return viewTransform * size;
         }
 
-        public IReadonlyVector MapToViewport(IReadonlyVector point)
+        public Vector2 MapToViewport(IReadonlyVector point)
         {
             return (-viewTranslation) + viewInverseTransform * point;
         }
 
-        public IReadonlyVector MapSizeToViewport(IReadonlyVector size)
+        public Vector2 MapSizeToViewport(IReadonlyVector size)
         {
             return viewInverseTransform * size;
         }

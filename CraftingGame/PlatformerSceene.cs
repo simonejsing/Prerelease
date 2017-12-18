@@ -24,7 +24,7 @@ namespace CraftingGame
         private IFont debugFont = null;
 
         public ViewportProjection View { get; }
-        public Rect2 ActiveView => View.Projection;
+        private Rect2 ActiveView => View.Projection;
 
         // Terrain
         private int plane = 0;
@@ -332,7 +332,7 @@ namespace CraftingGame
             }
             */
 
-            RenderGrid();
+            RenderDynamicGrid();
         }
 
         private void RenderRectangle(Vector2 point, Vector2 size, Color color)
@@ -342,7 +342,7 @@ namespace CraftingGame
             // and add the height to the origin.
             point = new Vector2(point.X, point.Y + size.Y);
             size = new Vector2(size.X, -size.Y);
-            Renderer.RenderRectangle(TransformPointToScreen(point), TransformSize(size), color);
+            Renderer.RenderRectangle(View.MapToViewport(point), View.MapSizeToViewport(size), color);
         }
 
         private void RenderObject(IRenderableObject obj)
@@ -352,12 +352,11 @@ namespace CraftingGame
             // and add the height to the origin.
             var origin = new Vector2(obj.Position.X, obj.Position.Y + obj.Size.Y);
             var size = new Vector2(obj.Size.X, -obj.Size.Y);
-            Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, TransformPointToScreen(origin), TransformSize(size), obj.Facing.X < 0);
+            Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, View.MapToViewport(origin), View.MapSizeToViewport(size), obj.Facing.X < 0);
         }
 
-        private void RenderGrid()
+        private void RenderDynamicGrid()
         {
-            // Dynamic grid...
             var gridTop = (int)Math.Floor(ActiveView.TopLeft.Y / 1000);
             var gridBottom = (int)Math.Floor(ActiveView.BottomLeft.Y / 1000);
 
@@ -366,13 +365,13 @@ namespace CraftingGame
                 var c = y >= 0 ? Color.Blue : Color.Red;
                 if (y == 0)
                     c = Color.DarkGray;
-                var p = TransformPointToScreen(new Vector2(0, y * 1000));
+                var p = View.MapToViewport(new Vector2(0, y * 1000));
                 Renderer.RenderVector(new Vector2(0, p.Y), new Vector2(ActiveView.Size.X, 0), c, 3);
 
                 // Render y-labels
                 Renderer.RenderText(
-                    debugFont, 
-                    TransformPointToScreen(new Vector2(0, y * 1000)),
+                    debugFont,
+                    View.MapToViewport(new Vector2(0, y * 1000)),
                     $"(0,{y * 1000})",
                     c);
             }
@@ -384,32 +383,16 @@ namespace CraftingGame
                 var c = x >= 0 ? Color.Blue : Color.Red;
                 if (x == 0)
                     c = Color.DarkGray;
-                var p = TransformPointToScreen(new Vector2(x * 1000, 0));
+                var p = View.MapToViewport(new Vector2(x * 1000, 0));
                 Renderer.RenderVector(new Vector2(p.X, 0), new Vector2(0, -ActiveView.Size.Y), c, 3);
 
                 // Render x-labels
                 Renderer.RenderText(
                     debugFont,
-                    TransformPointToScreen(new Vector2(x * 1000, 0)),
+                    View.MapToViewport(new Vector2(x * 1000, 0)),
                     $"({x * 1000},0)",
                     c);
             }
-
-            /*Renderer.RenderText(debugFont, TransformPointToScreen(Vector2.Zero), "(0,0)", Color.Blue);
-            Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(1000, 0)), "(1000,0)", Color.Blue);
-            Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(0, 1000)), "(0,1000)", Color.Blue);
-            Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(-1000, 0)), "(-1000,0)", Color.Blue);
-            Renderer.RenderText(debugFont, TransformPointToScreen(new Vector2(0, -1000)), "(0,-1000)", Color.Blue);*/
-        }
-
-        private Vector2 TransformPointToScreen(Vector2 point)
-        {
-            return point - ActiveView.TopLeft;
-        }
-
-        private IReadonlyVector TransformSize(Vector2 size)
-        {
-            return size;
         }
     }
 }

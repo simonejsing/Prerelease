@@ -66,8 +66,8 @@ namespace MainGame.UnitTests
 
         public void VerifyBlockRendered(Coordinate coord, Times times)
         {
-            var blockSize = Game.Grid.Size;
-            var view = Game.ActiveView;
+            var blockSize = Game.View.MapSizeToViewport(Game.Grid.Size);
+            var view = Game.View.Projection;
             var blockLocation = Game.Grid.GridCoordinateToPoint(coord);
             var blockRenderLocation = blockLocation + Matrix2x2.ProjectY * blockSize - view.TopLeft;
 
