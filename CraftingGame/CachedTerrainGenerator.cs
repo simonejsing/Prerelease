@@ -51,6 +51,11 @@ namespace CraftingGame
 
         public void Update(int numberOfTiles)
         {
+            if(numberOfTiles == -1)
+            {
+                numberOfTiles = Int32.MaxValue;
+            }
+
             if (activeLoadingSector == null)
             {
                 activeLoadingSector = GetNextLoadingSector();

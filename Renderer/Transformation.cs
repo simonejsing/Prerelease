@@ -2,13 +2,13 @@
 
 namespace Renderer
 {
-    class Transformation
+    public class Transformation
     {
         private Matrix2x2 matrix;
 
         public Transformation()
         {
-            this.matrix = Matrix2x2.Identity();
+            this.matrix = Matrix2x2.Identity;
         }
 
         public void Scale(float scaleX, float scaleY)

@@ -10,6 +10,8 @@ namespace CraftingGame
 {
     public class PlatformerSceene : Sceene
     {
+        public const int BlockSize = 30;
+
         // Use a fixed update step size.
         private const float UpdateStep = 1.0f;
         private readonly Vector2 ZeroVector = Vector2.Zero;
@@ -25,9 +27,10 @@ namespace CraftingGame
 
         // Terrain
         private int plane = 0;
-        //private readonly Vector2 GridSize = new Vector2(30, 30);
-        private readonly Grid grid = new Grid(30, 30);
+        private readonly Grid grid = new Grid(BlockSize, BlockSize);
         private readonly CachedTerrainGenerator terrainGenerator;
+
+        public Grid Grid => grid;
 
         // Game state
         public GameState State { get; private set; }
@@ -75,14 +78,21 @@ namespace CraftingGame
             State.AddLevel(level1);
             State.AddLevel(level2);
             TransitionToLevel(level1.Name);
-            //TransitionToProceduralLevel();
+
+            TransitionToProceduralLevel();
 
             terrainGenerator.SetActiveSector((int)ActiveView.TopLeft.X, (int)ActiveView.TopLeft.Y, plane);
         }
 
         private void TransitionToProceduralLevel()
         {
-            //objectManager
+            // Initialize the starting sector(s) based on the active view
+            var points = new[] { ActiveView.TopLeft, ActiveView.BottomLeft, ActiveView.TopRight, ActiveView.BottomRight };
+            foreach(var point in points)
+            {
+                var coord = grid.PointToGridCoordinate(point);
+                terrainGenerator.Generate(coord, new Plane(plane));
+            }
         }
 
         public override string[] DiagnosticsString()
@@ -95,6 +105,11 @@ namespace CraftingGame
                 string.Format("Sectors: {0}/{1}", terrainGenerator.Sectors.Count(s => s.FullyLoaded), terrainGenerator.Sectors.Count()),
                 string.Format("Player: {0}", playerPos),
             };
+        }
+
+        public void GenerateTerrainSectors()
+        {
+            terrainGenerator.Update(-1);
         }
 
         public override void Update(float timestep)

@@ -2,7 +2,7 @@
 
 namespace VectorMath
 {
-    public struct Vector2 : IComparable<Vector2>, IReadonlyVector, IEquatable<Vector2>
+    public struct Vector2 : IReadonlyVector, IComparable<Vector2>, IEquatable<Vector2>
     {
         public const float VectorLengthPrecission = 0.001f;
 
@@ -12,6 +12,10 @@ namespace VectorMath
         public float Length => (float) Math.Sqrt(X*X + Y*Y);
         public float LengthSquared => X * X + Y * Y;
         public float Angle => (float) Math.Atan2(Y, X);
+
+        public Vector2 Flip => new Vector2(-X, -Y);
+        public Vector2 FlipX => new Vector2(-X, Y);
+        public Vector2 FlipY => new Vector2(X, -Y);
 
         public Vector2(float x = 0, float y = 0)
         {
@@ -108,12 +112,12 @@ namespace VectorMath
             return new Vector2(left.X / factor, left.Y / factor);
         }
 
-        public static bool operator ==(Vector2 left, Vector2 right)
+        public static bool operator ==(Vector2 left, IReadonlyVector right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(Vector2 left, Vector2 right)
+        public static bool operator !=(Vector2 left, IReadonlyVector right)
         {
             return !left.Equals(right);
         }

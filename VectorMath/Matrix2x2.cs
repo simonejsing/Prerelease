@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VectorMath
 {
-    public class Matrix2x2
+    public struct Matrix2x2
     {
         public Vector2[] Columns { get; }
 
@@ -31,10 +31,9 @@ namespace VectorMath
             Columns[1] = new Vector2(secondColumn);
         }
 
-        public static Matrix2x2 Identity()
-        {
-            return new Matrix2x2(new Vector2(1, 0), new Vector2(0, 1));
-        }
+        public static Matrix2x2 Identity = new Matrix2x2(new Vector2(1, 0), new Vector2(0, 1));
+        public static Matrix2x2 ProjectX = new Matrix2x2(new Vector2(1, 0), new Vector2(0, 0));
+        public static Matrix2x2 ProjectY = new Matrix2x2(new Vector2(0, 0), new Vector2(0, 1));
 
         public static Vector2 operator *(Matrix2x2 matrix, IReadonlyVector vector)
         {
