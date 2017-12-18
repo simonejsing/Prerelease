@@ -41,28 +41,55 @@ namespace MainGame.UnitTests
         }
 
         [TestMethod]
+        public void DoesNotRenderTerrainBlockWhenOutOfView()
+        {
+            var blockCoord = new Coordinate(2, 1);
+            var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
+            harness.Game.View.Translate(GameHarness.DefaultViewPort * 10);
+            harness.Game.Render(0.1f);
+            harness.VerifyBlockRendered(blockCoord, Times.Never());
+        }
+
+        [TestMethod]
+        public void RendersTerrainBlockWhenScaled()
+        {
+            var blockCoord = new Coordinate(0, 0);
+            var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
+            // Zoom out by 10%
+            harness.Game.View.Scale(1.1f);
+            harness.Game.Render(0.1f);
+            harness.VerifyBlockRendered(blockCoord);
+        }
+
+        [TestMethod]
+        public void DoesNotRenderTerrainBlockWhenZoomedIn()
+        {
+            var blockCoord = new Coordinate(2, 2);
+            var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
+            // Zoom in by 100%
+            harness.Game.View.Scale(0.5f);
+            harness.Game.Render(0.1f);
+            harness.VerifyBlockRendered(blockCoord, Times.Never());
+        }
+
+        [TestMethod]
         public void RendersTerrainBlockWhenViewIsTranslated()
         {
             var blockCoord = new Coordinate(0, 0);
             var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
-
-            // Translate view slightly
-            harness.Game.ActiveView.TopLeft += new Vector2(10, 20);
+            harness.Game.View.Translate(new Vector2(10, 20));
             harness.Game.Render(0.1f);
-
             harness.VerifyBlockRendered(blockCoord);
         }
 
         [TestMethod]
         public void HandlesPlayerMovingRight()
         {
-            var blockCoord = new Coordinate(0, 0);
-            var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
-            var player1 = harness.Game.State.Players.First();
-            var initialX = player1.Position.X;
+            var harness = GameHarness.CreateEmptyGame();
+            var initialX = harness.Player.Position.X;
             harness.Input(moveRight: true);
             harness.Game.Update(0.1f);
-            player1.Position.X.Should().BeGreaterThan(initialX);
+            harness.Player.Position.X.Should().BeGreaterThan(initialX);
         }
     }
 }

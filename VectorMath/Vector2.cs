@@ -77,12 +77,12 @@ namespace VectorMath
         }
 
         // Operators
-        public static Vector2 operator +(Vector2 left, Vector2 right)
+        public static Vector2 operator +(Vector2 left, IReadonlyVector right)
         {
             return new Vector2(left.X + right.X, left.Y + right.Y);
         }
 
-        public static Vector2 operator -(Vector2 left, Vector2 right)
+        public static Vector2 operator -(Vector2 left, IReadonlyVector right)
         {
             return new Vector2(left.X - right.X, left.Y - right.Y);
         }
@@ -92,7 +92,7 @@ namespace VectorMath
             return new Vector2(-left.X, -left.Y);
         }
 
-        public static Vector2 operator *(Vector2 left, Vector2 factor)
+        public static Vector2 operator *(Vector2 left, IReadonlyVector factor)
         {
             return new Vector2(left.X * factor.X, left.Y * factor.Y);
         }

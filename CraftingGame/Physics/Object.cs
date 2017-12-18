@@ -7,19 +7,19 @@ namespace CraftingGame.Physics
     {
         private readonly ActionQueue actionQueue;
 
-        public Rect2 BoundingBox { get; }
+        public Rect2 BoundingBox { get; private set; }
 
         public Vector2 Position
         {
             get { return BoundingBox.TopLeft; }
-            set { BoundingBox.TopLeft = value; }
+            set { BoundingBox = new Rect2(value, BoundingBox.Size); }
         }
         public Vector2 Facing { get; set; }
 
         public Vector2 Size
         {
             get { return BoundingBox.Size; }
-            set { BoundingBox.Size = value; }
+            set { BoundingBox = new Rect2(BoundingBox.TopLeft, value); }
         }
 
         public IBinding<ISprite> SpriteBinding { get; set; }

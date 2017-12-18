@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using CraftingGame;
+using CraftingGame.Physics;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,10 @@ namespace MainGame.UnitTests
         private readonly InputMask playerInput;
 
         public PlatformerSceene Game { get; }
+        public PlayerObject Player => Game.State.Players.First();
+
+        // By default create a small 5x5 block viewport
+        public static Vector2 DefaultViewPort => new Vector2(5 * PlatformerSceene.BlockSize, 5 * PlatformerSceene.BlockSize);
 
         internal static GameHarness CreateEmptyGame()
         {
@@ -33,7 +38,7 @@ namespace MainGame.UnitTests
         private static GameHarness CreateGameFromTerrain(ITerrainGenerator terrain)
         {
             var playerInput = CreateInput();
-            var mockRenderer = CreateRenderer(DefaultViewPort());
+            var mockRenderer = CreateRenderer(DefaultViewPort);
             return new GameHarness(mockRenderer, terrain);
         }
 
@@ -56,6 +61,11 @@ namespace MainGame.UnitTests
 
         public void VerifyBlockRendered(Coordinate coord)
         {
+            VerifyBlockRendered(coord, Times.Once());
+        }
+
+        public void VerifyBlockRendered(Coordinate coord, Times times)
+        {
             var blockSize = Game.Grid.Size;
             var view = Game.ActiveView;
             var blockLocation = Game.Grid.GridCoordinateToPoint(coord);
@@ -66,13 +76,7 @@ namespace MainGame.UnitTests
                     It.Is<IReadonlyVector>(v => v.Equals(blockRenderLocation)),
                     It.Is<IReadonlyVector>(v => v.Equals(blockSize.FlipY)),
                     It.IsAny<Color>()),
-                Times.Once);
-        }
-
-        // By default create a small 5x5 block viewport
-        private static Vector2 DefaultViewPort()
-        {
-            return new Vector2(5 * PlatformerSceene.BlockSize, 5 * PlatformerSceene.BlockSize);
+                times);
         }
 
         private static Mock<IRenderer> CreateRenderer(Vector2 viewPort)

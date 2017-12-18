@@ -23,7 +23,8 @@ namespace CraftingGame
         private Door doorToEnter = null;
         private IFont debugFont = null;
 
-        public Rect2 ActiveView { get; set; }
+        public ViewportProjection View { get; }
+        public Rect2 ActiveView => View.Projection;
 
         // Terrain
         private int plane = 0;
@@ -42,7 +43,8 @@ namespace CraftingGame
                 terrain ?? new Generator(100, 100, 80));
             //this.terrainGenerator = terrain ?? new Generator(100, 100, 80);
             var viewPort = renderer.GetViewport();
-            ActiveView = new Rect2(new Vector2(-viewPort.X/2, viewPort.Y/2), viewPort);
+            View = new ViewportProjection(viewPort);
+            View.Center(new Vector2(0, 0));
             renderer.Scale(1, -1);
             this.actionQueue = actionQueue;
         }
@@ -154,10 +156,17 @@ namespace CraftingGame
         private void HandleUiInput()
         {
             const int ScrollSpeed = 50;
-            ActiveView.TopLeft += new Vector2(0, UiInput.Input.Up ? ScrollSpeed : 0);
-            ActiveView.TopLeft += new Vector2(0, UiInput.Input.Down ? -ScrollSpeed : 0);
-            ActiveView.TopLeft += new Vector2(UiInput.Input.Left ? -ScrollSpeed : 0, 0);
-            ActiveView.TopLeft += new Vector2(UiInput.Input.Right ? ScrollSpeed : 0, 0);
+            var translation = new Vector2();
+            if (UiInput.Input.Up)
+                translation += new Vector2(0, ScrollSpeed);
+            else if (UiInput.Input.Down)
+                translation += new Vector2(0, -ScrollSpeed);
+            if (UiInput.Input.Left)
+                translation += new Vector2(ScrollSpeed, 0);
+            else if (UiInput.Input.Right)
+                translation += new Vector2(-ScrollSpeed, 0);
+
+            View.Translate(translation);
         }
 
         private void HandleTransition()

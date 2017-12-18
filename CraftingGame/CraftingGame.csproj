@@ -67,6 +67,7 @@
     <Compile Include="TerrainSector.cs" />
     <Compile Include="CachedTerrainGenerator.cs" />
     <Compile Include="SpriteResolver.cs" />
+    <Compile Include="ViewportProjection.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Maps\Level2.blocks.txt" />

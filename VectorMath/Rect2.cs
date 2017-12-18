@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VectorMath
 {
-    public class Rect2
+    public struct Rect2
     {
         public Vector2 TopLeft { get; set; }
         public Vector2 TopRight => new Vector2(TopLeft.X + Size.X, TopLeft.Y);
