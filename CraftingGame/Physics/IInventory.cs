@@ -14,7 +14,7 @@ namespace CraftingGame.Physics
         void Add(string item);
         int Count(string name);
         bool CanTake(string name);
-        Item Take(string name);
+        ItemBase Take(string name);
         void Consume(PlayerObject player, string name);
     }
 }

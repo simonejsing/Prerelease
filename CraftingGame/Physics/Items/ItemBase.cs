@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CraftingGame.Physics.Items
 {
-    public abstract class Item
+    public abstract class ItemBase
     {
         public abstract string Name { get; }
         public abstract bool Consumable { get; }

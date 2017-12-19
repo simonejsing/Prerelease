@@ -1,0 +1,51 @@
+﻿using System;
+using System.Linq;
+using CraftingGame.Physics;
+using CraftingGame.Physics.Items;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Terrain;
+
+namespace MainGame.UnitTests
+{
+    [TestClass]
+    public class ItemTests
+    {
+        [TestMethod]
+        public void CanCreateAllItems()
+        {
+            var itemTypes = GetAllItemTypes();
+            itemTypes.Length.Should().BeGreaterThan(0);
+
+            foreach(var type in itemTypes)
+            {
+                ItemFactory.Create(type.Name).Should().NotBeNull($"item type {type} should be constructable. Did you miss adding to the factory?");
+            }
+        }
+
+        [TestMethod]
+        public void CanCreateItemsFromTerrainTypes()
+        {
+            foreach (TerrainType type in Enum.GetValues(typeof(TerrainType)))
+            {
+                switch (type)
+                {
+                    case TerrainType.NotGenerated:
+                    case TerrainType.Free:
+                    case TerrainType.Sea:
+                    case TerrainType.Bedrock:
+                        break;
+                    default:
+                        ItemFactory.FromTerrain(type).Should().NotBeNull($"terrain type {type} should be minable");
+                        break;
+                }
+            }
+        }
+
+        private Type[] GetAllItemTypes()
+        {
+            var assembly = typeof(ItemFactory).Assembly;
+            return assembly.GetTypes().Where(t => String.Equals(t.Namespace, "CraftingGame.Physics.Items", StringComparison.Ordinal) && !t.IsAbstract).ToArray();
+        }
+    }
+}

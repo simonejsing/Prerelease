@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Contracts;
-using VectorMath;
 
 namespace CraftingGame.Physics.Items
 {
-    public sealed class BlockOfRock : ItemBase
+    public sealed class BlockOfDirt : ItemBase
     {
-        public override string Name => nameof(BlockOfRock);
+        public override string Name => nameof(BlockOfDirt);
         public override bool Consumable => false;
         public override bool Placable => true;
 
-        internal BlockOfRock()
+        internal BlockOfDirt()
         {
         }
     }

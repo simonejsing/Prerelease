@@ -1,6 +1,6 @@
 ﻿namespace CraftingGame.Physics.Items
 {
-    internal class NoopItem : Item
+    internal class NoopItem : ItemBase
     {
         public override string Name => "Noop";
         public override bool Consumable => false;

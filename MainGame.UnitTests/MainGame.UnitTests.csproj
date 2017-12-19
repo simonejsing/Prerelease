@@ -83,6 +83,7 @@
     <Compile Include="CameraTests.cs" />
     <Compile Include="InventoryTests.cs" />
     <Compile Include="RectangleTests.cs" />
+    <Compile Include="ItemTests.cs" />
     <Compile Include="ViewportProjectionTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -43,10 +43,11 @@
     <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="Physics\IInventory.cs" />
     <Compile Include="Physics\ItemObject.cs" />
+    <Compile Include="Physics\Items\BlockOfDirt.cs" />
     <Compile Include="Physics\Items\BlockOfRock.cs" />
     <Compile Include="Physics\Items\ConsumableFlower.cs" />
-    <Compile Include="Physics\Items\Item.cs" />
-    <Compile Include="Physics\Items\ItemFactory.cs" />
+    <Compile Include="Physics\Items\ItemBase.cs" />
+    <Compile Include="Physics\ItemFactory.cs" />
     <Compile Include="Physics\Items\NoopItem.cs" />
     <Compile Include="ProceduralLevel.cs" />
     <Compile Include="Widgets\DynamicGridWidget.cs" />

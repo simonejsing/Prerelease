@@ -33,7 +33,7 @@ namespace CraftingGame.Physics
             return items.ContainsKey(name) && items[name] > 0;
         }
 
-        public Item Take(string name)
+        public ItemBase Take(string name)
         {
             if (!CanTake(name))
                 return new NoopItem();

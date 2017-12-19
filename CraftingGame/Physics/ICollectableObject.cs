@@ -10,7 +10,7 @@ namespace CraftingGame.Physics
         void OnCollect(ICollectingObject target);
 
         Rect2 BoundingBox { get; }
-        Item Item { get; }
+        ItemBase Item { get; }
         bool PickedUp { get; }
     }
 }
