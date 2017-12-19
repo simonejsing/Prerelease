@@ -4,6 +4,7 @@ using CraftingGame.Physics;
 using CraftingGame.Physics.Items;
 using VectorMath;
 using FluentAssertions;
+using Contracts;
 
 namespace MainGame.UnitTests
 {
@@ -30,6 +31,20 @@ namespace MainGame.UnitTests
             var item = inventory.Take(block.Name);
             inventory.Count(block.Name).Should().Be(0);
             inventory.CanTake(block.Name).Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void CanConsumeItemFromInventory()
+        {
+            var player = new PlayerObject(null, null, Vector2.Zero, Vector2.Zero, "", Color.Red);
+            var inventory = new Inventory();
+            var flower = new ConsumableFlower();
+            inventory.Add(flower.Name);
+            inventory.CanTake(flower.Name).Should().BeTrue();
+            inventory.Consume(player, flower.Name);
+            inventory.Count(flower.Name).Should().Be(0);
+            inventory.CanTake(flower.Name).Should().BeFalse();
+            player.Dead.Should().BeTrue();
         }
     }
 }

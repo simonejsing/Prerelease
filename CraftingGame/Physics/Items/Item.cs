@@ -11,5 +11,9 @@ namespace CraftingGame.Physics.Items
         public abstract string Name { get; }
         public abstract bool Consumable { get; }
         public abstract bool Placable { get; }
+
+        public virtual void Consume(PlayerObject player)
+        {
+        }
     }
 }

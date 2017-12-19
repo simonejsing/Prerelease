@@ -41,5 +41,18 @@ namespace CraftingGame.Physics
             items[name]--;
             return ItemFactory.Create(name);
         }
+
+        public void Consume(PlayerObject player, string name)
+        {
+            if (!CanTake(name))
+                return;
+
+            var item = ItemFactory.Create(name);
+            if(item.Consumable)
+            {
+                items[name]--;
+                item.Consume(player);
+            }
+        }
     }
 }

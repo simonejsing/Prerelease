@@ -22,5 +22,10 @@ namespace CraftingGame.Physics.Items
         {
             ItemFactory.Register(nameof(ConsumableFlower), () => new ConsumableFlower());
         }
+
+        public override void Consume(PlayerObject player)
+        {
+            player.HitPoints = 0;
+        }
     }
 }
