@@ -23,6 +23,7 @@ namespace CraftingGame
         private Door doorToEnter = null;
         private IFont debugFont = null;
 
+        public Camera Camera { get; private set; }
         public ViewportProjection View { get; }
         private Rect2 ActiveView => View.Projection;
 
@@ -45,7 +46,8 @@ namespace CraftingGame
             var viewPort = renderer.GetViewport();
             View = new ViewportProjection(viewPort);
             View.Center(new Vector2(0, 0));
-            View.Scale(2.0f);
+            this.Camera = new Camera(View);
+            //View.Scale(2.0f);
             renderer.Scale(1, -1);
             this.actionQueue = actionQueue;
         }
@@ -69,6 +71,8 @@ namespace CraftingGame
 
             objectManager = new ObjectManager(players);
             State = new GameState(players);
+            Camera.Track(State.Players.First());
+            Camera.Follow();
 
             var proceduralManager = new ProceduralObjectManager(terrainGenerator, grid, new Plane(plane));
             //physics = new PhysicsEngine(objectManager, UpdateStep);
@@ -123,6 +127,9 @@ namespace CraftingGame
                 HandleTransition();
             }
 
+            // Camera follows player
+            Camera.Update();
+
             terrainGenerator.Update(200);
 
             // Handle UI inputs
@@ -167,7 +174,11 @@ namespace CraftingGame
             else if (UiInput.Input.Right)
                 translation += new Vector2(ScrollSpeed, 0);
 
-            View.Translate(translation);
+            if (translation != Vector2.Zero)
+            {
+                Camera.Free();
+                View.Translate(translation);
+            }
         }
 
         private void HandleTransition()
@@ -203,6 +214,11 @@ namespace CraftingGame
             player.Active = inputMask.Input.Active;
             if (!player.Active)
                 return;
+
+            if (inputMask.Moving)
+            {
+                Camera.Follow();
+            }
 
             bool horizontalInput = false;
 

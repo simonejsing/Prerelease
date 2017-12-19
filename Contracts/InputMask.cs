@@ -16,6 +16,8 @@
     {
         public InputSet Input = new InputSet();
 
+        public bool Moving => Input.Active && (Input.Left || Input.Right || Input.Up || Input.Down);
+
         public InputMask()
         {
             Reset();

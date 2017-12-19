@@ -38,6 +38,7 @@
     <EmbeddedResource Include="Maps\Level1.blocks.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera.cs" />
     <Compile Include="IObjectManager.cs" />
     <Compile Include="LevelFactory.cs" />
     <Compile Include="ObjectManager.cs" />
