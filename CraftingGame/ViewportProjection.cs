@@ -6,17 +6,17 @@ namespace CraftingGame
     // The view is a projection of the view port into the game world, it contains a scale factor and a translation
     public class ViewportProjection
     {
-        private Vector2 viewPort;
         private Matrix2x2 viewTransform = Matrix2x2.Identity;
         private Matrix2x2 viewInverseTransform = Matrix2x2.Identity;
         private Vector2 viewTranslation = Vector2.Zero;
 
+        public Vector2 ViewPort { get; }
         // The projection of the viewport into the game world
         public Rect2 Projection { get; private set; }
 
         public ViewportProjection(IReadonlyVector viewPort)
         {
-            this.viewPort = new Vector2(viewPort);
+            this.ViewPort = new Vector2(viewPort);
             UpdateProjection();
         }
 
@@ -28,7 +28,7 @@ namespace CraftingGame
 
         public void Center(IReadonlyVector point)
         {
-            viewTranslation = -0.5f * viewPort.FlipY + point;
+            viewTranslation = -0.5f * (viewTransform*ViewPort).FlipY + point;
             UpdateProjection();
         }
 
@@ -41,12 +41,13 @@ namespace CraftingGame
         {
             viewTransform = new Matrix2x2(scale.X, 0, 0, scale.Y);
             viewInverseTransform = new Matrix2x2(1f / scale.X, 0, 0, 1f / scale.Y);
+            viewTranslation = viewTransform*viewTranslation;
             UpdateProjection();
         }
 
         private void UpdateProjection()
         {
-            Projection = new Rect2(MapToWorld(Vector2.Zero), MapSizeToWorld(viewPort));
+            Projection = new Rect2(MapToWorld(Vector2.Zero), MapSizeToWorld(ViewPort));
         }
 
         public Vector2 MapToWorld(IReadonlyVector viewPortPixel)
@@ -61,7 +62,7 @@ namespace CraftingGame
 
         public Vector2 MapToViewport(IReadonlyVector point)
         {
-            return (-viewTranslation) + viewInverseTransform * point;
+            return viewInverseTransform * ((-viewTranslation) + point);
         }
 
         public Vector2 MapSizeToViewport(IReadonlyVector size)

@@ -45,6 +45,7 @@ namespace CraftingGame
             var viewPort = renderer.GetViewport();
             View = new ViewportProjection(viewPort);
             View.Center(new Vector2(0, 0));
+            View.Scale(2.0f);
             renderer.Scale(1, -1);
             this.actionQueue = actionQueue;
         }
@@ -162,9 +163,9 @@ namespace CraftingGame
             else if (UiInput.Input.Down)
                 translation += new Vector2(0, -ScrollSpeed);
             if (UiInput.Input.Left)
-                translation += new Vector2(ScrollSpeed, 0);
-            else if (UiInput.Input.Right)
                 translation += new Vector2(-ScrollSpeed, 0);
+            else if (UiInput.Input.Right)
+                translation += new Vector2(ScrollSpeed, 0);
 
             View.Translate(translation);
         }
@@ -357,40 +358,45 @@ namespace CraftingGame
 
         private void RenderDynamicGrid()
         {
-            var gridTop = (int)Math.Floor(ActiveView.TopLeft.Y / 1000);
-            var gridBottom = (int)Math.Floor(ActiveView.BottomLeft.Y / 1000);
+            var gridSize = BlockSize*10;
+
+            var gridTop = (int)Math.Floor(ActiveView.TopLeft.Y / gridSize);
+            var gridBottom = (int)Math.Floor(ActiveView.BottomLeft.Y / gridSize);
+
+            //var gridBottom = (int)Math.Floor(View.MapToWorld(Vector2.Zero).Y / gridSize);
+            //var gridTop = (int)Math.Floor(View.MapSizeToWorld(View.ViewPort).Y / gridSize);
 
             for (var y = gridBottom; y <= gridTop; y += 1)
             {
                 var c = y >= 0 ? Color.Blue : Color.Red;
                 if (y == 0)
                     c = Color.DarkGray;
-                var p = View.MapToViewport(new Vector2(0, y * 1000));
-                Renderer.RenderVector(new Vector2(0, p.Y), new Vector2(ActiveView.Size.X, 0), c, 3);
+                var p = View.MapToViewport(new Vector2(0, y * gridSize));
+                Renderer.RenderVector(new Vector2(0, p.Y), new Vector2(View.ViewPort.X, 0), c, 3);
 
                 // Render y-labels
                 Renderer.RenderText(
                     debugFont,
-                    View.MapToViewport(new Vector2(0, y * 1000)),
-                    $"(0,{y * 1000})",
+                    View.MapToViewport(new Vector2(0, y * gridSize)),
+                    $"(0,{y * gridSize})",
                     c);
             }
 
-            var gridLeft = (int)Math.Floor(ActiveView.TopLeft.X / 1000);
-            var gridRight = (int)Math.Floor(ActiveView.TopRight.X / 1000);
+            var gridLeft = (int)Math.Floor(ActiveView.TopLeft.X / gridSize);
+            var gridRight = (int)Math.Floor(ActiveView.TopRight.X / gridSize);
             for (var x = gridLeft; x <= gridRight; x += 1)
             {
                 var c = x >= 0 ? Color.Blue : Color.Red;
                 if (x == 0)
                     c = Color.DarkGray;
-                var p = View.MapToViewport(new Vector2(x * 1000, 0));
-                Renderer.RenderVector(new Vector2(p.X, 0), new Vector2(0, -ActiveView.Size.Y), c, 3);
+                var p = View.MapToViewport(new Vector2(x * gridSize, 0));
+                Renderer.RenderVector(new Vector2(p.X, 0), new Vector2(0, -View.ViewPort.Y), c, 3);
 
                 // Render x-labels
                 Renderer.RenderText(
                     debugFont,
-                    View.MapToViewport(new Vector2(x * 1000, 0)),
-                    $"({x * 1000},0)",
+                    View.MapToViewport(new Vector2(x * gridSize, 0)),
+                    $"({x * gridSize},0)",
                     c);
             }
         }

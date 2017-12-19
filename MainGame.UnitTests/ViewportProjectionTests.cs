@@ -57,6 +57,18 @@ namespace MainGame.UnitTests
         }
 
         [TestMethod]
+        public void ViewportProjectionCenterThenScale()
+        {
+            var projection = new ViewportProjection(new Vector2(100, 100));
+            projection.Center(new Vector2(0, 0));
+            projection.Scale(2.0f);
+            VerifyProjection(
+                projection,
+                new Vector2(-100, 100),
+                new Vector2(0, 0));
+        }
+
+        [TestMethod]
         public void ViewportProjectionToWorld()
         {
             var projection = new ViewportProjection(new Vector2(100, 100));
@@ -66,6 +78,31 @@ namespace MainGame.UnitTests
             p.TopLeft.Y.Should().Be(50);
             p.BottomRight.X.Should().Be(50);
             p.BottomRight.Y.Should().Be(-50);
+        }
+
+        [TestMethod]
+        public void ViewportProjectionToWorldScaled()
+        {
+            var projection = new ViewportProjection(new Vector2(100, 100));
+            projection.Scale(2.0f);
+            var p = projection.Projection;
+            p.TopLeft.X.Should().Be(0);
+            p.TopLeft.Y.Should().Be(0);
+            p.BottomRight.X.Should().Be(200);
+            p.BottomRight.Y.Should().Be(-200);
+        }
+
+        [TestMethod]
+        public void ViewportProjectionToWorldScaledAroundCenter()
+        {
+            var projection = new ViewportProjection(new Vector2(100, 100));
+            projection.Center(new Vector2(0, 0));
+            projection.Scale(2.0f);
+            var p = projection.Projection;
+            p.TopLeft.X.Should().Be(-100);
+            p.TopLeft.Y.Should().Be(100);
+            p.BottomRight.X.Should().Be(100);
+            p.BottomRight.Y.Should().Be(-100);
         }
 
         private static void VerifyProjection(ViewportProjection projection, Vector2 point, Vector2 projectedPoint)
