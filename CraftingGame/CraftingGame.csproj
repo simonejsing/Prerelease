@@ -39,6 +39,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Controllers\CameraController.cs" />
+    <Compile Include="Controllers\PlayerController.cs" />
+    <Compile Include="ProceduralLevel.cs" />
+    <Compile Include="Widgets\DynamicGridWidget.cs" />
     <Compile Include="IObjectManager.cs" />
     <Compile Include="LevelFactory.cs" />
     <Compile Include="ObjectManager.cs" />
@@ -62,6 +66,7 @@
     <Compile Include="Physics\Projectile.cs" />
     <Compile Include="Physics\StaticObject.cs" />
     <Compile Include="Physics\Weapon.cs" />
+    <Compile Include="Widgets\TerrainWidget.cs" />
     <Compile Include="PlatformerSceene.cs" />
     <Compile Include="ProceduralObjectManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -129,7 +129,6 @@ namespace Prerelease.Main
             var time = (float)gameTime.TotalGameTime.TotalSeconds;
             var deltaT = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            uiInput.Reset();
             uiInput.Apply(uiKeyboard.ReadInput());
 
             currentInputs = MergeInputs(keyboard, controllers[1]);

@@ -1,4 +1,5 @@
 ﻿using CraftingGame.Physics;
+using VectorMath;
 
 namespace CraftingGame
 {
@@ -28,6 +29,11 @@ namespace CraftingGame
         public void Free()
         {
             this.Mode = CameraMode.Free;
+        }
+
+        public void Translate(IReadonlyVector translation)
+        {
+            view.Translate(translation);
         }
 
         public void Follow()

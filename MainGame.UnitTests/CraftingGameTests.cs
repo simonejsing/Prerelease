@@ -91,5 +91,19 @@ namespace MainGame.UnitTests
             harness.Game.Update(0.1f);
             harness.Player.Position.X.Should().BeGreaterThan(initialX);
         }
+
+        [TestMethod]
+        public void PlayerCanDigIntoTerrain()
+        {
+            var plane = new Plane(0);
+            var harness = GameHarness.CreateSolidBlockGame(TerrainType.Rock);
+            var playerCoord = harness.Game.Grid.PointToGridCoordinate(harness.Player.Position);
+            playerCoord.V.Should().Be(0);
+            var digCoord = new Coordinate(playerCoord.U + Math.Sign(harness.Player.Facing.X), playerCoord.V - 1);
+            harness.Game.Terrain[digCoord, plane].Type.Should().Be(TerrainType.Rock);
+            harness.Input(fire: true);
+            harness.Game.Update(0.1f);
+            harness.Game.Terrain[digCoord, plane].Type.Should().Be(TerrainType.Free);
+        }
     }
 }

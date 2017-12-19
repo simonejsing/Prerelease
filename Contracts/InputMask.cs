@@ -10,13 +10,13 @@
         public bool Fire;
         public bool Select;
         public bool Restart;
+
+        public bool Moving => Active && (Left || Right || Up || Down);
     }
 
     public class InputMask
     {
         public InputSet Input = new InputSet();
-
-        public bool Moving => Input.Active && (Input.Left || Input.Right || Input.Up || Input.Down);
 
         public InputMask()
         {

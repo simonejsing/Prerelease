@@ -5,7 +5,7 @@ namespace CraftingGame.Physics
 {
     public class Object : IRenderableObject
     {
-        private readonly ActionQueue actionQueue;
+        public ActionQueue ActionQueue { get; }
 
         public Rect2 BoundingBox { get; private set; }
 
@@ -29,7 +29,7 @@ namespace CraftingGame.Physics
 
         public Object(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size)
         {
-            this.actionQueue = actionQueue;
+            this.ActionQueue = actionQueue;
             this.BoundingBox = new Rect2(startingPosition, size);
             this.Facing = new Vector2(1, 0);
             this.Action = new GameAction(ActionType.Noop);
@@ -37,7 +37,7 @@ namespace CraftingGame.Physics
 
         public void Activate(Object activator)
         {
-            actionQueue.Enqueue(Action);
+            ActionQueue.Enqueue(Action);
         }
     }
 }

@@ -35,9 +35,14 @@ namespace MainGame.UnitTests
             return CreateGameFromTerrain(terrain);
         }
 
+        internal static GameHarness CreateSolidBlockGame(TerrainType blockType)
+        {
+            var terrain = new TerrainStub(c => c.V < 0 ? blockType : TerrainType.Free);
+            return CreateGameFromTerrain(terrain);
+        }
+
         private static GameHarness CreateGameFromTerrain(ITerrainGenerator terrain)
         {
-            var playerInput = CreateInput();
             var mockRenderer = CreateRenderer(DefaultViewPort);
             return new GameHarness(mockRenderer, terrain);
         }
@@ -47,16 +52,17 @@ namespace MainGame.UnitTests
             this.mockRenderer = mockRenderer;
             this.playerInput = CreateInput();
             this.Game = CreateGame(mockRenderer.Object, terrain, playerInput);
-            this.Game.GenerateTerrainSectors();
         }
 
         public void Input(
             bool moveRight = false,
-            bool moveLeft = false)
+            bool moveLeft = false,
+            bool fire = false)
         {
             playerInput.Input.Active = true;
             playerInput.Input.Right = moveRight;
             playerInput.Input.Left = moveLeft;
+            playerInput.Input.Fire = fire;
         }
 
         public void VerifyBlockRendered(Coordinate coord)

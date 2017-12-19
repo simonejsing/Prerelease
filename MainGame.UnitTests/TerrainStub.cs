@@ -38,8 +38,18 @@ namespace MainGame.UnitTests
 
     public class TerrainStub : ITerrainGenerator
     {
-        private readonly Dictionary<TerrainPoint, TerrainBlock> blocks = new Dictionary<TerrainPoint, TerrainBlock>();
+        private readonly Dictionary<TerrainPoint, TerrainBlock> blockOverlay = new Dictionary<TerrainPoint, TerrainBlock>();
+        private readonly Func<Coordinate, TerrainType> generator;
         private int generationCounter = 0;
+
+        public TerrainStub() : this(c => TerrainType.Free)
+        {
+        }
+
+        public TerrainStub(Func<Coordinate, TerrainType> generator)
+        {
+            this.generator = generator;
+        }
 
         public void AddBlock(int u, int v, int w, TerrainBlock block)
         {
@@ -52,7 +62,7 @@ namespace MainGame.UnitTests
         public void AddBlock(Coordinate c, Plane p, TerrainBlock block)
         {
             block.Coord = c;
-            blocks.Add(new TerrainPoint(c.U, c.V, p.W), block);
+            blockOverlay.Add(new TerrainPoint(c.U, c.V, p.W), block);
         }
 
         public int SeaLevel => 80;
@@ -65,7 +75,15 @@ namespace MainGame.UnitTests
             {
                 var point = new TerrainPoint(c.U, c.V, p.W);
                 generationCounter++;
-                return blocks.FirstOrDefault(b => b.Key.Equals(point)).Value;
+                if (!blockOverlay.Any(b => b.Key.Equals(point)))
+                {
+                    return new TerrainBlock()
+                    {
+                        Coord = c,
+                        Type = generator(c)
+                    };
+                }
+                return blockOverlay.First(b => b.Key.Equals(point)).Value;
             }
         }
 

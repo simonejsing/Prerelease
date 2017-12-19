@@ -92,6 +92,8 @@ namespace CraftingGame.Physics
         public IEnumerable<LevelState> Levels => levels;
         public LevelState ActiveLevel { get; private set; }
 
+        public Door DoorToEnter { get; set; }
+
         public GameState(IEnumerable<PlayerObject> playerObject)
         {
             this.players = playerObject.ToArray();
