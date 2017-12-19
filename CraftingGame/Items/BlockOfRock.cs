@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Contracts;
 using VectorMath;
 
-namespace CraftingGame.Physics.Items
+namespace CraftingGame.Items
 {
     public sealed class BlockOfRock : ItemBase
     {

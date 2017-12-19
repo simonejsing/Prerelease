@@ -1,4 +1,4 @@
-﻿namespace CraftingGame.Physics.Items
+﻿namespace CraftingGame.Items
 {
     internal class NoopItem : ItemBase
     {

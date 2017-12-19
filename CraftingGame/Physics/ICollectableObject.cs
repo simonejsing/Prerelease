@@ -1,4 +1,4 @@
-﻿using CraftingGame.Physics.Items;
+﻿using CraftingGame.Items;
 using VectorMath;
 
 namespace CraftingGame.Physics

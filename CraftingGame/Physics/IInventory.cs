@@ -1,4 +1,4 @@
-﻿using CraftingGame.Physics.Items;
+﻿using CraftingGame.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;

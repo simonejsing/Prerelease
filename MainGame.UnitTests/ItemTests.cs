@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
-using CraftingGame.Physics;
-using CraftingGame.Physics.Items;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Terrain;
+using CraftingGame;
 
 namespace MainGame.UnitTests
 {
@@ -45,7 +44,7 @@ namespace MainGame.UnitTests
         private Type[] GetAllItemTypes()
         {
             var assembly = typeof(ItemFactory).Assembly;
-            return assembly.GetTypes().Where(t => String.Equals(t.Namespace, "CraftingGame.Physics.Items", StringComparison.Ordinal) && !t.IsAbstract).ToArray();
+            return assembly.GetTypes().Where(t => String.Equals(t.Namespace, "CraftingGame.Items", StringComparison.Ordinal) && !t.IsAbstract).ToArray();
         }
     }
 }

@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Contracts;
 using VectorMath;
+using CraftingGame.Physics;
 
-namespace CraftingGame.Physics.Items
+namespace CraftingGame.Items
 {
     public sealed class ConsumableFlower : ItemBase
     {

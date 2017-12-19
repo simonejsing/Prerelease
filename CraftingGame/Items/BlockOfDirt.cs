@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CraftingGame.Physics.Items
+namespace CraftingGame.Items
 {
     public sealed class BlockOfDirt : ItemBase
     {

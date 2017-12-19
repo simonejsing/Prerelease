@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CraftingGame.Physics;
-using CraftingGame.Physics.Items;
+using CraftingGame.Items;
 using VectorMath;
 using FluentAssertions;
 using Contracts;

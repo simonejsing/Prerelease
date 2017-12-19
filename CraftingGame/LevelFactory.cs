@@ -5,7 +5,7 @@ using System.Reflection;
 using Contracts;
 using CraftingGame.Physics;
 using VectorMath;
-using CraftingGame.Physics.Items;
+using CraftingGame.Items;
 
 namespace CraftingGame
 {

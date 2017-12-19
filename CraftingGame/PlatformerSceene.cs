@@ -7,7 +7,7 @@ using CraftingGame.Physics;
 using CraftingGame.Widgets;
 using Terrain;
 using VectorMath;
-using CraftingGame.Physics.Items;
+using CraftingGame.Items;
 
 namespace CraftingGame
 {
