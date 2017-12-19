@@ -5,6 +5,7 @@ using System.Reflection;
 using Contracts;
 using CraftingGame.Physics;
 using VectorMath;
+using CraftingGame.Physics.Items;
 
 namespace CraftingGame
 {
@@ -22,7 +23,7 @@ namespace CraftingGame
             var levelEnemies = new List<EnemyObject>();
             var levelCrates = new List<MovableObject>();
             var levelStaticObjects = new List<StaticObject>();
-            var levelCollectableObjects = new List<StaticObject>();
+            var levelCollectableObjects = new List<ItemObject>();
             var levelDoors = new List<Door>();
             var levelText = ReadLevelBlocks(levelName);
 
@@ -87,19 +88,19 @@ namespace CraftingGame
             level.AddCrates(levelCrates);
             level.AddDoors(levelDoors);
             level.AddStaticObjects(levelStaticObjects);
-            level.AddCollectableObjects(levelCollectableObjects);
+            level.AddCollectableObjects(levelCollectableObjects.ToArray());
             return level;
         }
 
-        private StaticObject CreateFlowerObject(IReadonlyVector position, IReadonlyVector size)
+        private ItemObject CreateFlowerObject(IReadonlyVector position, IReadonlyVector size)
         {
-            var flowerObject = new StaticObject(actionQueue, position, size);
+            var flowerObject = new ItemObject(actionQueue, position, size, new ConsumableFlower());
             flowerObject.SpriteBinding = new ObjectBinding<ISprite>("flower");
             flowerObject.Collect += CollectFlower;
             return flowerObject;
         }
 
-        private void CollectFlower(object sender, ICollectingObject target)
+        private void CollectFlower(object sender, ICollectableObject source, ICollectingObject target)
         {
             target.Inventory.Add("flower");
         }

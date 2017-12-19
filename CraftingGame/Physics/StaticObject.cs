@@ -3,7 +3,7 @@ using VectorMath;
 
 namespace CraftingGame.Physics
 {
-    public class StaticObject : Object, ICollidableObject, ICollectableObject
+    public class StaticObject : Object, ICollidableObject
     {
         public StaticObject(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPosition, size)
         {
@@ -12,7 +12,6 @@ namespace CraftingGame.Physics
         public event ObjectCollisionEventHandler ObjectCollision;
         public event GridCollisionEventHandler GridCollision;
         public event HitEventHandler Hit;
-        public event CollectEventHandler Collect;
 
         public void OnObjectCollision(ICollidableObject target, Collision collision)
         {
@@ -29,12 +28,6 @@ namespace CraftingGame.Physics
             Hit?.Invoke(this, target);
         }
 
-        public void OnCollect(ICollectingObject target)
-        {
-            Collect?.Invoke(this, target);
-        }
-
         public bool Occupied => true;
-        public bool PickedUp { get; set; }
     }
 }

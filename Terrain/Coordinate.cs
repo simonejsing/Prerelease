@@ -33,6 +33,16 @@ namespace Terrain
             return new Coordinate(self.U / other.U, self.V / other.V);
         }
 
+        public static bool operator ==(Coordinate self, Coordinate other)
+        {
+            return self.Equals(other);
+        }
+
+        public static bool operator !=(Coordinate self, Coordinate other)
+        {
+            return !self.Equals(other);
+        }
+
         public override string ToString()
         {
             return $"({U},{V})";

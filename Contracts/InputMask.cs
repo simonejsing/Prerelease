@@ -7,7 +7,7 @@
         public bool Right;
         public bool Up;
         public bool Down;
-        public bool Fire;
+        public bool Attack;
         public bool Select;
         public bool Restart;
 
@@ -30,7 +30,7 @@
             Input.Right |= gameInput.Right;
             Input.Up |= gameInput.Up;
             Input.Down |= gameInput.Down;
-            Input.Fire |= gameInput.Fire;
+            Input.Attack |= gameInput.Attack;
             Input.Select |= gameInput.Select;
             Input.Restart |= gameInput.Restart;
         }
@@ -42,7 +42,7 @@
             Input.Right = false;
             Input.Up = false;
             Input.Down = false;
-            Input.Fire = false;
+            Input.Attack = false;
             Input.Select = false;
             Input.Restart = false;
         }

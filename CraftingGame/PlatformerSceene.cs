@@ -7,6 +7,7 @@ using CraftingGame.Physics;
 using CraftingGame.Widgets;
 using Terrain;
 using VectorMath;
+using CraftingGame.Physics.Items;
 
 namespace CraftingGame
 {
@@ -124,8 +125,25 @@ namespace CraftingGame
                 case TerrainType.Rock:
                     // Yes! Then get to work...
                     cachedTerrain.Destroy(digCoord, Plane);
+
+                    // Drop an item of the terrain type.
+                    var item = ItemFactory.FromTerrain(type);
+                    if(item != null)
+                    {
+                        var size = new Vector2(10, 10);
+                        var coordPos = Grid.GridCoordinateToPoint(digCoord);
+                        var position = coordPos + 0.5f * (Grid.Size - size);
+                        var itemObject = new ItemObject(ActionQueue, position, size, item);
+                        itemObject.Collect += PickUpItem;
+                        State.ActiveLevel.AddCollectableObjects(itemObject);
+                    }
                     break;
             }
+        }
+
+        private void PickUpItem(object sender, ICollectableObject source, ICollectingObject target)
+        {
+            target.Inventory.Add(source.Item.Name);
         }
 
         public override void Update(float timestep)
@@ -238,6 +256,7 @@ namespace CraftingGame
                 string.Format("View: {0}", View.Projection.TopLeft),
                 string.Format("Sectors: {0}/{1}", cachedTerrain.Sectors.Count(s => s.FullyLoaded), cachedTerrain.Sectors.Count()),
                 string.Format("Player: {0}", playerPos),
+                string.Format("Inventory: {0}", player?.Inventory?.TotalCount ?? 0),
             };
         }
     }

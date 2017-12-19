@@ -13,7 +13,7 @@ namespace CraftingGame.Physics
         private readonly List<MovableObject> crates = new List<MovableObject>();
         private readonly List<Door> doors = new List<Door>();
         private readonly List<StaticObject> staticObjects = new List<StaticObject>();
-        private readonly List<StaticObject> collectableObjects = new List<StaticObject>();
+        private readonly List<ItemObject> collectableObjects = new List<ItemObject>();
 
         public IReadonlyVector SpawnPoint { get; }
         public BlockGrid Blocks { get; private set; }
@@ -24,7 +24,7 @@ namespace CraftingGame.Physics
         public IEnumerable<MovableObject> Crates => crates;
         public IEnumerable<Door> Doors => doors;
         public IEnumerable<StaticObject> StaticObjects => staticObjects;
-        public IEnumerable<StaticObject> CollectableObjects => collectableObjects;
+        public IEnumerable<ItemObject> CollectableObjects => collectableObjects;
 
         public IEnumerable<Object> AllObjects => ((IEnumerable<Object>)enemies).Concat(projectiles).Concat(crates).Concat(doors).Concat(staticObjects).Concat(collectableObjects);
 
@@ -59,7 +59,7 @@ namespace CraftingGame.Physics
             staticObjects.AddRange(levelStaticObjects);
         }
 
-        public void AddCollectableObjects(List<StaticObject> levelCollectableObjects)
+        public void AddCollectableObjects(params ItemObject[] levelCollectableObjects)
         {
             collectableObjects.AddRange(levelCollectableObjects);
         }
@@ -76,6 +76,9 @@ namespace CraftingGame.Physics
 
             // Delete dead enemies
             enemies.RemoveAll(e => e.Dead);
+
+            // Remove collected items
+            collectableObjects.RemoveAll(c => c.PickedUp);
         }
     }
 

@@ -68,7 +68,7 @@ namespace CraftingGame.Controllers
                 {
                     instantVelocity = new Vector2(0, Constants.JUMP_SPEED);
                 }
-                if (inputMask.Input.Fire && player.Weapon.CanFire)
+                if (inputMask.Input.Attack && player.Weapon.CanFire)
                 {
                     player.Weapon.Cooldown = 10;
                     OnDig(player);
@@ -96,7 +96,7 @@ namespace CraftingGame.Controllers
                 player.Velocity = new Vector2(0.0f, player.Velocity.Y);
             }
 
-            if (inputMask.Input.Fire && player.Weapon.CanFire)
+            if (inputMask.Input.Attack && player.Weapon.CanFire)
             {
                 //state.ActiveLevel.AddProjectiles(FireWeapon(player));
             }

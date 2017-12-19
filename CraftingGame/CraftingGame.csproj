@@ -41,6 +41,13 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Controllers\FreeCameraController.cs" />
     <Compile Include="Controllers\PlayerController.cs" />
+    <Compile Include="Physics\IInventory.cs" />
+    <Compile Include="Physics\ItemObject.cs" />
+    <Compile Include="Physics\Items\BlockOfRock.cs" />
+    <Compile Include="Physics\Items\ConsumableFlower.cs" />
+    <Compile Include="Physics\Items\Item.cs" />
+    <Compile Include="Physics\Items\ItemFactory.cs" />
+    <Compile Include="Physics\Items\NoopItem.cs" />
     <Compile Include="ProceduralLevel.cs" />
     <Compile Include="Widgets\DynamicGridWidget.cs" />
     <Compile Include="IObjectManager.cs" />
@@ -56,7 +63,6 @@
     <Compile Include="Physics\ICollectingObject.cs" />
     <Compile Include="Physics\ICollidableObject.cs" />
     <Compile Include="Physics\ICollidableObjectGrid.cs" />
-    <Compile Include="Physics\IInventory.cs" />
     <Compile Include="Physics\Inventory.cs" />
     <Compile Include="Physics\IProjectile.cs" />
     <Compile Include="Physics\MovableObject.cs" />
@@ -92,6 +98,7 @@
       <Name>VectorMath</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

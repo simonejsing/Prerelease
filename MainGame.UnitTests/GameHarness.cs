@@ -57,12 +57,12 @@ namespace MainGame.UnitTests
         public void Input(
             bool moveRight = false,
             bool moveLeft = false,
-            bool fire = false)
+            bool attack = false)
         {
             playerInput.Input.Active = true;
             playerInput.Input.Right = moveRight;
             playerInput.Input.Left = moveLeft;
-            playerInput.Input.Fire = fire;
+            playerInput.Input.Attack = attack;
         }
 
         public void VerifyBlockRendered(Coordinate coord)
