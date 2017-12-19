@@ -11,12 +11,12 @@ namespace CraftingGame.Physics
 {
     public class ItemObject : StaticObject, ICollectableObject
     {
-        public ItemBase Item { get; }
+        public StackableItemBase Item { get; }
         public bool PickedUp { get; set; }
 
         public event CollectEventHandler Collect;
 
-        public ItemObject(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size, ItemBase item) : base(actionQueue, startingPosition, size)
+        public ItemObject(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size, StackableItemBase item) : base(actionQueue, startingPosition, size)
         {
             this.Item = item;
         }

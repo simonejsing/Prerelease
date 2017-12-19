@@ -9,7 +9,7 @@ using CraftingGame.Physics;
 
 namespace CraftingGame.Items
 {
-    public sealed class ConsumableFlower : ItemBase
+    public sealed class ConsumableFlower : StackableItemBase
     {
         public override string Name => nameof(ConsumableFlower);
         public override bool Consumable => true;

@@ -10,7 +10,7 @@ namespace CraftingGame
 {
     public static class ItemFactory
     {
-        public static IDictionary<string, Func<ItemBase>> factories = new Dictionary<string, Func<ItemBase>>();
+        public static IDictionary<string, Func<StackableItemBase>> factories = new Dictionary<string, Func<StackableItemBase>>();
 
         static ItemFactory()
         {
@@ -20,13 +20,13 @@ namespace CraftingGame
             Register(nameof(ConsumableFlower), () => new ConsumableFlower());
         }
 
-        private static void Register(string name, Func<ItemBase> factory)
+        private static void Register(string name, Func<StackableItemBase> factory)
         {
             var key = name.ToLower();
             factories.Add(key, factory);
         }
 
-        public static ItemBase Create(string name)
+        public static StackableItemBase Create(string name)
         {
             var key = name.ToLower();
             if (!factories.ContainsKey(key))
@@ -36,7 +36,7 @@ namespace CraftingGame
             return factories[key]();
         }
 
-        public static ItemBase FromTerrain(TerrainType type)
+        public static StackableItemBase FromTerrain(TerrainType type)
         {
             switch(type)
             {

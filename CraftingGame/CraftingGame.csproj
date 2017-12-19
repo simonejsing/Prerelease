@@ -46,7 +46,7 @@
     <Compile Include="Items\BlockOfDirt.cs" />
     <Compile Include="Items\BlockOfRock.cs" />
     <Compile Include="Items\ConsumableFlower.cs" />
-    <Compile Include="Items\ItemBase.cs" />
+    <Compile Include="Items\StackableItemBase.cs" />
     <Compile Include="ItemFactory.cs" />
     <Compile Include="Items\NoopItem.cs" />
     <Compile Include="ProceduralLevel.cs" />
