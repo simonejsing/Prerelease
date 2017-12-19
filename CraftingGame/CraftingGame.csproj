@@ -39,7 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
-    <Compile Include="Controllers\CameraController.cs" />
+    <Compile Include="Controllers\FreeCameraController.cs" />
     <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="ProceduralLevel.cs" />
     <Compile Include="Widgets\DynamicGridWidget.cs" />

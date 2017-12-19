@@ -34,7 +34,7 @@ namespace CraftingGame
         private DynamicGridWidget dynamicGridWidget;
 
         // Input controllers
-        private CameraController cameraController;
+        private FreeCameraController freeCameraController;
         private PlayerController playerController;
 
         public ITerrainGenerator Terrain => level.Terrain;
@@ -86,7 +86,6 @@ namespace CraftingGame
 
             level.Load(View);
             State.AddLevel(level.State);
-            TransitionToLevel(level.Name);
 
             var activeView = View.Projection;
             cachedTerrain.SetActiveSector((int)activeView.TopLeft.X, (int)activeView.TopLeft.Y, Plane.W);
@@ -94,8 +93,39 @@ namespace CraftingGame
             terrainWidget = new TerrainWidget(Renderer, Terrain);
             dynamicGridWidget = new DynamicGridWidget(Renderer, debugFont, BlockSize);
 
-            cameraController = new CameraController(Camera);
+            freeCameraController = new FreeCameraController(Camera);
             playerController = new PlayerController(State, physics, Camera);
+            playerController.Dig += OnPlayerDig;
+
+            TransitionToLevel(level.Name);
+        }
+
+        private void OnPlayerDig(object sender, PlayerObject player)
+        {
+            // Find the spot below and in front of the player's center
+            var playerCoord = Grid.PointToGridCoordinate(player.Center);
+            var digCoord = new Coordinate(playerCoord.U + Math.Sign(player.Facing.X), playerCoord.V);
+
+            // Can the player dig here?
+            cachedTerrain.Generate(digCoord, Plane);
+            var type = cachedTerrain[digCoord, Plane].Type;
+            if (type == TerrainType.Free)
+            {
+                // No, try below
+                digCoord = new Coordinate(digCoord.U, digCoord.V - 1);
+                cachedTerrain.Generate(digCoord, Plane);
+                type = cachedTerrain[digCoord, Plane].Type;
+            }
+
+            // Dig it!
+            switch (type)
+            {
+                case TerrainType.Dirt:
+                case TerrainType.Rock:
+                    // Yes! Then get to work...
+                    cachedTerrain.Destroy(digCoord, Plane);
+                    break;
+            }
         }
 
         public override void Update(float timestep)
@@ -103,16 +133,16 @@ namespace CraftingGame
             // Enter selected door now
             if (State.DoorToEnter != null)
             {
-                HandleTransition();
+                TransitionThroughDoor(State.DoorToEnter);
             }
+
+            cachedTerrain.Update(200);
 
             // Camera follows player
             Camera.Update();
 
-            cachedTerrain.Update(200);
-
             // Handle UI inputs
-            cameraController.Update(UiInput);
+            freeCameraController.Update(UiInput);
 
             foreach (var player in State.Players)
             {
@@ -141,12 +171,12 @@ namespace CraftingGame
             State.ActiveLevel.CleanUp();
         }
 
-        private void HandleTransition()
+        private void TransitionThroughDoor(Door door)
         {
-            switch (State.DoorToEnter.Destination.Type)
+            switch (door.Destination.Type)
             {
                 case DestinationType.Level:
-                    TransitionToLevel(State.DoorToEnter.Destination.Identifier);
+                    TransitionToLevel(door.Destination.Identifier);
                     break;
             }
         }
@@ -158,9 +188,7 @@ namespace CraftingGame
             // Spawn players at starting location
             foreach (var player in State.Players)
             {
-                player.Acceleration = Vector2.Zero;
-                player.Velocity = Vector2.Zero;
-                player.Position = new Vector2(State.ActiveLevel.SpawnPoint);
+                playerController.SpawnPlayer(player);
             }
         }
 

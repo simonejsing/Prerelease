@@ -86,6 +86,15 @@ namespace CraftingGame
             activeSector.Generate(u, v);
         }
 
+        public void Destroy(Coordinate c, Plane p)
+        {
+            activeSector = FindSector(c.U, c.V, p.W);
+
+            var u = c.U - activeSector.U * TerrainSector.SectorWidth;
+            var v = c.V - activeSector.V * TerrainSector.SectorHeight;
+            activeSector.Destroy(u, v);
+        }
+
         private TerrainSector FindSector(int x, int y, int z)
         {
             // Handle negative coordinates

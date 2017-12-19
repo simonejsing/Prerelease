@@ -101,6 +101,8 @@ namespace MainGame.UnitTests
             playerCoord.V.Should().Be(0);
             var digCoord = new Coordinate(playerCoord.U + Math.Sign(harness.Player.Facing.X), playerCoord.V - 1);
             harness.Game.Terrain[digCoord, plane].Type.Should().Be(TerrainType.Rock);
+            harness.Input();
+            harness.Game.Update(0.1f);
             harness.Input(fire: true);
             harness.Game.Update(0.1f);
             harness.Game.Terrain[digCoord, plane].Type.Should().Be(TerrainType.Free);

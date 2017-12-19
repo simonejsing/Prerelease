@@ -8,17 +8,26 @@ using VectorMath;
 
 namespace CraftingGame.Controllers
 {
+    public delegate void DigEventHandler(object sender, PlayerObject player);
+
     internal class PlayerController
     {
         private readonly GameState state;
         private readonly PhysicsEngine physicsEngine;
         private readonly Camera camera;
 
+        public event DigEventHandler Dig;
+
         public PlayerController(GameState state, PhysicsEngine physicsEngine, Camera camera)
         {
             this.state = state;
             this.physicsEngine = physicsEngine;
             this.camera = camera;
+        }
+
+        public void OnDig(PlayerObject player)
+        {
+            Dig?.Invoke(this, player);
         }
 
         public void Update(PlayerObject player)
@@ -42,10 +51,7 @@ namespace CraftingGame.Controllers
 
             if (inputMask.Input.Restart)
             {
-                player.Position = Vector2.Zero;
-                player.Velocity = Vector2.Zero;
-                player.Weapon.Cooldown = 0;
-                player.HitPoints = 1;
+                SpawnPlayer(player);
             }
 
             if (player.Dead)
@@ -61,6 +67,11 @@ namespace CraftingGame.Controllers
                 if (inputMask.Input.Up)
                 {
                     instantVelocity = new Vector2(0, Constants.JUMP_SPEED);
+                }
+                if (inputMask.Input.Fire && player.Weapon.CanFire)
+                {
+                    player.Weapon.Cooldown = 10;
+                    OnDig(player);
                 }
             }
 
@@ -87,7 +98,7 @@ namespace CraftingGame.Controllers
 
             if (inputMask.Input.Fire && player.Weapon.CanFire)
             {
-                state.ActiveLevel.AddProjectiles(FireWeapon(player));
+                //state.ActiveLevel.AddProjectiles(FireWeapon(player));
             }
 
             player.Weapon.Update();
@@ -103,6 +114,15 @@ namespace CraftingGame.Controllers
                 touchedObject.OnCollect(player);
                 touchedObject.PickedUp = true;
             }
+        }
+
+        public void SpawnPlayer(PlayerObject player)
+        {
+            player.Acceleration = Vector2.Zero;
+            player.Velocity = Vector2.Zero;
+            player.Weapon.Cooldown = 0;
+            player.HitPoints = 1;
+            player.Position = new Vector2(state.ActiveLevel.SpawnPoint);
         }
 
         private Projectile FireWeapon(PlayerObject player)

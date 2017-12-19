@@ -76,7 +76,15 @@ namespace CraftingGame
 
         public void Generate(int u, int v)
         {
-            tiles[u, v] = generator[this.topLeft + new Coordinate(u, v), this.plane];
+            if (tiles[u, v].Type == TerrainType.NotGenerated)
+            {
+                tiles[u, v] = generator[this.topLeft + new Coordinate(u, v), this.plane];
+            }
+        }
+
+        public void Destroy(int u, int v)
+        {
+            tiles[u, v].Type = TerrainType.Free;
         }
     }
 }

@@ -3,13 +3,13 @@ using VectorMath;
 
 namespace CraftingGame.Controllers
 {
-    internal class CameraController
+    internal class FreeCameraController
     {
         public const int ScrollSpeed = 50;
 
         private readonly Camera camera;
 
-        public CameraController(Camera camera)
+        public FreeCameraController(Camera camera)
         {
             this.camera = camera;
         }
