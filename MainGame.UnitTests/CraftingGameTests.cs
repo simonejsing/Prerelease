@@ -87,7 +87,7 @@ namespace MainGame.UnitTests
         {
             var harness = GameHarness.CreateEmptyGame();
             var initialX = harness.Player.Position.X;
-            harness.Input(moveRight: true);
+            harness.Input(right: true);
             harness.Game.Update(0.1f);
             harness.Player.Position.X.Should().BeGreaterThan(initialX);
         }
@@ -104,8 +104,11 @@ namespace MainGame.UnitTests
         [TestMethod]
         public void PlayerCanDigIntoTerrain()
         {
-            var harness = GameHarness.CreateSolidBlockGame(TerrainType.Rock);
-            var digCoord = DigCoordinate(harness, harness.Player);
+            var harness = GameHarness.CreateFromMap(
+@"...
+.0.
+RRR");
+            var digCoord = new Coordinate(1, -1);
             harness.ReadTerrainType(digCoord).Should().Be(TerrainType.Rock);
             harness.Input();
             harness.Game.Update(0.1f);
@@ -129,6 +132,21 @@ namespace MainGame.UnitTests
         }
 
         [TestMethod]
+        public void PlayerCanDigStraightDown()
+        {
+            var harness = GameHarness.CreateFromMap(
+@"...
+.0.
+RRR");
+            harness.ReadTerrainType(0, -1).Should().Be(TerrainType.Rock);
+            harness.Input();
+            harness.Game.Update(0.1f);
+            harness.Input(down: true, attack: true);
+            harness.Game.Update(0.1f);
+            harness.ReadTerrainType(0, -1).Should().Be(TerrainType.Free);
+        }
+
+        [TestMethod]
         public void TestTerrainMap()
         {
             var plane = new Plane(0);
@@ -145,12 +163,6 @@ RRR");
             terrain[new Coordinate(-1, -1), plane].Type.Should().Be(TerrainType.Rock);
             terrain[new Coordinate(0, -1), plane].Type.Should().Be(TerrainType.Rock);
             terrain[new Coordinate(1, -1), plane].Type.Should().Be(TerrainType.Rock);
-        }
-
-        private static Coordinate DigCoordinate(GameHarness harness, PlayerObject player)
-        {
-            var playerCoord = harness.Game.Grid.PointToGridCoordinate(player.Center);
-            return new Coordinate(playerCoord.U + Math.Sign(player.Facing.X), playerCoord.V - 1);
         }
 
         private static Coordinate PlayerCoordinate(GameHarness harness)

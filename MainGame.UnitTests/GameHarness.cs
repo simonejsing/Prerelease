@@ -61,13 +61,17 @@ namespace MainGame.UnitTests
         }
 
         public void Input(
-            bool moveRight = false,
-            bool moveLeft = false,
+            bool right = false,
+            bool left = false,
+            bool up = false,
+            bool down = false,
             bool attack = false)
         {
             playerInput.Input.Active = true;
-            playerInput.Input.Right = moveRight;
-            playerInput.Input.Left = moveLeft;
+            playerInput.Input.Right = right;
+            playerInput.Input.Left = left;
+            playerInput.Input.Up = up;
+            playerInput.Input.Down = down;
             playerInput.Input.Attack = attack;
         }
 
