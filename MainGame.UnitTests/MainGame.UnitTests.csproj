@@ -80,11 +80,12 @@
     <Compile Include="TerrainGeneratorTests.cs" />
     <Compile Include="TerrainSectorTests.cs" />
     <Compile Include="GridTests.cs" />
-    <Compile Include="MatrixTests.cs" />
+    <Compile Include="VectorMathTests.cs" />
     <Compile Include="CameraTests.cs" />
     <Compile Include="InventoryTests.cs" />
     <Compile Include="RectangleTests.cs" />
     <Compile Include="ItemTests.cs" />
+    <Compile Include="TerrainModificationTests.cs" />
     <Compile Include="ViewportProjectionTests.cs" />
   </ItemGroup>
   <ItemGroup>

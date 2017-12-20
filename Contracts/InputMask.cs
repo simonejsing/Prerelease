@@ -8,10 +8,11 @@
         public bool Up;
         public bool Down;
         public bool Attack;
+        public bool Jump;
         public bool Select;
         public bool Restart;
 
-        public bool Moving => Active && (Left || Right || Up || Down);
+        public bool Moving => Active && (Left || Right || Up || Down || Jump);
     }
 
     public class InputMask
@@ -31,6 +32,7 @@
             Input.Up |= gameInput.Up;
             Input.Down |= gameInput.Down;
             Input.Attack |= gameInput.Attack;
+            Input.Jump |= gameInput.Jump;
             Input.Select |= gameInput.Select;
             Input.Restart |= gameInput.Restart;
         }
@@ -43,6 +45,7 @@
             Input.Up = false;
             Input.Down = false;
             Input.Attack = false;
+            Input.Jump = false;
             Input.Select = false;
             Input.Restart = false;
         }

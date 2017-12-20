@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using CraftingGame;
 using CraftingGame.Physics;
+using FluentAssertions;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace MainGame.UnitTests
 
         public PlatformerSceene Game { get; }
         public PlayerObject Player => Game.State.Players.First();
+        public Coordinate PlayerCoordinate => Game.Grid.PointToGridCoordinate(Player.Center);
         public Plane Plane => Game.Plane;
 
         // By default create a small 5x5 block viewport
@@ -83,6 +85,24 @@ namespace MainGame.UnitTests
         public TerrainType ReadTerrainType(Coordinate c)
         {
             return Game.Terrain[c, Plane].Type;
+        }
+
+        public void VerifyTerrain(string terrainMap)
+        {
+            var generator = new TerrainGenerator(terrainMap);
+            var offset = generator.Offset;
+            var size = generator.Size;
+
+            for(var v = 0; v <= size.V; v++)
+            {
+                for (var u = 0; u <= size.U; u++)
+                {
+                    var coord = new Coordinate(u - offset.U, v - offset.V);
+                    var expectedTerrainType = generator.Generator(coord);
+                    var actualTerrainType = ReadTerrainType(coord);
+                    actualTerrainType.Should().Be(expectedTerrainType, $"terrain type at ({coord.U},{coord.V})");
+                }
+            }
         }
 
         public void VerifyBlockRendered(Coordinate coord)

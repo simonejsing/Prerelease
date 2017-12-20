@@ -105,7 +105,28 @@ namespace CraftingGame
         {
             // Find the spot below and in front of the player's center
             var playerCoord = Grid.PointToGridCoordinate(player.Center);
-            var digCoord = new Coordinate(playerCoord.U + Math.Sign(player.Facing.X), playerCoord.V);
+            //var digCoord = new Coordinate(playerCoord.U + Math.Sign(player.Facing.X), playerCoord.V);
+            var digCoord = playerCoord;
+            var lookAngleUnit = player.LookDirection.Angle / Math.PI;
+            // u-offset
+            if (lookAngleUnit > -3f/8f && lookAngleUnit < 3f/8f)
+            {
+                digCoord += new Coordinate(1, 0);
+            }
+            else if(lookAngleUnit > 5f/8f || lookAngleUnit < -5f/8f)
+            {
+                digCoord += new Coordinate(-1, 0);
+            }
+
+            // v-offset
+            if (lookAngleUnit > 1f/8f && lookAngleUnit < 7f/8f)
+            {
+                digCoord += new Coordinate(0, 1);
+            }
+            else if (lookAngleUnit < -1f/8f && lookAngleUnit > -7f/8f)
+            {
+                digCoord += new Coordinate(0, -1);
+            }
 
             // Can the player dig here?
             cachedTerrain.Generate(digCoord, Plane);

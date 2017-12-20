@@ -57,6 +57,40 @@ namespace CraftingGame.Controllers
             if (player.Dead)
                 return;
 
+            // Update look direction according to inputs
+            player.LookDirection = new Vector2();
+
+            var horizontalControl = player.Grounded ? Constants.GROUND_ACCELERATION : Constants.AIR_ACCELERATION;
+            if (inputMask.Input.Left)
+            {
+                horizontalInput = true;
+                player.Acceleration -= new Vector2(horizontalControl, 0);
+                player.Facing = new Vector2(-1, 0);
+                player.LookDirection += new Vector2(-1, 0);
+            }
+            if (inputMask.Input.Right)
+            {
+                horizontalInput = true;
+                player.Acceleration += new Vector2(horizontalControl, 0);
+                player.Facing = new Vector2(1, 0);
+                player.LookDirection += new Vector2(1, 0);
+            }
+            if (inputMask.Input.Up)
+            {
+                player.LookDirection += new Vector2(0, 1);
+            }
+            if (inputMask.Input.Down)
+            {
+                player.LookDirection += new Vector2(0, -1);
+            }
+
+            // If player is on the ground and not moving, come to a complete horizontal stop to prevent drift
+            if (player.Grounded && !horizontalInput)
+            {
+                player.Acceleration = new Vector2(0.0f, player.Acceleration.Y);
+                player.Velocity = new Vector2(0.0f, player.Velocity.Y);
+            }
+
             if (player.Grounded)
             {
                 if (inputMask.Input.Select)
@@ -64,7 +98,7 @@ namespace CraftingGame.Controllers
                     // Enter door if on door sprite (next frame update will carry out the transition
                     state.DoorToEnter = state.ActiveLevel.Doors.FirstOrDefault(d => player.BoundingBox.Intersects(d.Center));
                 }
-                if (inputMask.Input.Up)
+                if (inputMask.Input.Jump)
                 {
                     instantVelocity = new Vector2(0, Constants.JUMP_SPEED);
                 }
@@ -73,27 +107,6 @@ namespace CraftingGame.Controllers
                     player.Weapon.Cooldown = 10;
                     OnDig(player);
                 }
-            }
-
-            var horizontalControl = player.Grounded ? Constants.GROUND_ACCELERATION : Constants.AIR_ACCELERATION;
-            if (inputMask.Input.Left)
-            {
-                horizontalInput = true;
-                player.Acceleration -= new Vector2(horizontalControl, 0);
-                player.Facing = new Vector2(-1, 0);
-            }
-            if (inputMask.Input.Right)
-            {
-                horizontalInput = true;
-                player.Acceleration += new Vector2(horizontalControl, 0);
-                player.Facing = new Vector2(1, 0);
-            }
-
-            // If player is on the ground and not moving, come to a complete horizontal stop to prevent drift
-            if (player.Grounded && !horizontalInput)
-            {
-                player.Acceleration = new Vector2(0.0f, player.Acceleration.Y);
-                player.Velocity = new Vector2(0.0f, player.Velocity.Y);
             }
 
             if (inputMask.Input.Attack && player.Weapon.CanFire)

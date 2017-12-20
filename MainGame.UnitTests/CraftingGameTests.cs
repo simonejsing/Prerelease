@@ -96,78 +96,9 @@ namespace MainGame.UnitTests
         public void PlayerSpawnsOnTerrain()
         {
             var harness = GameHarness.CreateSolidBlockGame(TerrainType.Rock);
-            var playerCoord = harness.Game.Grid.PointToGridCoordinate(harness.Player.Center);
+            var playerCoord = harness.PlayerCoordinate;
             playerCoord.U.Should().Be(0);
             playerCoord.V.Should().Be(0);
-        }
-
-        [TestMethod]
-        public void PlayerCanDigIntoTerrain()
-        {
-            var harness = GameHarness.CreateFromMap(
-@"...
-.0.
-RRR");
-            var digCoord = new Coordinate(1, -1);
-            harness.ReadTerrainType(digCoord).Should().Be(TerrainType.Rock);
-            harness.Input();
-            harness.Game.Update(0.1f);
-            harness.Input(attack: true);
-            harness.Game.Update(0.1f);
-            harness.ReadTerrainType(digCoord).Should().Be(TerrainType.Free);
-
-            // Digging into terrain should drop an item
-            var drop = harness.Game.State.ActiveLevel.CollectableObjects.First();
-            harness.Game.Grid.PointToGridCoordinate(drop.Center).Should().Be(digCoord);
-            drop.Should().NotBeNull();
-            drop.Item.Name.Should().Be("BlockOfRock");
-
-            // Teleport player ontop of item and collect the item
-            harness.Player.Position = harness.Game.Grid.GridCoordinateToPoint(digCoord);
-            harness.Input();
-            harness.Game.Update(0.1f);
-
-            // Verify inventory contains dropped item
-            harness.Player.Inventory.Count("BlockOfRock").Should().Be(1);
-        }
-
-        [TestMethod]
-        public void PlayerCanDigStraightDown()
-        {
-            var harness = GameHarness.CreateFromMap(
-@"...
-.0.
-RRR");
-            harness.ReadTerrainType(0, -1).Should().Be(TerrainType.Rock);
-            harness.Input();
-            harness.Game.Update(0.1f);
-            harness.Input(down: true, attack: true);
-            harness.Game.Update(0.1f);
-            harness.ReadTerrainType(0, -1).Should().Be(TerrainType.Free);
-        }
-
-        [TestMethod]
-        public void TestTerrainMap()
-        {
-            var plane = new Plane(0);
-            var terrain = new TerrainStub(
-@"RRR
-.0.
-RRR");
-            terrain[new Coordinate(-1, 1), plane].Type.Should().Be(TerrainType.Rock);
-            terrain[new Coordinate(0, 1), plane].Type.Should().Be(TerrainType.Rock);
-            terrain[new Coordinate(1, 1), plane].Type.Should().Be(TerrainType.Rock);
-            terrain[new Coordinate(-1, 0), plane].Type.Should().Be(TerrainType.Free);
-            terrain[new Coordinate(0, 0), plane].Type.Should().Be(TerrainType.Free);
-            terrain[new Coordinate(1, 0), plane].Type.Should().Be(TerrainType.Free);
-            terrain[new Coordinate(-1, -1), plane].Type.Should().Be(TerrainType.Rock);
-            terrain[new Coordinate(0, -1), plane].Type.Should().Be(TerrainType.Rock);
-            terrain[new Coordinate(1, -1), plane].Type.Should().Be(TerrainType.Rock);
-        }
-
-        private static Coordinate PlayerCoordinate(GameHarness harness)
-        {
-            return harness.Game.Grid.PointToGridCoordinate(harness.Player.Center);
         }
     }
 }

@@ -8,6 +8,7 @@ namespace CraftingGame.Physics
     {
         public InputMask InputMask { get; }
 
+        public Vector2 LookDirection { get; set; }
         public bool Active { get; set; }
         public Color Color { get; }
         public Weapon Weapon { get; }

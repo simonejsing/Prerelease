@@ -6,7 +6,7 @@ using FluentAssertions;
 namespace MainGame.UnitTests
 {
     [TestClass]
-    public class MatrixTests
+    public class VectorMathTests
     {
         [TestMethod]
         public void VectorEqualityComparisonEquals()
@@ -42,6 +42,34 @@ namespace MainGame.UnitTests
             var p = Matrix2x2.ProjectY * v;
             p.X.Should().Be(0);
             p.Y.Should().Be(52);
+        }
+
+        [TestMethod]
+        public void TestVectorAngleRight()
+        {
+            var v = new Vector2(1, 0);
+            v.Angle.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void TestVectorAngleLeft()
+        {
+            var v = new Vector2(-1, 0);
+            v.Angle.Should().Be((float)Math.PI);
+        }
+
+        [TestMethod]
+        public void TestVectorAngleUp()
+        {
+            var v = new Vector2(0, 1);
+            v.Angle.Should().Be((float)Math.PI/2.0f);
+        }
+
+        [TestMethod]
+        public void TestVectorAngleDown()
+        {
+            var v = new Vector2(0, -1);
+            v.Angle.Should().Be((float)-Math.PI/2.0f);
         }
     }
 }

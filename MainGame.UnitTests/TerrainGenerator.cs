@@ -10,17 +10,19 @@ namespace MainGame.UnitTests
     internal class TerrainGenerator
     {
         private string[] lines;
-        private Coordinate offset;
+
+        public Coordinate Offset { get; }
+        public Coordinate Size => new Coordinate(lines.Max(l => l.Length), lines.Length);
 
         public TerrainGenerator(string terrainMap)
         {
             lines = terrainMap.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            offset = FindOrigin(lines);
+            Offset = FindOrigin(lines);
         }
 
         public TerrainType Generator(Coordinate coord)
         {
-            var vCoord = coord.V - offset.V;
+            var vCoord = coord.V - Offset.V;
             // Anything above the defined terrain is considered free space
             if (vCoord > 0)
                 return TerrainType.Free;
@@ -30,7 +32,7 @@ namespace MainGame.UnitTests
                 return TerrainType.Bedrock;
 
             var line = lines[-vCoord];
-            var uCoord = coord.U + offset.U;
+            var uCoord = coord.U + Offset.U;
             if (uCoord < 0 || uCoord >= line.Length)
             {
                 return TerrainType.Free;
