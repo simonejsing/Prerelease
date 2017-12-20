@@ -17,7 +17,7 @@ namespace CraftingGame.Physics
 
         public IInventory Inventory { get; }
 
-        public PlayerObject(ActionQueue actionQueue, InputMask inputMask, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPosition, size)
+        public PlayerObject(ActionQueue actionQueue, InputMask inputMask, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPlane, startingPosition, size)
         {
             Weapon = new Weapon();
             Inventory = new Inventory();

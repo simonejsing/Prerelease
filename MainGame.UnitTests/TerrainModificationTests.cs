@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Terrain;
 using FluentAssertions;
 using System.Linq;
+using Contracts;
 
 namespace MainGame.UnitTests
 {

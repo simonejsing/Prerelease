@@ -21,7 +21,7 @@ namespace MainGame.UnitTests
         public PlatformerSceene Game { get; }
         public PlayerObject Player => Game.State.Players.First();
         public Coordinate PlayerCoordinate => Game.Grid.PointToGridCoordinate(Player.Center);
-        public Plane Plane => Game.Plane;
+        public Plane Plane => Player.Plane;
 
         // By default create a small 5x5 block viewport
         public static Vector2 DefaultViewPort => new Vector2(5 * PlatformerSceene.BlockSize, 5 * PlatformerSceene.BlockSize);

@@ -16,7 +16,7 @@ namespace CraftingGame.Physics
             lifetime--;
         }
 
-        public Projectile(ActionQueue actionQueue, Object shooter, Color color, Vector2 startingPosition, Vector2 initialVelocity, Vector2 size) : base(actionQueue, startingPosition, size)
+        public Projectile(ActionQueue actionQueue, Object shooter, Color color, Plane startingPlane, Vector2 startingPosition, Vector2 initialVelocity, Vector2 size) : base(actionQueue, startingPlane, startingPosition, size)
         {
             this.Velocity = initialVelocity;
             this.Shooter = shooter;

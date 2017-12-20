@@ -10,7 +10,7 @@ namespace CraftingGame.Physics
         public Vector2 Velocity { get; set; }
         public Vector2 DeltaPosition { get; set; }
 
-        public MovableObject(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPosition, size)
+        public MovableObject(ActionQueue actionQueue, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPlane, startingPosition, size)
         {
             Grounded = false;
             Acceleration = Vector2.Zero;

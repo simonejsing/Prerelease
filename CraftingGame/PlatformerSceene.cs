@@ -7,7 +7,7 @@ using CraftingGame.Physics;
 using CraftingGame.Widgets;
 using Terrain;
 using VectorMath;
-using CraftingGame.Items;
+using CraftingGame.Actions;
 
 namespace CraftingGame
 {
@@ -33,6 +33,9 @@ namespace CraftingGame
         // Widgets
         private TerrainWidget terrainWidget;
         private DynamicGridWidget dynamicGridWidget;
+
+        // Actions
+        private DigAction digAction;
 
         // Input controllers
         private FreeCameraController freeCameraController;
@@ -71,10 +74,10 @@ namespace CraftingGame
 
             var players = new List<PlayerObject>
             {
-                new PlayerObject(actionQueue, inputMasks[0], new Vector2(), new Vector2(30, 30), "Chicken", Color.Red),
-                new PlayerObject(actionQueue, inputMasks[1], new Vector2(), new Vector2(30, 30), "Chicken", Color.Green),
-                new PlayerObject(actionQueue, inputMasks[2], new Vector2(), new Vector2(30, 30), "Chicken", Color.Blue),
-                new PlayerObject(actionQueue, inputMasks[3], new Vector2(), new Vector2(30, 30), "Chicken", Color.Yellow),
+                new PlayerObject(actionQueue, inputMasks[0], new Plane(0), new Vector2(), new Vector2(30, 30), "Chicken", Color.Red),
+                new PlayerObject(actionQueue, inputMasks[1], new Plane(0), new Vector2(), new Vector2(30, 30), "Chicken", Color.Green),
+                new PlayerObject(actionQueue, inputMasks[2], new Plane(0), new Vector2(), new Vector2(30, 30), "Chicken", Color.Blue),
+                new PlayerObject(actionQueue, inputMasks[3], new Plane(0), new Vector2(), new Vector2(30, 30), "Chicken", Color.Yellow),
             };
             spriteResolver.ResolveBindings(players);
 
@@ -91,84 +94,16 @@ namespace CraftingGame
             var activeView = View.Projection;
             cachedTerrain.SetActiveSector((int)activeView.TopLeft.X, (int)activeView.TopLeft.Y, Plane.W);
 
+            digAction = new DigAction(ActionQueue, State, Grid, cachedTerrain);
+
             terrainWidget = new TerrainWidget(Renderer, Terrain);
             dynamicGridWidget = new DynamicGridWidget(Renderer, debugFont, BlockSize);
 
             freeCameraController = new FreeCameraController(Camera);
             playerController = new PlayerController(State, physics, Camera);
-            playerController.Dig += OnPlayerDig;
+            playerController.Dig += digAction.OnPlayerDig;
 
             TransitionToLevel(level.Name);
-        }
-
-        private void OnPlayerDig(object sender, PlayerObject player)
-        {
-            if (player.LookDirection.TooSmall)
-            {
-                return;
-            }
-
-            // Find the spot below and in front of the player's center
-            var playerCoord = Grid.PointToGridCoordinate(player.Center);
-            var digCoord = playerCoord;
-            var lookAngleUnit = player.LookDirection.Angle / Math.PI;
-            // u-offset
-            if (lookAngleUnit > -3f/8f && lookAngleUnit < 3f/8f)
-            {
-                digCoord += new Coordinate(1, 0);
-            }
-            else if(lookAngleUnit > 5f/8f || lookAngleUnit < -5f/8f)
-            {
-                digCoord += new Coordinate(-1, 0);
-            }
-
-            // v-offset
-            if (lookAngleUnit > 1f/8f && lookAngleUnit < 7f/8f)
-            {
-                digCoord += new Coordinate(0, 1);
-            }
-            else if (lookAngleUnit < -1f/8f && lookAngleUnit > -7f/8f)
-            {
-                digCoord += new Coordinate(0, -1);
-            }
-
-            // Can the player dig here?
-            cachedTerrain.Generate(digCoord, Plane);
-            var type = cachedTerrain[digCoord, Plane].Type;
-            if (type == TerrainType.Free)
-            {
-                // No, try below
-                digCoord = new Coordinate(digCoord.U, digCoord.V - 1);
-                cachedTerrain.Generate(digCoord, Plane);
-                type = cachedTerrain[digCoord, Plane].Type;
-            }
-
-            // Dig it!
-            switch (type)
-            {
-                case TerrainType.Dirt:
-                case TerrainType.Rock:
-                    // Yes! Then get to work...
-                    cachedTerrain.Destroy(digCoord, Plane);
-
-                    // Drop an item of the terrain type.
-                    var item = ItemFactory.FromTerrain(type);
-                    if(item != null)
-                    {
-                        var size = new Vector2(10, 10);
-                        var coordPos = Grid.GridCoordinateToPoint(digCoord);
-                        var position = coordPos + 0.5f * (Grid.Size - size);
-                        var itemObject = new ItemObject(ActionQueue, position, size, item);
-                        itemObject.Collect += PickUpItem;
-                        State.ActiveLevel.AddCollectableObjects(itemObject);
-                    }
-                    break;
-            }
-        }
-
-        private void PickUpItem(object sender, ICollectableObject source, ICollectingObject target)
-        {
-            target.Inventory.Add(source.Item.Name);
         }
 
         public override void Update(float timestep)

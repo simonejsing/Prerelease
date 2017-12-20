@@ -5,7 +5,7 @@ namespace CraftingGame.Physics
 {
     public class StaticObject : Object, ICollidableObject
     {
-        public StaticObject(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPosition, size)
+        public StaticObject(ActionQueue actionQueue, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPlane, startingPosition, size)
         {
         }
 

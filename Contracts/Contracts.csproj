@@ -57,6 +57,7 @@
     <Compile Include="ISprite.cs" />
     <Compile Include="IUserInterface.cs" />
     <Compile Include="ObjectBinding.cs" />
+    <Compile Include="Plane.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResolvedBinding.cs" />
     <Compile Include="Sceene.cs" />

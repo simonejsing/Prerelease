@@ -141,7 +141,7 @@ namespace CraftingGame.Controllers
         private Projectile FireWeapon(PlayerObject player)
         {
             player.Weapon.Cooldown = 10;
-            return new Projectile(player.ActionQueue, player, player.Color, player.Center, new Vector2(Constants.PROJECTILE_VELOCITY * player.Facing.X, 0.0f), new Vector2(1, 1));
+            return new Projectile(player.ActionQueue, player, player.Color, player.Plane, player.Center, new Vector2(Constants.PROJECTILE_VELOCITY * player.Facing.X, 0.0f), new Vector2(1, 1));
         }
     }
 }

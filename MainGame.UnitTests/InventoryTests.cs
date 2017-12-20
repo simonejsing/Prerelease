@@ -36,7 +36,7 @@ namespace MainGame.UnitTests
         [TestMethod]
         public void CanConsumeItemFromInventory()
         {
-            var player = new PlayerObject(null, null, Vector2.Zero, Vector2.Zero, "", Color.Red);
+            var player = new PlayerObject(null, null, new Plane(0), Vector2.Zero, Vector2.Zero, "", Color.Red);
             var inventory = new Inventory();
             var flower = nameof(ConsumableFlower);
             inventory.Add(flower);
