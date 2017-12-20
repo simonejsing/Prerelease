@@ -125,7 +125,6 @@ namespace CraftingGame.Controllers
             foreach (var touchedObject in state.ActiveLevel.CollectableObjects.Where(o => o.BoundingBox.Intersects(player.BoundingBox)))
             {
                 touchedObject.OnCollect(player);
-                touchedObject.PickedUp = true;
             }
         }
 

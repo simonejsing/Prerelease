@@ -9,10 +9,20 @@ namespace CraftingGame.Physics
     {
         private readonly Dictionary<string, int> items = new Dictionary<string, int>();
 
+        public int Capacity { get; }
         public int TotalCount => items.Values.Sum();
+        public bool Full => Capacity == TotalCount;
 
-        public void Add(string item)
+        public Inventory(int capacity)
         {
+            this.Capacity = capacity;
+        }
+
+        public bool Add(string item)
+        {
+            if (Full)
+                return false;
+
             if (!items.ContainsKey(item))
             {
                 items.Add(item, 1);
@@ -21,6 +31,8 @@ namespace CraftingGame.Physics
             {
                 items[item]++;
             }
+
+            return true;
         }
 
         public int Count(string name)

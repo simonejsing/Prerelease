@@ -35,6 +35,7 @@ namespace CraftingGame
         private DynamicGridWidget dynamicGridWidget;
 
         // Actions
+        private CollectAction collectAction;
         private DigAction digAction;
 
         // Input controllers
@@ -94,14 +95,15 @@ namespace CraftingGame
             var activeView = View.Projection;
             cachedTerrain.SetActiveSector((int)activeView.TopLeft.X, (int)activeView.TopLeft.Y, Plane.W);
 
-            digAction = new DigAction(ActionQueue, State, Grid, cachedTerrain);
+            collectAction = new CollectAction();
+            digAction = new DigAction(ActionQueue, collectAction, State, Grid, cachedTerrain);
 
             terrainWidget = new TerrainWidget(Renderer, Terrain);
             dynamicGridWidget = new DynamicGridWidget(Renderer, debugFont, BlockSize);
 
             freeCameraController = new FreeCameraController(Camera);
             playerController = new PlayerController(State, physics, Camera);
-            playerController.Dig += digAction.OnPlayerDig;
+            playerController.Dig += digAction.Invoke;
 
             TransitionToLevel(level.Name);
         }

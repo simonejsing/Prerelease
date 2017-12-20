@@ -16,7 +16,7 @@ namespace CraftingGame
         private IEnumerable<PlayerObject> ActivePlayers => players.Where(p => p.Active && !p.Dead);
         public IEnumerable<IRenderableObject> RenderOrder => renderLayers.SelectMany(objs => objs.Value).Concat(ActivePlayers);
         public IEnumerable<ICollidableObject> CollisionOrder => collisionLayers.SelectMany(objs => objs.Value).Concat(ActivePlayers);
-        public IEnumerable<ICollectableObject> CollectableOrder => collectableLayers.SelectMany(objs => objs.Value.Where(o => o.PickedUp == false));
+        public IEnumerable<ICollectableObject> CollectableOrder => collectableLayers.SelectMany(objs => objs.Value.Where(o => o.Collected == false));
 
         public ObjectManager(List<PlayerObject> players)
         {
@@ -30,7 +30,7 @@ namespace CraftingGame
             renderLayers.Clear();
             renderLayers.Add(0, activeLevel.Blocks.OccupiedBlocks);
             renderLayers.Add(1, ((IEnumerable<IRenderableObject>)activeLevel.StaticObjects).Concat(activeLevel.Doors));
-            renderLayers.Add(2, ((IEnumerable<IRenderableObject>)activeLevel.CollectableObjects.Where(o => o.PickedUp == false)));
+            renderLayers.Add(2, ((IEnumerable<IRenderableObject>)activeLevel.CollectableObjects.Where(o => o.Collected == false)));
             renderLayers.Add(3, activeLevel.Crates);
             renderLayers.Add(4, activeLevel.Enemies);
             //layers.Add(5, activeLevel.Projectiles);

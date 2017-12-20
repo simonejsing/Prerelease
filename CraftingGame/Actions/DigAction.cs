@@ -10,22 +10,24 @@ using VectorMath;
 
 namespace CraftingGame.Actions
 {
-    internal class DigAction
+    public class DigAction
     {
         private readonly ActionQueue actionQueue;
+        private readonly CollectAction collectAction;
         private readonly GameState state;
         private readonly Grid grid;
         private readonly IModifiableTerrain terrain;
 
-        public DigAction(ActionQueue actionQueue, GameState state, Grid grid, IModifiableTerrain terrain)
+        public DigAction(ActionQueue actionQueue, CollectAction collectAction, GameState state, Grid grid, IModifiableTerrain terrain)
         {
             this.actionQueue = actionQueue;
+            this.collectAction = collectAction;
             this.state = state;
             this.grid = grid;
             this.terrain = terrain;
         }
 
-        public void OnPlayerDig(object sender, PlayerObject player)
+        public void Invoke(object sender, PlayerObject player)
         {
             if (player.LookDirection.TooSmall)
             {
@@ -63,16 +65,11 @@ namespace CraftingGame.Actions
                         var coordPos = grid.GridCoordinateToPoint(digCoord);
                         var position = coordPos + 0.5f * (grid.Size - size);
                         var itemObject = new ItemObject(actionQueue, player.Plane, position, size, item);
-                        itemObject.Collect += PickUpItem;
+                        itemObject.Collect += collectAction.Invoke;
                         state.ActiveLevel.AddCollectableObjects(itemObject);
                     }
                     break;
             }
-        }
-
-        private void PickUpItem(object sender, ICollectableObject source, ICollectingObject target)
-        {
-            target.Inventory.Add(source.Item.Name);
         }
 
         private static Coordinate LookingAtCoordinate(Coordinate coord, Vector2 lookDirection)

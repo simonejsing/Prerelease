@@ -38,6 +38,7 @@
     <EmbeddedResource Include="Maps\Level1.blocks.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\CollectAction.cs" />
     <Compile Include="Actions\DigAction.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Controllers\FreeCameraController.cs" />

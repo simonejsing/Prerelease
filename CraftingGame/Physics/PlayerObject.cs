@@ -20,7 +20,7 @@ namespace CraftingGame.Physics
         public PlayerObject(ActionQueue actionQueue, InputMask inputMask, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPlane, startingPosition, size)
         {
             Weapon = new Weapon();
-            Inventory = new Inventory();
+            Inventory = new Inventory(100);
             InputMask = inputMask;
             Active = false;
             SpriteBinding = new ObjectBinding<ISprite>(spritePath);

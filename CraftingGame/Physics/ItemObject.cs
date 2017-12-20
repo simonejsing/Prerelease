@@ -12,7 +12,7 @@ namespace CraftingGame.Physics
     public class ItemObject : StaticObject, ICollectableObject
     {
         public StackableItemBase Item { get; }
-        public bool PickedUp { get; set; }
+        public bool Collected { get; set; }
 
         public event CollectEventHandler Collect;
 

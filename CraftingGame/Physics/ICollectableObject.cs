@@ -11,6 +11,6 @@ namespace CraftingGame.Physics
 
         Rect2 BoundingBox { get; }
         StackableItemBase Item { get; }
-        bool PickedUp { get; }
+        bool Collected { get; set; }
     }
 }
