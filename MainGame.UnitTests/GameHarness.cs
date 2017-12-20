@@ -19,6 +19,7 @@ namespace MainGame.UnitTests
 
         public PlatformerSceene Game { get; }
         public PlayerObject Player => Game.State.Players.First();
+        public Plane Plane => Game.Plane;
 
         // By default create a small 5x5 block viewport
         public static Vector2 DefaultViewPort => new Vector2(5 * PlatformerSceene.BlockSize, 5 * PlatformerSceene.BlockSize);
@@ -39,6 +40,11 @@ namespace MainGame.UnitTests
         {
             var terrain = new TerrainStub(c => c.V < 0 ? blockType : TerrainType.Free);
             return CreateGameFromTerrain(terrain);
+        }
+
+        internal static GameHarness CreateFromMap(string terrainMap)
+        {
+            return CreateGameFromTerrain(new TerrainStub(terrainMap));
         }
 
         private static GameHarness CreateGameFromTerrain(ITerrainGenerator terrain)
@@ -63,6 +69,16 @@ namespace MainGame.UnitTests
             playerInput.Input.Right = moveRight;
             playerInput.Input.Left = moveLeft;
             playerInput.Input.Attack = attack;
+        }
+
+        public TerrainType ReadTerrainType(int u, int v)
+        {
+            return ReadTerrainType(new Coordinate(u, v));
+        }
+
+        public TerrainType ReadTerrainType(Coordinate c)
+        {
+            return Game.Terrain[c, Plane].Type;
         }
 
         public void VerifyBlockRendered(Coordinate coord)

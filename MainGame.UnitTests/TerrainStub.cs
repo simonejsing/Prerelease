@@ -46,6 +46,10 @@ namespace MainGame.UnitTests
         {
         }
 
+        public TerrainStub(string terrainMap) : this(new TerrainGenerator(terrainMap).Generator)
+        {
+        }
+
         public TerrainStub(Func<Coordinate, TerrainType> generator)
         {
             this.generator = generator;

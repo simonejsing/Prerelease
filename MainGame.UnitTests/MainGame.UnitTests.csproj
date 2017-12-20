@@ -75,6 +75,7 @@
     <Compile Include="CraftingGameTests.cs" />
     <Compile Include="GameHarness.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TerrainGenerator.cs" />
     <Compile Include="TerrainStub.cs" />
     <Compile Include="TerrainGeneratorTests.cs" />
     <Compile Include="TerrainSectorTests.cs" />

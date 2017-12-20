@@ -104,15 +104,14 @@ namespace MainGame.UnitTests
         [TestMethod]
         public void PlayerCanDigIntoTerrain()
         {
-            var plane = new Plane(0);
             var harness = GameHarness.CreateSolidBlockGame(TerrainType.Rock);
             var digCoord = DigCoordinate(harness, harness.Player);
-            harness.Game.Terrain[digCoord, plane].Type.Should().Be(TerrainType.Rock);
+            harness.ReadTerrainType(digCoord).Should().Be(TerrainType.Rock);
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(attack: true);
             harness.Game.Update(0.1f);
-            harness.Game.Terrain[digCoord, plane].Type.Should().Be(TerrainType.Free);
+            harness.ReadTerrainType(digCoord).Should().Be(TerrainType.Free);
 
             // Digging into terrain should drop an item
             var drop = harness.Game.State.ActiveLevel.CollectableObjects.First();
@@ -129,10 +128,34 @@ namespace MainGame.UnitTests
             harness.Player.Inventory.Count("BlockOfRock").Should().Be(1);
         }
 
+        [TestMethod]
+        public void TestTerrainMap()
+        {
+            var plane = new Plane(0);
+            var terrain = new TerrainStub(
+@"RRR
+.0.
+RRR");
+            terrain[new Coordinate(-1, 1), plane].Type.Should().Be(TerrainType.Rock);
+            terrain[new Coordinate(0, 1), plane].Type.Should().Be(TerrainType.Rock);
+            terrain[new Coordinate(1, 1), plane].Type.Should().Be(TerrainType.Rock);
+            terrain[new Coordinate(-1, 0), plane].Type.Should().Be(TerrainType.Free);
+            terrain[new Coordinate(0, 0), plane].Type.Should().Be(TerrainType.Free);
+            terrain[new Coordinate(1, 0), plane].Type.Should().Be(TerrainType.Free);
+            terrain[new Coordinate(-1, -1), plane].Type.Should().Be(TerrainType.Rock);
+            terrain[new Coordinate(0, -1), plane].Type.Should().Be(TerrainType.Rock);
+            terrain[new Coordinate(1, -1), plane].Type.Should().Be(TerrainType.Rock);
+        }
+
         private static Coordinate DigCoordinate(GameHarness harness, PlayerObject player)
         {
             var playerCoord = harness.Game.Grid.PointToGridCoordinate(player.Center);
             return new Coordinate(playerCoord.U + Math.Sign(player.Facing.X), playerCoord.V - 1);
+        }
+
+        private static Coordinate PlayerCoordinate(GameHarness harness)
+        {
+            return harness.Game.Grid.PointToGridCoordinate(harness.Player.Center);
         }
     }
 }
