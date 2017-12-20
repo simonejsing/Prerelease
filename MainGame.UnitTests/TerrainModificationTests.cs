@@ -10,7 +10,7 @@ namespace MainGame.UnitTests
     public class TerrainModificationTests
     {
         [TestMethod]
-        public void PlayerCanDigIntoTerrain()
+        public void ShouldBeAbleToDigAndCollectDroppedBlock()
         {
             var harness = GameHarness.CreateFromMap(
 @"...
@@ -18,7 +18,7 @@ namespace MainGame.UnitTests
 RRR");
             harness.Input();
             harness.Game.Update(0.1f);
-            harness.Input(attack: true);
+            harness.Input(right: true, attack: true);
             harness.Game.Update(0.1f);
             harness.VerifyTerrain(
 @"...
@@ -39,6 +39,23 @@ RR.");
 
             // Verify inventory contains dropped item
             harness.Player.Inventory.Count("BlockOfRock").Should().Be(1);
+        }
+
+        [TestMethod]
+        public void ShouldNotModifyTerrainIfPlayerIsNotLooking()
+        {
+            var harness = GameHarness.CreateFromMap(
+@"RRR
+R0R
+RRR");
+            harness.Input();
+            harness.Game.Update(0.1f);
+            harness.Input(attack: true);
+            harness.Game.Update(0.1f);
+            harness.VerifyTerrain(
+@"RRR
+R0R
+RRR");
         }
 
         [TestMethod]

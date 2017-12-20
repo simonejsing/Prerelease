@@ -103,9 +103,13 @@ namespace CraftingGame
 
         private void OnPlayerDig(object sender, PlayerObject player)
         {
+            if (player.LookDirection.TooSmall)
+            {
+                return;
+            }
+
             // Find the spot below and in front of the player's center
             var playerCoord = Grid.PointToGridCoordinate(player.Center);
-            //var digCoord = new Coordinate(playerCoord.U + Math.Sign(player.Facing.X), playerCoord.V);
             var digCoord = playerCoord;
             var lookAngleUnit = player.LookDirection.Angle / Math.PI;
             // u-offset
