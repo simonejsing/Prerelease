@@ -34,7 +34,7 @@ namespace Renderer
             sprites = new SpriteLibrary(manager);
             fonts = new FontLibrary(manager);
 
-            this.viewport = new VectorMath.Vector2(device.Viewport.Width, device.Viewport.Height);
+            this.viewport = new VectorMath.Vector2(device.DisplayMode.Width, device.DisplayMode.Height);
             ResetTransform();
         }
 
