@@ -23,6 +23,7 @@ namespace Prerelease.Main.Input
             currentInputs.Right = Right();
             currentInputs.Up = Up();
             currentInputs.Down = Down();
+            currentInputs.Jump = Jump();
             currentInputs.Attack = Attack();
             currentInputs.Select = Select();
             currentInputs.Restart = Restart();
@@ -31,35 +32,40 @@ namespace Prerelease.Main.Input
 
         private bool Restart()
         {
-            return pressedKeys.Contains(Keys.Space);
+            return pressedKeys.Contains(Keys.Escape);
         }
 
-        public bool Left()
+        private bool Left()
         {
             return pressedKeys.Contains(Keys.A);
         }
 
-        public bool Right()
+        private bool Right()
         {
             return pressedKeys.Contains(Keys.D);
         }
 
-        public bool Up()
+        private bool Up()
         {
             return pressedKeys.Contains(Keys.W);
         }
 
-        public bool Down()
+        private bool Down()
         {
             return pressedKeys.Contains(Keys.S);
         }
 
-        public bool Attack()
+        private bool Jump()
+        {
+            return pressedKeys.Contains(Keys.Space);
+        }
+
+        private bool Attack()
         {
             return pressedKeys.Contains(Keys.E);
         }
 
-        public bool Select()
+        private bool Select()
         {
             return pressedKeys.Contains(Keys.Q);
         }
