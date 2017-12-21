@@ -23,7 +23,7 @@ namespace Prerelease.Main.Input
             currentInputs.Right = Right();
             currentInputs.Up = Up();
             currentInputs.Down = Down();
-            currentInputs.Fire = Fire();
+            currentInputs.Attack = Attack();
             currentInputs.Select = Select();
             currentInputs.Restart = Restart();
             return currentInputs;
@@ -55,7 +55,7 @@ namespace Prerelease.Main.Input
             return state.ThumbSticks.Left.Y < 0.0;
         }
 
-        private bool Fire()
+        private bool Attack()
         {
             return state.Buttons.X == ButtonState.Pressed;
         }

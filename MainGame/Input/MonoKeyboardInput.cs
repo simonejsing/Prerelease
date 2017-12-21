@@ -23,7 +23,7 @@ namespace Prerelease.Main.Input
             currentInputs.Right = Right();
             currentInputs.Up = Up();
             currentInputs.Down = Down();
-            currentInputs.Fire = Fire();
+            currentInputs.Attack = Attack();
             currentInputs.Select = Select();
             currentInputs.Restart = Restart();
             return currentInputs;
@@ -54,7 +54,7 @@ namespace Prerelease.Main.Input
             return pressedKeys.Contains(Keys.S);
         }
 
-        public bool Fire()
+        public bool Attack()
         {
             return pressedKeys.Contains(Keys.E);
         }

@@ -184,7 +184,7 @@ namespace Prerelease.Main
                         inputMasks[0].Input.Right ? "R" : (currentInputs.Right ? "r" : "-"),
                         inputMasks[0].Input.Up ? "U" : (currentInputs.Up ? "u" : "-"),
                         inputMasks[0].Input.Down ? "D" : (currentInputs.Down ? "d" : "-"),
-                        inputMasks[0].Input.Fire ? "F" : (currentInputs.Fire ? "f" : "-"),
+                        inputMasks[0].Input.Attack ? "A" : (currentInputs.Attack ? "a" : "-"),
                         inputMasks[0].Input.Select ? "S" : (currentInputs.Select ? "s" : "-")),
                     Color.Red);
 

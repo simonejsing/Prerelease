@@ -234,7 +234,7 @@ namespace CraftingGame
             }
             */
 
-            dynamicGridWidget.Render(View);
+            //dynamicGridWidget.Render(View);
         }
 
         private void RenderObject(IRenderableObject obj)
