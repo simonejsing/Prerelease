@@ -17,6 +17,7 @@ namespace MainGame.UnitTests
 @"...
 .0.
 RRR");
+            harness.StartGame();
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(right: true, attack: true);
@@ -49,6 +50,7 @@ RR.");
 @"RRR
 R0R
 RRR");
+            harness.StartGame();
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(attack: true);
@@ -66,6 +68,7 @@ RRR");
 @"...
 .0R
 RRR");
+            harness.StartGame();
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(right: true, attack: true);
@@ -83,6 +86,7 @@ RRR");
 @"...
 R0.
 RRR");
+            harness.StartGame();
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(left: true, attack: true);
@@ -100,6 +104,7 @@ RRR");
 @"...
 .0.
 RRR");
+            harness.StartGame();
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(down: true, right: true, attack: true);
@@ -117,6 +122,7 @@ RR.");
 @"...
 .0.
 RRR");
+            harness.StartGame();
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(down: true, left: true, attack: true);
@@ -134,6 +140,7 @@ RRR");
 @"...
 .0.
 RRR");
+            harness.StartGame();
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(down: true, attack: true);
@@ -151,6 +158,7 @@ R.R");
 @"RRR
 .0.
 RRR");
+            harness.StartGame();
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(up: true, attack: true);
@@ -168,6 +176,7 @@ RRR");
 @"RRR
 .0.
 RRR");
+            harness.StartGame();
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(up: true, left: true, attack: true);
@@ -185,6 +194,7 @@ RRR");
 @"RRR
 .0.
 RRR");
+            harness.StartGame();
             harness.Input();
             harness.Game.Update(0.1f);
             harness.Input(up: true, right: true, attack: true);
@@ -222,6 +232,7 @@ RRR");
 .0.
 RRR";
             var harness = GameHarness.CreateFromMap(terrainMap);
+            harness.StartGame();
             harness.VerifyTerrain(terrainMap);
         }
     }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using VectorMath;
 
@@ -110,6 +112,14 @@ namespace CraftingGame.Physics
         public void SetActiveLevel(string levelName)
         {
             ActiveLevel = levels.First(l => string.Equals(l.Name, levelName));
+        }
+
+        public void SaveToStream(MemoryStream stream)
+        {
+        }
+
+        public void LoadFromStream(Stream stream)
+        {
         }
     }
 }

@@ -42,7 +42,7 @@ namespace CraftingGame
         private FreeCameraController freeCameraController;
         private PlayerController playerController;
 
-        public ITerrainGenerator Terrain => level.Terrain;
+        public IModifiableTerrain Terrain => level.Terrain;
         public Camera Camera { get; }
         public ViewportProjection View { get; }
         public Grid Grid { get; } = new Grid(BlockSize, BlockSize);

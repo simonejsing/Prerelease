@@ -15,7 +15,7 @@ namespace CraftingGame
         private readonly CachedTerrainGenerator terrain;
 
         public string Name => Plane.W.ToString();
-        public ITerrainGenerator Terrain => terrain;
+        public IModifiableTerrain Terrain => terrain;
         public Plane Plane { get; }
         public Vector2 SpawnPoint { get; private set; }
         public LevelState State { get; private set; }

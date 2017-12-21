@@ -10,15 +10,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Terrain;
 using VectorMath;
+using System.IO;
 
 namespace MainGame.UnitTests
 {
     class GameHarness
     {
         private readonly Mock<IRenderer> mockRenderer;
+        private readonly ITerrainGenerator terrain;
         private readonly InputMask playerInput;
 
-        public PlatformerSceene Game { get; }
+        public PlatformerSceene Game { get; private set; }
         public PlayerObject Player => Game.State.Players.First();
         public Coordinate PlayerCoordinate => Game.Grid.PointToGridCoordinate(Player.Center);
         public Plane Plane => Player.Plane;
@@ -58,7 +60,18 @@ namespace MainGame.UnitTests
         private GameHarness(Mock<IRenderer> mockRenderer, ITerrainGenerator terrain)
         {
             this.mockRenderer = mockRenderer;
+            this.terrain = terrain;
             this.playerInput = CreateInput();
+        }
+
+        public void LoadGame(Stream stream)
+        {
+            this.Game = CreateGame(mockRenderer.Object, terrain, playerInput);
+            this.Game.State.LoadFromStream(stream);
+        }
+
+        public void StartGame()
+        {
             this.Game = CreateGame(mockRenderer.Object, terrain, playerInput);
         }
 

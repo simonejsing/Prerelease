@@ -13,7 +13,7 @@ namespace MainGame.UnitTests
         [TestMethod]
         public void TerrainModificationPersistsWhenLoadingGameState()
         {
-            /*var harness = GameHarness.CreateFromMap(
+            var harness = GameHarness.CreateFromMap(
 @"0..
 RRR
 RRR");
@@ -32,8 +32,7 @@ RRR
 RRR");
                 harness2.LoadGame(stream);
                 harness2.ReadTerrainType(modificationCoord).Should().Be(TerrainType.Free);
-            }*/
-            Assert.Fail();
+            }
         }
     }
 }
