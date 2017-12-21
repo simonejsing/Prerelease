@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terrain;
@@ -43,6 +44,10 @@ namespace MainGame.UnitTests
         private int generationCounter = 0;
 
         public TerrainStub() : this(c => TerrainType.Free)
+        {
+        }
+
+        public TerrainStub(string terrainMap) : this(new TerrainGenerator(terrainMap).Generator)
         {
         }
 

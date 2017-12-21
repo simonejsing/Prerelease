@@ -8,6 +8,7 @@ namespace CraftingGame.Physics
     {
         public InputMask InputMask { get; }
 
+        public Vector2 LookDirection { get; set; }
         public bool Active { get; set; }
         public Color Color { get; }
         public Weapon Weapon { get; }
@@ -16,10 +17,10 @@ namespace CraftingGame.Physics
 
         public IInventory Inventory { get; }
 
-        public PlayerObject(ActionQueue actionQueue, InputMask inputMask, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPosition, size)
+        public PlayerObject(ActionQueue actionQueue, InputMask inputMask, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPlane, startingPosition, size)
         {
             Weapon = new Weapon();
-            Inventory = new Inventory();
+            Inventory = new Inventory(100);
             InputMask = inputMask;
             Active = false;
             SpriteBinding = new ObjectBinding<ISprite>(spritePath);

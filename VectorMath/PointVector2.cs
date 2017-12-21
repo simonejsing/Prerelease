@@ -11,6 +11,8 @@ namespace VectorMath
         public Vector2 Origin { get; set; }
         public Vector2 Vector { get; set; }
 
+        public bool TooSmall => Vector.TooSmall;
+
         public Vector2 Destination
         {
             get
@@ -47,11 +49,6 @@ namespace VectorMath
             Vector = new Vector2(pointVector.Vector);
         }
 
-        public bool TooSmall()
-        {
-            return Vector.TooSmall();
-        }
-
         public bool Intersect(Line2 line)
         {
             return IntersectionTest(IntersectionFactor(line), Vector.LengthSquared);
@@ -77,7 +74,7 @@ namespace VectorMath
         public bool Intersect(PointVector2 vector)
         {
             // If either vector has zero length it is impossible to intersect
-            if (TooSmall() || vector.TooSmall())
+            if (TooSmall || vector.TooSmall)
                 return false;
 
             var t1 = Line.IntersectionFactor(vector.Line);

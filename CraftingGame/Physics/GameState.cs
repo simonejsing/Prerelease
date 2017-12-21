@@ -78,7 +78,7 @@ namespace CraftingGame.Physics
             enemies.RemoveAll(e => e.Dead);
 
             // Remove collected items
-            collectableObjects.RemoveAll(c => c.PickedUp);
+            collectableObjects.RemoveAll(c => c.Collected);
         }
     }
 

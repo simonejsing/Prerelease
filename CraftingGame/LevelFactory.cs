@@ -20,6 +20,7 @@ namespace CraftingGame
 
         public LevelState Load(string levelName)
         {
+            var plane = new Plane(0);
             var levelEnemies = new List<EnemyObject>();
             var levelCrates = new List<MovableObject>();
             var levelStaticObjects = new List<StaticObject>();
@@ -52,22 +53,22 @@ namespace CraftingGame
                             break;
                         case 'h':
                         case 'H':
-                            var hiddenObject = CreateHiddenObject(new Vector2(30 * col, 30 * row), new Vector2(30, 30));
+                            var hiddenObject = CreateHiddenObject(plane, new Vector2(30 * col, 30 * row), new Vector2(30, 30));
                             levelStaticObjects.Add(hiddenObject);
                             break;
                         case 'f':
                         case 'F':
-                            var collectableObject = CreateFlowerObject(new Vector2(30 * col, 30 * row), new Vector2(30, 30));
+                            var collectableObject = CreateFlowerObject(plane, new Vector2(30 * col, 30 * row), new Vector2(30, 30));
                             levelCollectableObjects.Add(collectableObject);
                             break;
                         case 'c':
                         case 'C':
-                            var crate = CreateCrate(new Vector2(30*col, 30*row), new Vector2(30, 30));
+                            var crate = CreateCrate(plane, new Vector2(30*col, 30*row), new Vector2(30, 30));
                             levelCrates.Add(crate);
                             break;
                         case 'e':
                         case 'E':
-                            var enemy = CreateEnemy(new Vector2(30 * col, 30 * row), new Vector2(30, 30));
+                            var enemy = CreateEnemy(plane, new Vector2(30 * col, 30 * row), new Vector2(30, 30));
                             levelEnemies.Add(enemy);
                             break;
                         case '1':
@@ -75,7 +76,7 @@ namespace CraftingGame
                         case '3':
                             // Level door
                             int levelNumber = (int)char.GetNumericValue(cellValue);
-                            var door = CreateDoorToLevel(new Vector2(30 * col, 30 * row), new Vector2(30, 30), levelNumber);
+                            var door = CreateDoorToLevel(plane, new Vector2(30 * col, 30 * row), new Vector2(30, 30), levelNumber);
                             levelDoors.Add(door);
                             break;
                     }
@@ -92,9 +93,9 @@ namespace CraftingGame
             return level;
         }
 
-        private ItemObject CreateFlowerObject(IReadonlyVector position, IReadonlyVector size)
+        private ItemObject CreateFlowerObject(Plane plane, IReadonlyVector position, IReadonlyVector size)
         {
-            var flowerObject = new ItemObject(actionQueue, position, size, new ConsumableFlower());
+            var flowerObject = new ItemObject(actionQueue, plane, position, size, new ConsumableFlower());
             flowerObject.SpriteBinding = new ObjectBinding<ISprite>("flower");
             flowerObject.Collect += CollectFlower;
             return flowerObject;
@@ -105,23 +106,23 @@ namespace CraftingGame
             target.Inventory.Add("flower");
         }
 
-        private StaticObject CreateHiddenObject(IReadonlyVector position, IReadonlyVector size)
+        private StaticObject CreateHiddenObject(Plane plane, IReadonlyVector position, IReadonlyVector size)
         {
-            var hiddenObject = new StaticObject(actionQueue, position, size);
+            var hiddenObject = new StaticObject(actionQueue, plane, position, size);
             hiddenObject.SpriteBinding = new ObjectBinding<ISprite>("empty");
             return hiddenObject;
         }
 
-        private MovableObject CreateCrate(IReadonlyVector position, IReadonlyVector size)
+        private MovableObject CreateCrate(Plane plane, IReadonlyVector position, IReadonlyVector size)
         {
-            var crate = new MovableObject(actionQueue, position, size);
+            var crate = new MovableObject(actionQueue, plane, position, size);
             crate.SpriteBinding = new ObjectBinding<ISprite>("crate");
             return crate;
         }
 
-        private Door CreateDoorToLevel(IReadonlyVector position, IReadonlyVector size, int levelNumber)
+        private Door CreateDoorToLevel(Plane plane, IReadonlyVector position, IReadonlyVector size, int levelNumber)
         {
-            var door = new Door(actionQueue, position, size);
+            var door = new Door(actionQueue, plane, position, size);
             door.SpriteBinding = new ObjectBinding<ISprite>("door");
             door.Destination = new Destination()
             {
@@ -131,9 +132,9 @@ namespace CraftingGame
             return door;
         }
 
-        private EnemyObject CreateEnemy(IReadonlyVector position, IReadonlyVector size)
+        private EnemyObject CreateEnemy(Plane plane, IReadonlyVector position, IReadonlyVector size)
         {
-            var enemy = new EnemyObject(actionQueue, position, size);
+            var enemy = new EnemyObject(actionQueue, plane, position, size);
             enemy.SpriteBinding = new ObjectBinding<ISprite>("skeleton");
             return enemy;
         }

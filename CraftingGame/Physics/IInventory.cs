@@ -9,9 +9,11 @@ namespace CraftingGame.Physics
 {
     public interface IInventory
     {
+        int Capacity { get; }
         int TotalCount { get; }
+        bool Full { get; }
 
-        void Add(string item);
+        bool Add(string item);
         int Count(string name);
         bool CanTake(string name);
         StackableItemBase Take(string name);

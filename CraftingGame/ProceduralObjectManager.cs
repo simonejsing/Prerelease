@@ -5,6 +5,7 @@ using CraftingGame.Physics;
 using Terrain;
 using VectorMath;
 using Object = CraftingGame.Physics.Object;
+using Contracts;
 
 namespace CraftingGame
 {

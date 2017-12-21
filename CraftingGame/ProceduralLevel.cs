@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CraftingGame.Physics;
 using Terrain;
 using VectorMath;
+using Contracts;
 
 namespace CraftingGame
 {

@@ -35,6 +35,10 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <ProjectReference Include="..\Contracts\Contracts.csproj">
+      <Project>{1B4E6F20-64F7-4912-BF4A-4CCDF2420CCC}</Project>
+      <Name>Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VectorMath\VectorMath.csproj">
       <Project>{e28a40e7-8894-4524-b748-8f89e8014e30}</Project>
       <Name>VectorMath</Name>
@@ -45,11 +49,11 @@
     <Compile Include="Coordinate.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="Grid.cs" />
+    <Compile Include="IModifiableTerrain.cs" />
     <Compile Include="INoiseGenerator.cs" />
     <Compile Include="ITerrainGenerator.cs" />
     <Compile Include="OctaveNoise.cs" />
     <Compile Include="PerlinNoise.cs" />
-    <Compile Include="Plane.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SineNoise.cs" />
     <Compile Include="TerrainBlock.cs" />

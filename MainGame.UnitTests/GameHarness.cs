@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using CraftingGame;
 using CraftingGame.Physics;
+using FluentAssertions;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,8 @@ namespace MainGame.UnitTests
 
         public PlatformerSceene Game { get; }
         public PlayerObject Player => Game.State.Players.First();
+        public Coordinate PlayerCoordinate => Game.Grid.PointToGridCoordinate(Player.Center);
+        public Plane Plane => Player.Plane;
 
         // By default create a small 5x5 block viewport
         public static Vector2 DefaultViewPort => new Vector2(5 * PlatformerSceene.BlockSize, 5 * PlatformerSceene.BlockSize);
@@ -41,6 +44,11 @@ namespace MainGame.UnitTests
             return CreateGameFromTerrain(terrain);
         }
 
+        internal static GameHarness CreateFromMap(string terrainMap)
+        {
+            return CreateGameFromTerrain(new TerrainStub(terrainMap));
+        }
+
         private static GameHarness CreateGameFromTerrain(ITerrainGenerator terrain)
         {
             var mockRenderer = CreateRenderer(DefaultViewPort);
@@ -55,14 +63,46 @@ namespace MainGame.UnitTests
         }
 
         public void Input(
-            bool moveRight = false,
-            bool moveLeft = false,
+            bool right = false,
+            bool left = false,
+            bool up = false,
+            bool down = false,
             bool attack = false)
         {
             playerInput.Input.Active = true;
-            playerInput.Input.Right = moveRight;
-            playerInput.Input.Left = moveLeft;
+            playerInput.Input.Right = right;
+            playerInput.Input.Left = left;
+            playerInput.Input.Up = up;
+            playerInput.Input.Down = down;
             playerInput.Input.Attack = attack;
+        }
+
+        public TerrainType ReadTerrainType(int u, int v)
+        {
+            return ReadTerrainType(new Coordinate(u, v));
+        }
+
+        public TerrainType ReadTerrainType(Coordinate c)
+        {
+            return Game.Terrain[c, Plane].Type;
+        }
+
+        public void VerifyTerrain(string terrainMap)
+        {
+            var generator = new TerrainGenerator(terrainMap);
+            var offset = generator.Offset;
+            var size = generator.Size;
+
+            for(var v = 0; v <= size.V; v++)
+            {
+                for (var u = 0; u <= size.U; u++)
+                {
+                    var coord = new Coordinate(u - offset.U, v - offset.V);
+                    var expectedTerrainType = generator.Generator(coord);
+                    var actualTerrainType = ReadTerrainType(coord);
+                    actualTerrainType.Should().Be(expectedTerrainType, $"terrain type at ({coord.U},{coord.V})");
+                }
+            }
         }
 
         public void VerifyBlockRendered(Coordinate coord)

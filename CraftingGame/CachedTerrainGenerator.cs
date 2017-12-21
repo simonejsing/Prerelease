@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ using VectorMath;
 
 namespace CraftingGame
 {
-    public class CachedTerrainGenerator : ITerrainGenerator
+    public class CachedTerrainGenerator : IModifiableTerrain
     {
         private readonly ITerrainGenerator terrainGenerator;
         private readonly IList<TerrainSector> sectors = new List<TerrainSector>();

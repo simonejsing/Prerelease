@@ -1,4 +1,6 @@
-﻿namespace Terrain
+﻿using Contracts;
+
+namespace Terrain
 {
     public interface ITerrainGenerator
     {

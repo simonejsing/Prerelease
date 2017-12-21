@@ -9,6 +9,7 @@ namespace CraftingGame.Physics
 
         public Rect2 BoundingBox { get; private set; }
 
+        public Plane Plane { get; set; }
         public Vector2 Position
         {
             get { return BoundingBox.TopLeft; }
@@ -27,9 +28,10 @@ namespace CraftingGame.Physics
 
         public Vector2 Center => Position + 0.5f * Size;
 
-        public Object(ActionQueue actionQueue, IReadonlyVector startingPosition, IReadonlyVector size)
+        public Object(ActionQueue actionQueue, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size)
         {
             this.ActionQueue = actionQueue;
+            this.Plane = startingPlane;
             this.BoundingBox = new Rect2(startingPosition, size);
             this.Facing = new Vector2(1, 0);
             this.Action = new GameAction(ActionType.Noop);

@@ -12,6 +12,7 @@ namespace VectorMath
         public float Length => (float) Math.Sqrt(X*X + Y*Y);
         public float LengthSquared => X * X + Y * Y;
         public float Angle => (float) Math.Atan2(Y, X);
+        public bool TooSmall => LengthSquared < VectorLengthPrecission;
 
         public Vector2 Flip => new Vector2(-X, -Y);
         public Vector2 FlipX => new Vector2(-X, Y);
@@ -69,11 +70,6 @@ namespace VectorMath
         public float ProjectionLength(Vector2 v)
         {
             return Dot(this, v) / v.Length;
-        }
-
-        public bool TooSmall()
-        {
-            return LengthSquared < VectorLengthPrecission;
         }
 
         // Operators

@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Terrain;
+using Contracts;
 
 namespace MainGame.UnitTests
 {

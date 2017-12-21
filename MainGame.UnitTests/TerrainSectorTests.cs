@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Terrain;
+using Contracts;
 
 namespace MainGame.UnitTests
 {

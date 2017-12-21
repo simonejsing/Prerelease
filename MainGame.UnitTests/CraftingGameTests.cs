@@ -87,7 +87,7 @@ namespace MainGame.UnitTests
         {
             var harness = GameHarness.CreateEmptyGame();
             var initialX = harness.Player.Position.X;
-            harness.Input(moveRight: true);
+            harness.Input(right: true);
             harness.Game.Update(0.1f);
             harness.Player.Position.X.Should().BeGreaterThan(initialX);
         }
@@ -96,43 +96,9 @@ namespace MainGame.UnitTests
         public void PlayerSpawnsOnTerrain()
         {
             var harness = GameHarness.CreateSolidBlockGame(TerrainType.Rock);
-            var playerCoord = harness.Game.Grid.PointToGridCoordinate(harness.Player.Center);
+            var playerCoord = harness.PlayerCoordinate;
             playerCoord.U.Should().Be(0);
             playerCoord.V.Should().Be(0);
-        }
-
-        [TestMethod]
-        public void PlayerCanDigIntoTerrain()
-        {
-            var plane = new Plane(0);
-            var harness = GameHarness.CreateSolidBlockGame(TerrainType.Rock);
-            var digCoord = DigCoordinate(harness, harness.Player);
-            harness.Game.Terrain[digCoord, plane].Type.Should().Be(TerrainType.Rock);
-            harness.Input();
-            harness.Game.Update(0.1f);
-            harness.Input(attack: true);
-            harness.Game.Update(0.1f);
-            harness.Game.Terrain[digCoord, plane].Type.Should().Be(TerrainType.Free);
-
-            // Digging into terrain should drop an item
-            var drop = harness.Game.State.ActiveLevel.CollectableObjects.First();
-            harness.Game.Grid.PointToGridCoordinate(drop.Center).Should().Be(digCoord);
-            drop.Should().NotBeNull();
-            drop.Item.Name.Should().Be("BlockOfRock");
-
-            // Teleport player ontop of item and collect the item
-            harness.Player.Position = harness.Game.Grid.GridCoordinateToPoint(digCoord);
-            harness.Input();
-            harness.Game.Update(0.1f);
-
-            // Verify inventory contains dropped item
-            harness.Player.Inventory.Count("BlockOfRock").Should().Be(1);
-        }
-
-        private static Coordinate DigCoordinate(GameHarness harness, PlayerObject player)
-        {
-            var playerCoord = harness.Game.Grid.PointToGridCoordinate(player.Center);
-            return new Coordinate(playerCoord.U + Math.Sign(player.Facing.X), playerCoord.V - 1);
         }
     }
 }
