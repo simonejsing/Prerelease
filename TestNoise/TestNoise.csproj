@@ -51,11 +51,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Contracts\Contracts.csproj">
-      <Project>{1b4e6f20-64f7-4912-bf4a-4ccdf2420ccc}</Project>
+      <Project>{fade0799-e4fa-4c63-900a-e996fcdfb52b}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Terrain\Terrain.csproj">
-      <Project>{94AB4A7B-EC90-4BD8-9634-407E0BD15E1B}</Project>
+      <Project>{042f191a-5693-47c9-9db7-c142c6cd1d88}</Project>
       <Name>Terrain</Name>
     </ProjectReference>
   </ItemGroup>

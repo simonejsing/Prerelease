@@ -151,23 +151,23 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Contracts\Contracts.csproj">
-      <Project>{1b4e6f20-64f7-4912-bf4a-4ccdf2420ccc}</Project>
+      <Project>{fade0799-e4fa-4c63-900a-e996fcdfb52b}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\CraftingGame\CraftingGame.csproj">
-      <Project>{3e68e3ba-8697-4be6-8722-f25256384ef5}</Project>
+      <Project>{6cc105e8-2782-4606-b208-752d56144d04}</Project>
       <Name>CraftingGame</Name>
     </ProjectReference>
     <ProjectReference Include="..\Renderer\Renderer.csproj">
-      <Project>{47ab637f-3d27-4154-abd9-a89f78de8b9d}</Project>
+      <Project>{0c245534-2dab-421d-abda-3acf8f60f864}</Project>
       <Name>Renderer</Name>
     </ProjectReference>
     <ProjectReference Include="..\Terrain\Terrain.csproj">
-      <Project>{94ab4a7b-ec90-4bd8-9634-407e0bd15e1b}</Project>
+      <Project>{042f191a-5693-47c9-9db7-c142c6cd1d88}</Project>
       <Name>Terrain</Name>
     </ProjectReference>
     <ProjectReference Include="..\VectorMath\VectorMath.csproj">
-      <Project>{e28a40e7-8894-4524-b748-8f89e8014e30}</Project>
+      <Project>{d6fc4da6-763d-4244-95a2-80851469f553}</Project>
       <Name>VectorMath</Name>
     </ProjectReference>
   </ItemGroup>
