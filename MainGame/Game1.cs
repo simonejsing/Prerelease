@@ -2,6 +2,7 @@
 using Contracts;
 using CraftingGame;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Prerelease.Main.Input;
 using Renderer;
 using Color = Contracts.Color;
@@ -17,7 +18,8 @@ namespace Prerelease.Main
         public const bool Debug = true;
 
         private ISceene activeSceene = null;
-        private readonly IMonoInput keyboard, uiKeyboard;
+        private readonly IMonoInput keyboard;
+        private readonly MonoUIKeyboardInput uiKeyboard;
         private readonly IMonoInput[] controllers;
         private readonly InputMask uiInput = new InputMask("ui");
         private readonly InputMask inputMergeMask = new InputMask(null);
@@ -75,6 +77,12 @@ namespace Prerelease.Main
             base.Initialize();
         }
 
+        protected override void OnExiting(object sender, EventArgs args)
+        {
+            base.OnExiting(sender, args);
+            activeSceene?.Exiting();
+        }
+
         private void SetupActionMap()
         {
             actionMap = new Action[Enum.GetNames(typeof(ActionType)).Length];
@@ -94,7 +102,7 @@ namespace Prerelease.Main
             var scope = renderer.ActivateScope("Debug");
             debugFont = scope.LoadFont("ConsoleFont");
 
-            this.activeSceene = new PlatformerSceene(renderer, userInterface, actionQueue);
+            this.activeSceene = new PlatformerSceene(new StreamProvider(), renderer, userInterface, actionQueue);
             this.activeSceene.Activate(uiInput, inputMasks);
         }
 
@@ -130,6 +138,12 @@ namespace Prerelease.Main
             var deltaT = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             uiInput.Apply(uiKeyboard.ReadInput());
+
+            if (uiKeyboard.KeyPressed(Keys.Escape))
+            {
+                activeSceene.Exiting();
+                Exit();
+            }
 
             currentInputs = MergeInputs(keyboard, controllers[1]);
             inputMasks[0].Apply(currentInputs);

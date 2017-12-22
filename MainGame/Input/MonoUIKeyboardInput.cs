@@ -29,37 +29,42 @@ namespace Prerelease.Main.Input
             return currentInputs;
         }
 
+        public bool KeyPressed(Keys key)
+        {
+            return pressedKeys.Contains(key);
+        }
+
         private bool Restart()
         {
             return pressedKeys.Contains(Keys.Space);
         }
 
-        public bool Left()
+        private bool Left()
         {
             return pressedKeys.Contains(Keys.Left);
         }
 
-        public bool Right()
+        private bool Right()
         {
             return pressedKeys.Contains(Keys.Right);
         }
 
-        public bool Up()
+        private bool Up()
         {
             return pressedKeys.Contains(Keys.Up);
         }
 
-        public bool Down()
+        private bool Down()
         {
             return pressedKeys.Contains(Keys.Down);
         }
 
-        public bool Attack()
+        private bool Attack()
         {
             return pressedKeys.Contains(Keys.E);
         }
 
-        public bool Select()
+        private bool Select()
         {
             return pressedKeys.Contains(Keys.Q);
         }

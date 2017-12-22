@@ -15,6 +15,8 @@ namespace CraftingGame.Physics
 
         public StatefulObject(ActionQueue actionQueue, Guid key, IDictionary<string, object> state)
         {
+            this.ActionQueue = actionQueue;
+            this.Id = key;
             this.state = state;
         }
 

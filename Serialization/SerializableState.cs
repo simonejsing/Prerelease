@@ -15,7 +15,13 @@ namespace Serialization
         {
             using(var reader = new StreamReader(stream))
             {
-                return JsonConvert.DeserializeObject<SerializableState>(reader.ReadToEnd());
+                var state = JsonConvert.DeserializeObject<SerializableState>(reader.ReadToEnd());
+                if(state == null)
+                {
+                    throw new FileLoadException("Failed to read game state from file.");
+                }
+
+                return state;
             }
         }
 

@@ -154,7 +154,7 @@ namespace MainGame.UnitTests
 
         private static PlatformerSceene CreateGame(IRenderer renderer, ITerrainGenerator generator, params InputMask[] players)
         {
-            var game = new PlatformerSceene(renderer, null, new ActionQueue(), generator);
+            var game = new PlatformerSceene(new InMemoryStreamProvider(), renderer, null, new ActionQueue(), generator);
             game.Activate(CreateInput("ui"), GenerateInputSets(players));
             return game;
         }

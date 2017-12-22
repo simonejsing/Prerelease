@@ -25,6 +25,10 @@ namespace Contracts
             this.ActionQueue = actionQueue;
         }
 
+        public virtual void Exiting()
+        {
+        }
+
         public abstract void Update(float timestep);
 
         public virtual void Activate(InputMask uiInput, InputMask[] inputMasks)

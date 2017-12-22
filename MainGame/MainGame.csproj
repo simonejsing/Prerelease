@@ -124,6 +124,7 @@
     <Compile Include="Input\MonoControllerInput.cs" />
     <Compile Include="Input\MonoKeyboardInput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StreamProvider.cs" />
     <Compile Include="UserInterface.cs" />
   </ItemGroup>
   <ItemGroup>

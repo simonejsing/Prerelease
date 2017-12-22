@@ -59,6 +59,7 @@
     <Compile Include="CraftingGameTests.cs" />
     <Compile Include="GameHarness.cs" />
     <Compile Include="GameStateTests.cs" />
+    <Compile Include="InMemoryStreamProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TerrainGenerator.cs" />
     <Compile Include="TerrainStub.cs" />

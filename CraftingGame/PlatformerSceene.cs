@@ -21,6 +21,7 @@ namespace CraftingGame
         // Use a fixed update step size.
         private const float UpdateStep = 1.0f;
 
+        private readonly IStreamProvider streamProvider;
         private SpriteResolver spriteResolver;
         private PhysicsEngine physics;
         private IFont debugFont = null;
@@ -51,10 +52,24 @@ namespace CraftingGame
         // Game state
         public GameState State { get; }
 
-        public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainGenerator terrain = null)
+        public PlatformerSceene(IStreamProvider streamProvider, IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainGenerator terrain = null)
             : base("Platformer", renderer, ui, actionQueue)
         {
+            this.streamProvider = streamProvider;
             State = new GameState(actionQueue);
+
+            // Load latest game state
+            if (this.streamProvider.FileExists("state.json"))
+            {
+                try
+                {
+                    State.LoadFromStream(this.streamProvider.ReadFile("state.json"));
+                }
+                catch
+                {
+                }
+            }
+
             this.cachedTerrain = new CachedTerrainGenerator(
                 terrain ?? new Generator(TerrainDepth, TerrainHeight, TerrainSeaLevel));
             this.level = new ProceduralLevel(this.cachedTerrain, Grid, Plane);
@@ -66,6 +81,11 @@ namespace CraftingGame
             renderer.Scale(1, -1);
         }
 
+        public override void Exiting()
+        {
+            State.SaveToStream(this.streamProvider.WriteFile("state.json"));
+        }
+
         public override void Activate(InputMask uiInput, InputMask[] inputMasks)
         {
             base.Activate(uiInput, inputMasks);
@@ -73,6 +93,8 @@ namespace CraftingGame
             this.inputMasks = inputMasks;
 
             spriteResolver = new SpriteResolver(scope);
+            spriteResolver.ResolveBindings(State.Players.ToArray());
+
             debugFont = scope.LoadFont("ConsoleFont");
 
             var proceduralManager = new ProceduralObjectManager(cachedTerrain, Grid, Plane);
@@ -170,12 +192,6 @@ namespace CraftingGame
         private void TransitionToLevel(string levelName)
         {
             State.SetActiveLevel(levelName);
-
-            // Spawn players at starting location
-            foreach (var player in State.Players)
-            {
-                playerController.SpawnPlayer(player);
-            }
         }
 
         public override void Render(double gameTimeMsec)
