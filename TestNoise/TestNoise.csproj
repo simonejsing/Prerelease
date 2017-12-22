@@ -54,6 +54,10 @@
       <Project>{fade0799-e4fa-4c63-900a-e996fcdfb52b}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Serialization\Serialization.csproj">
+      <Project>{420d9d2b-2756-4e74-bb66-aba82cafb81c}</Project>
+      <Name>Serialization</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Terrain\Terrain.csproj">
       <Project>{042f191a-5693-47c9-9db7-c142c6cd1d88}</Project>
       <Name>Terrain</Name>

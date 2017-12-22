@@ -154,7 +154,9 @@ namespace MainGame.UnitTests
 
         private static PlatformerSceene CreateGame(IRenderer renderer, ITerrainGenerator generator, params InputMask[] players)
         {
-            var game = new PlatformerSceene(new InMemoryStreamProvider(), renderer, null, new ActionQueue(), generator);
+            var mockFactory = new Mock<ITerrainFactory>();
+            mockFactory.Setup(m => m.Create()).Returns(generator);
+            var game = new PlatformerSceene(new InMemoryStreamProvider(), renderer, null, new ActionQueue(), mockFactory.Object);
             game.Activate(CreateInput("ui"), GenerateInputSets(players));
             return game;
         }

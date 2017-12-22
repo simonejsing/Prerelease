@@ -3,35 +3,31 @@ using Contracts;
 using VectorMath;
 using Serialization;
 using System.Collections.Generic;
+using CraftingGame.State;
 
 namespace CraftingGame.Physics
 {
-    public class PlayerObject : MovableObject, ICollectingObject, IStatefulEntity
+    public class PlayerObject : MovableObject, ICollectingObject
     {
-        public string PlayerBinding { get; }
+        public string PlayerBinding { get; set; }
         public InputMask InputMask { get; private set; }
         public bool InputBound { get; private set; }
         public bool Active { get; set; }
 
         public Vector2 LookDirection { get; set; }
-        public Color Color { get; }
+        public Color Color { get; set; }
+
         public Weapon Weapon { get; }
         public int HitPoints { get; set; }
         public bool Dead => HitPoints <= 0;
 
         public IInventory Inventory { get; }
 
-        public Guid Id { get; }
-
-        public PlayerObject(ActionQueue actionQueue, Guid id, string playerBinding, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPlane, startingPosition, size)
+        public PlayerObject(ActionQueue actionQueue) : base(actionQueue)
         {
-            this.Id = id;
             Weapon = new Weapon();
             Inventory = new Inventory(100);
-            PlayerBinding = playerBinding;
             InputBound = false;
-            SpriteBinding = new ObjectBinding<ISprite>(spritePath);
-            Color = color;
             HitPoints = 1;
             ObjectCollision += OnObjectCollision;
         }
@@ -56,35 +52,37 @@ namespace CraftingGame.Physics
             }
         }
 
-        internal static PlayerObject FromState(StatefulObject state)
+        protected override void Load(StatefulObject state)
         {
-            return new PlayerObject(
-                state.ActionQueue,
-                state.Id,
-                state.ReadMandatoryState<string>("bind"),
-                new Plane(state.SafeReadValue("pl", 0)),
-                state.SafeReadVector("p"),
-                state.SafeReadVector("s"),
-                state.ReadMandatoryState<string>("sprite"),
-                state.SafeReadColor("c"));
+            base.Load(state);
+            this.PlayerBinding = state.ReadMandatoryState<string>("p.bind");
+            this.Color = state.SafeReadColor("p.c");
         }
 
-        public IDictionary<string, object> ExtractState()
+        public override IDictionary<string, object> ExtractState()
         {
-            return new Dictionary<string, object>
+            return ConcatenateState(base.ExtractState(), GetState());
+        }
+
+        private IDictionary<string, object> GetState()
+        {
+            return ConcatenateState(
+                new Dictionary<string, object>
+                {
+                    { "p.bind", PlayerBinding },
+                },
+                StatefulObject.EncodeColor("p.c", Color)
+            );
+        }
+
+        public static PlayerObject FromState(StatefulObject state)
+        {
+            var player = new PlayerObject(state.ActionQueue)
             {
-                { "bind", PlayerBinding },
-                { "sprite", SpriteBinding.Path },
-                { "pl", Plane.W },
-                { "p.x", Position.X },
-                { "p.y", Position.Y },
-                { "s.x", Size.X },
-                { "s.y", Size.Y },
-                { "c.r", Color.r },
-                { "c.g", Color.g },
-                { "c.b", Color.b },
-                { "c.a", Color.a },
+                Id = state.Id,
             };
+            player.Load(state);
+            return player;
         }
     }
 }

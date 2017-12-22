@@ -2,6 +2,7 @@
 using System.Linq;
 using Contracts;
 using CraftingGame.Physics;
+using CraftingGame.State;
 
 namespace CraftingGame
 {

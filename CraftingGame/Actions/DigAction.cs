@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using CraftingGame.Physics;
+using CraftingGame.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,7 +65,12 @@ namespace CraftingGame.Actions
                         var size = new Vector2(10, 10);
                         var coordPos = grid.GridCoordinateToPoint(digCoord);
                         var position = coordPos + 0.5f * (grid.Size - size);
-                        var itemObject = new ItemObject(actionQueue, player.Plane, position, size, item);
+                        var itemObject = new ItemObject(actionQueue, item)
+                        {
+                            Plane = player.Plane,
+                            Position = position,
+                            Size = size,
+                        };
                         itemObject.Collect += collectAction.Invoke;
                         state.ActiveLevel.AddCollectableObjects(itemObject);
                     }

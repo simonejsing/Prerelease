@@ -1,12 +1,15 @@
 ﻿using Contracts;
+using CraftingGame.Physics;
 using Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Terrain;
 using VectorMath;
+using Object = CraftingGame.Physics.Object;
 
-namespace CraftingGame.Physics
+namespace CraftingGame.State
 {
     public class LevelState
     {
@@ -89,6 +92,7 @@ namespace CraftingGame.Physics
     public class GameState
     {
         private readonly ActionQueue actionQueue;
+        private readonly ITerrainFactory terrainFactory;
 
         // Global state
         private PlayerObject[] players;
@@ -96,14 +100,17 @@ namespace CraftingGame.Physics
         // Per level state
         private readonly List<LevelState> levels = new List<LevelState>();
 
+        public IModifiableTerrain Terrain { get; set; }
+
         public IEnumerable<PlayerObject> Players => players;
         public IEnumerable<PlayerObject> ActivePlayers => Players.Where(p => p.Active);
         public IEnumerable<LevelState> Levels => levels;
         public LevelState ActiveLevel { get; private set; }
 
-        public GameState(ActionQueue actionQueue)
+        public GameState(ActionQueue actionQueue, ITerrainFactory terrainFactory)
         {
             this.actionQueue = actionQueue;
+            this.terrainFactory = terrainFactory;
             this.players = new PlayerObject[0];
         }
 
@@ -130,6 +137,7 @@ namespace CraftingGame.Physics
         {
             var state = new SerializableState();
             state.AddEntities("players", Players);
+            state.AddEntities("terrain", new[] { Terrain });
             state.Serialize(stream);
         }
 
@@ -139,6 +147,9 @@ namespace CraftingGame.Physics
 
             // Load players
             players = LoadEntities(state, "players", PlayerObject.FromState);
+
+            // Load terrain
+            Terrain = LoadEntities(state, "terrain", s => CachedTerrainGenerator.FromState(terrainFactory, s)).First();
         }
 
         private T[] LoadEntities<T>(SerializableState state, string entityType, Func<StatefulObject, T> factory)

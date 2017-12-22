@@ -10,5 +10,6 @@ namespace Terrain
     public interface IModifiableTerrain : ITerrainGenerator
     {
         void Destroy(Coordinate c, Plane p);
+        void SetActiveSector(int u, int v, int w);
     }
 }

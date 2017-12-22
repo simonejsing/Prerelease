@@ -8,6 +8,7 @@ using CraftingGame.Widgets;
 using Terrain;
 using VectorMath;
 using CraftingGame.Actions;
+using CraftingGame.State;
 
 namespace CraftingGame
 {
@@ -28,7 +29,6 @@ namespace CraftingGame
         private InputMask[] inputMasks;
 
         // Terrain
-        private readonly CachedTerrainGenerator cachedTerrain;
         private readonly ProceduralLevel level;
 
         // Widgets
@@ -43,7 +43,7 @@ namespace CraftingGame
         private FreeCameraController freeCameraController;
         private PlayerController playerController;
 
-        public IModifiableTerrain Terrain => level.Terrain;
+        public IModifiableTerrain Terrain => State.Terrain;
         public Camera Camera { get; }
         public ViewportProjection View { get; }
         public Grid Grid { get; } = new Grid(BlockSize, BlockSize);
@@ -52,11 +52,19 @@ namespace CraftingGame
         // Game state
         public GameState State { get; }
 
-        public PlatformerSceene(IStreamProvider streamProvider, IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainGenerator terrain = null)
+        private readonly Func<IEnumerable<TerrainSector>> SectorProbe;
+
+        public PlatformerSceene(IStreamProvider streamProvider, IRenderer renderer, IUserInterface ui, ActionQueue actionQueue) 
+            : this(streamProvider, renderer, ui, actionQueue, new TerrainFactory(TerrainDepth, TerrainHeight, TerrainSeaLevel))
+        {
+
+        }
+
+        public PlatformerSceene(IStreamProvider streamProvider, IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainFactory terrainFactory)
             : base("Platformer", renderer, ui, actionQueue)
         {
             this.streamProvider = streamProvider;
-            State = new GameState(actionQueue);
+            State = new GameState(actionQueue, terrainFactory);
 
             // Load latest game state
             if (this.streamProvider.FileExists("state.json"))
@@ -70,9 +78,11 @@ namespace CraftingGame
                 }
             }
 
-            this.cachedTerrain = new CachedTerrainGenerator(
-                terrain ?? new Generator(TerrainDepth, TerrainHeight, TerrainSeaLevel));
-            this.level = new ProceduralLevel(this.cachedTerrain, Grid, Plane);
+            var cachedTerrain = new CachedTerrainGenerator(terrainFactory.Create());
+            SectorProbe = () => cachedTerrain.Sectors;
+
+            State.Terrain = cachedTerrain;
+            this.level = new ProceduralLevel(cachedTerrain, Grid);
             var viewPort = renderer.GetViewport();
             View = new ViewportProjection(viewPort);
             View.Center(new Vector2(0, 0));
@@ -97,17 +107,17 @@ namespace CraftingGame
 
             debugFont = scope.LoadFont("ConsoleFont");
 
-            var proceduralManager = new ProceduralObjectManager(cachedTerrain, Grid, Plane);
+            var proceduralManager = new ProceduralObjectManager(State.Terrain, Grid, Plane);
             physics = new PhysicsEngine(proceduralManager, UpdateStep);
 
-            level.Load(View);
+            level.Load(View, Plane);
             State.AddLevel(level.State);
 
             var activeView = View.Projection;
-            cachedTerrain.SetActiveSector((int)activeView.TopLeft.X, (int)activeView.TopLeft.Y, Plane.W);
+            State.Terrain.SetActiveSector((int)activeView.TopLeft.X, (int)activeView.TopLeft.Y, Plane.W);
 
             collectAction = new CollectAction();
-            digAction = new DigAction(ActionQueue, collectAction, State, Grid, cachedTerrain);
+            digAction = new DigAction(ActionQueue, collectAction, State, Grid, State.Terrain);
 
             terrainWidget = new TerrainWidget(Renderer, Terrain);
             dynamicGridWidget = new DynamicGridWidget(Renderer, debugFont, BlockSize);
@@ -124,7 +134,8 @@ namespace CraftingGame
             // TODO: This does not need to happen every frame!
             JoinPlayers();
 
-            cachedTerrain.Update(200);
+            // Update level to generate terrain
+            this.level.Update();
 
             // Camera follows player
             Camera.Update();
@@ -182,7 +193,16 @@ namespace CraftingGame
 
         private void CreatePlayer(InputMask inputMask)
         {
-            var player = new PlayerObject(ActionQueue, Guid.NewGuid(), inputMask.PlayerBinding, new Plane(0), Vector2.Zero, new Vector2(30, 30), "Chicken", Color.Red);
+            var player = new PlayerObject(ActionQueue)
+            {
+                Id = Guid.NewGuid(),
+                PlayerBinding = inputMask.PlayerBinding,
+                SpriteBinding = new ObjectBinding<ISprite>("Chicken"),
+                Plane = new Plane(0),
+                Size = new Vector2(30, 30),
+                Color = Color.Red
+            };
+
             spriteResolver.ResolveBindings(player);
             playerController.SpawnPlayer(player);
             player.BindInput(inputMask);
@@ -235,10 +255,11 @@ namespace CraftingGame
         {
             var player = State.Players.FirstOrDefault();
             var playerPos = player?.Position ?? Vector2.Zero;
+            var sectors = SectorProbe().ToArray();
             return new[]
             {
                 string.Format("View: {0}", View.Projection.TopLeft),
-                string.Format("Sectors: {0}/{1}", cachedTerrain.Sectors.Count(s => s.FullyLoaded), cachedTerrain.Sectors.Count()),
+                string.Format("Sectors: {0}/{1}", sectors.Count(s => s.FullyLoaded), sectors.Count()),
                 string.Format("Player: {0}", playerPos),
                 string.Format("Inventory: {0}", player?.Inventory?.TotalCount ?? 0),
             };

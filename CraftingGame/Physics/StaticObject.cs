@@ -1,11 +1,14 @@
 ﻿using Contracts;
+using CraftingGame.State;
+using Serialization;
+using System.Collections.Generic;
 using VectorMath;
 
 namespace CraftingGame.Physics
 {
     public class StaticObject : Object, ICollidableObject
     {
-        public StaticObject(ActionQueue actionQueue, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPlane, startingPosition, size)
+        public StaticObject(ActionQueue actionQueue) : base(actionQueue)
         {
         }
 
@@ -29,5 +32,22 @@ namespace CraftingGame.Physics
         }
 
         public bool Occupied => true;
+
+        protected override void Load(StatefulObject state)
+        {
+            base.Load(state);
+        }
+
+        public override IDictionary<string, object> ExtractState()
+        {
+            return ConcatenateState(base.ExtractState(), GetState());
+        }
+
+        private IDictionary<string, object> GetState()
+        {
+            return new Dictionary<string, object>
+            {
+            };
+        }
     }
 }

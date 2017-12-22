@@ -13,7 +13,7 @@ namespace CraftingGame.Physics
 
     public class Door : Object
     {
-        public Door(ActionQueue actionQueue, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPlane, startingPosition, size)
+        public Door(ActionQueue actionQueue) : base(actionQueue)
         {
         }
 

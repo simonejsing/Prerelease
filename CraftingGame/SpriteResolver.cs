@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
-using Contracts;
-using CraftingGame.Physics;
-using Object = CraftingGame.Physics.Object;
 using System.Linq;
+using Contracts;
+using CraftingGame.State;
+using Object = CraftingGame.Physics.Object;
 
 namespace CraftingGame
 {

@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,16 +12,20 @@ namespace Terrain
     {
         private readonly INoiseGenerator rockGenerator, dirtGenerator, seabedGenerator;
 
+        public int Seed { get; }
         public int SeaLevel { get; }
         public int MaxDepth { get; }
         public int MaxHeight { get; }
 
+        public Guid Id { get; set; }
+
         public Generator(int maxDepth, int maxHeight, int seaLevel, int seed = 0)
         {
+            this.Seed = seed;
             SeaLevel = seaLevel;
             MaxDepth = maxDepth;
             MaxHeight = maxHeight;
-            var noise = new PerlinNoise(seed);
+            var noise = new PerlinNoise(this.Seed);
 
             rockGenerator = new OctaveNoise(noise, 4, 0.5);
             dirtGenerator = new OctaveNoise(noise, 4, 0.8);
@@ -154,6 +159,27 @@ namespace Terrain
             if (value > max)
                 return max;
             return value;
+        }
+
+        public IDictionary<string, object> ExtractState()
+        {
+            return new Dictionary<string, object>
+            {
+                { "seed", this.Seed },
+                { "md", this.MaxDepth },
+                { "mh", this.MaxHeight },
+                { "sl", this.SeaLevel },
+            };
+        }
+
+        public static ITerrainGenerator FromState(StatefulObject state)
+        {
+            var seed = state.ReadMandatoryState<int>("seed");
+            var maxDepth = state.ReadMandatoryState<int>("md");
+            var maxHeight = state.ReadMandatoryState<int>("mh");
+            var seaLevel = state.ReadMandatoryState<int>("sl");
+
+            return new Generator(maxDepth, maxHeight, seaLevel, seed);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace CraftingGame.Physics
 {
     public class Projectile : MovableObject, IProjectile
     {
-        public Color Color { get; }
+        public Color Color { get; set; }
         public Object Shooter { get; }
         public bool Expired => lifetime <= 0;
 
@@ -16,11 +16,9 @@ namespace CraftingGame.Physics
             lifetime--;
         }
 
-        public Projectile(ActionQueue actionQueue, Object shooter, Color color, Plane startingPlane, Vector2 startingPosition, Vector2 initialVelocity, Vector2 size) : base(actionQueue, startingPlane, startingPosition, size)
+        public Projectile(ActionQueue actionQueue, Object shooter) : base(actionQueue)
         {
-            this.Velocity = initialVelocity;
             this.Shooter = shooter;
-            this.Color = color;
             this.ObjectCollision += ProjectileObjectCollision;
         }
 

@@ -1,4 +1,6 @@
 ﻿using Contracts;
+using CraftingGame.State;
+using Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +26,12 @@ namespace CraftingGame
             this.terrainGenerator = terrainGenerator;
         }
 
+        public int Seed => terrainGenerator.Seed;
         public int SeaLevel => terrainGenerator.SeaLevel;
         public int MaxDepth => terrainGenerator.MaxDepth;
         public int MaxHeight => terrainGenerator.MaxHeight;
+
+        public Guid Id { get; set; }
 
         public TerrainBlock this[Coordinate c, Plane p]
         {
@@ -121,6 +126,20 @@ namespace CraftingGame
             if(numerator >= 0)
                 return numerator/denominator;
             return (numerator-denominator+1)/denominator;
+        }
+
+        public IDictionary<string, object> ExtractState()
+        {
+            return new Dictionary<string, object>
+            {
+                { "c.t", terrainGenerator.ExtractState() }
+            };
+        }
+
+        internal static CachedTerrainGenerator FromState(ITerrainFactory terrainFactory, StatefulObject state)
+        {
+            var subState = state.ReadEmbeddedState("c.t");
+            return new CachedTerrainGenerator(terrainFactory.FromState(subState));
         }
     }
 }

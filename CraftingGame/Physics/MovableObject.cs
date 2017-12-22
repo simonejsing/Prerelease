@@ -1,4 +1,7 @@
 ﻿using Contracts;
+using CraftingGame.State;
+using Serialization;
+using System.Collections.Generic;
 using VectorMath;
 
 namespace CraftingGame.Physics
@@ -10,7 +13,7 @@ namespace CraftingGame.Physics
         public Vector2 Velocity { get; set; }
         public Vector2 DeltaPosition { get; set; }
 
-        public MovableObject(ActionQueue actionQueue, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPlane, startingPosition, size)
+        public MovableObject(ActionQueue actionQueue) : base(actionQueue)
         {
             Grounded = false;
             Acceleration = Vector2.Zero;
@@ -30,6 +33,31 @@ namespace CraftingGame.Physics
             {
                 obj.Grounded = true;
             }
+        }
+
+        protected override void Load(StatefulObject state)
+        {
+            base.Load(state);
+            this.Acceleration = state.SafeReadVector("m.a");
+            this.Velocity = state.SafeReadVector("m.v");
+            this.Grounded = state.SafeReadValue("m.g", false);
+        }
+
+        public override IDictionary<string, object> ExtractState()
+        {
+            return ConcatenateState(base.ExtractState(), GetState());
+        }
+
+        private IDictionary<string, object> GetState()
+        {
+            return ConcatenateState(
+                new Dictionary<string, object>
+                {
+                    { "m.g", this.Grounded }
+                },
+                StatefulObject.EncodeVector("m.a", this.Acceleration),
+                StatefulObject.EncodeVector("m.v", this.Velocity)
+            );
         }
     }
 }

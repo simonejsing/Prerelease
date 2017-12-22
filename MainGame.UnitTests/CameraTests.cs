@@ -19,7 +19,11 @@ namespace MainGame.UnitTests
             var size = new Vector2(30, 30);
             var expected = 0.5f * viewPort.FlipX + position + 0.5f * size;
 
-            var obj = new MovableObject(null, new Plane(0), position, size);
+            var obj = new MovableObject(null)
+            {
+                Position = position,
+                Size = size,
+            };
             var view = new ViewportProjection(viewPort);
             var camera = new Camera(view);
             camera.Track(obj);

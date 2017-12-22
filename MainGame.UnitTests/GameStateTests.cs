@@ -7,7 +7,9 @@ using FluentAssertions;
 using VectorMath;
 using CraftingGame.Physics;
 using System.Linq;
+using CraftingGame.State;
 using Serialization;
+using CraftingGame;
 
 namespace MainGame.UnitTests
 {
@@ -37,23 +39,52 @@ namespace MainGame.UnitTests
         [TestMethod]
         public void CanPersistPlayerObject()
         {
-            var state = new GameState(new ActionQueue());
-            var player = new PlayerObject(null, Guid.NewGuid(), "player1", new Plane(5), new Vector2(100, 100), new Vector2(30, 30), "Chicken", Color.Red);
-            state.AddPlayer(player);
+            var player = new PlayerObject(null)
+            {
+                Id = Guid.NewGuid(),
+                PlayerBinding = "player1",
+                SpriteBinding = new ObjectBinding<ISprite>("Chicken"),
+                Plane = new Plane(5),
+                Position = new Vector2(100, 100),
+                Velocity = new Vector2(-20, 15),
+                Size = new Vector2(30, 30),
+                Color = Color.Red,
+            };
+            var state = player.ExtractState();
+
+            var newPlayer = PlayerObject.FromState(new StatefulObject(null, player.Id, state));
+            newPlayer.Id.Should().Be(player.Id);
+            newPlayer.PlayerBinding.Should().Be("player1");
+            newPlayer.Plane.W.Should().Be(5);
+            newPlayer.Position.Should().Be(new Vector2(100, 100));
+            newPlayer.Velocity.Should().Be(new Vector2(-20, 15));
+            newPlayer.Size.Should().Be(new Vector2(30, 30));
+            newPlayer.SpriteBinding.Path.Should().Be("Chicken");
+            newPlayer.Color.Should().Be(Color.Red);
+        }
+
+        [TestMethod]
+        public void CanPersistTerrainConfiguration()
+        {
+            var factory = new TerrainFactory(10, 10, 8, seed: 512);
+            var state = new GameState(null, factory)
+            {
+                Terrain = new CachedTerrainGenerator(factory.Create())
+            };
+
             using (var stream = new MemoryStream())
             {
                 state.SaveToStream(stream);
                 stream.Seek(0, SeekOrigin.Begin);
 
-                var loadState = new GameState(new ActionQueue());
-                loadState.LoadFromStream(stream);
-                var player1 = loadState.Players.First();
-                player1.PlayerBinding.Should().Be("player1");
-                player1.Plane.W.Should().Be(5);
-                player1.Position.Should().Be(new Vector2(100, 100));
-                player1.Size.Should().Be(new Vector2(30, 30));
-                player1.SpriteBinding.Path.Should().Be("Chicken");
-                player1.Color.Should().Be(Color.Red);
+                // Load game state
+                var newFactory = new TerrainFactory(100, 100, 80, seed: 0);
+                var newState = new GameState(null, newFactory);
+                newState.LoadFromStream(stream);
+                newState.Terrain.MaxDepth.Should().Be(10);
+                newState.Terrain.MaxHeight.Should().Be(10);
+                newState.Terrain.SeaLevel.Should().Be(8);
+                newState.Terrain.Seed.Should().Be(512);
             }
         }
 

@@ -16,7 +16,7 @@ namespace CraftingGame.Physics
 
         public event CollectEventHandler Collect;
 
-        public ItemObject(ActionQueue actionQueue, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size, StackableItemBase item) : base(actionQueue, startingPlane, startingPosition, size)
+        public ItemObject(ActionQueue actionQueue, StackableItemBase item) : base(actionQueue)
         {
             this.Item = item;
         }

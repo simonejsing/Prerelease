@@ -8,7 +8,7 @@ namespace CraftingGame.Physics
         public int HitPoints { get; set; }
         public bool Dead => HitPoints <= 0;
 
-        public EnemyObject(ActionQueue actionQueue, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size) : base(actionQueue, startingPlane, startingPosition, size)
+        public EnemyObject(ActionQueue actionQueue) : base(actionQueue)
         {
             HitPoints = 10;
             Hit += EnemyOnHit;

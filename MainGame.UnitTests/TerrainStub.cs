@@ -70,9 +70,12 @@ namespace MainGame.UnitTests
             blockOverlay.Add(new TerrainPoint(c.U, c.V, p.W), block);
         }
 
+        public int Seed => 0;
         public int SeaLevel => 80;
         public int MaxDepth => 100;
         public int MaxHeight => 100;
+
+        public Guid Id { get; set; }
 
         public TerrainBlock this[Coordinate c, Plane p]
         {
@@ -99,6 +102,11 @@ namespace MainGame.UnitTests
         public int GenerationCounter()
         {
             return generationCounter;
+        }
+
+        public IDictionary<string, object> ExtractState()
+        {
+            return new Dictionary<string, object>();
         }
     }
 }

@@ -17,11 +17,11 @@ namespace MainGame.UnitTests
         public void CollectableItemIsNotCollectedIfPlayerInventoryIsFull()
         {
             var action = new CollectAction();
-            var player = new PlayerObject(null, Guid.NewGuid(), null, new Plane(0), Vector2.Zero, Vector2.Zero, "", Color.Red);
+            var player = new PlayerObject(null);
             FillInventory(player);
 
             var item = ItemFactory.Create(nameof(BlockOfRock));
-            var itemObject = new ItemObject(null, new Plane(0), Vector2.Zero, Vector2.Zero, item);
+            var itemObject = new ItemObject(null, item);
             action.Invoke(itemObject, itemObject, player);
             itemObject.Collected.Should().BeFalse();
         }
