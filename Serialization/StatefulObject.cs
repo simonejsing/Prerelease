@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using VectorMath;
 
@@ -44,23 +45,6 @@ namespace Serialization
                 SafeReadValue($"{propertyName}:a", def.a));
         }
 
-        public T SafeReadValue<T>(string propertyName, T defaultValue)
-        {
-            if (!state.ContainsKey(propertyName))
-            {
-                return defaultValue;
-            }
-
-            try
-            {
-                return (T)Convert.ChangeType(state[propertyName], typeof(T));
-            }
-            catch
-            {
-                return defaultValue;
-            }
-        }
-
         public static IDictionary<string, object> EncodeVector(string propertyName, Vector2 vector)
         {
             return new Dictionary<string, object>
@@ -87,7 +71,23 @@ namespace Serialization
             return new StatefulObject(this.ActionQueue, this.Id, subState);
         }
 
+        public T SafeReadValue<T>(string propertyName, T defaultValue)
+        {
+            return SafeOperation(propertyName, o => (T)Convert.ChangeType(o, typeof(T)), defaultValue);
+        }
+
+        public IList<StatefulObject> SafeReadList(string propertyName)
+        {
+            var list = SafeOperation(propertyName, o => ((JArray)o).ToObject<List<IDictionary<string, object>>>(), new List<IDictionary<string, object>>());
+            return list.Select(i => new StatefulObject(this.ActionQueue, this.Id, i)).ToList();
+        }
+
         private IDictionary<string, object> SafeReadEmbeddedState(string propertyName, IDictionary<string, object> defaultValue)
+        {
+            return SafeOperation(propertyName, o => ((JObject)o).ToObject<Dictionary<string, object>>(), defaultValue);
+        }
+
+        private T SafeOperation<T>(string propertyName, Func<object, T> operation, T defaultValue)
         {
             if (!state.ContainsKey(propertyName))
             {
@@ -96,7 +96,7 @@ namespace Serialization
 
             try
             {
-                return ((JObject)state[propertyName]).ToObject<Dictionary<string, object>>();
+                return operation(state[propertyName]);
             }
             catch
             {

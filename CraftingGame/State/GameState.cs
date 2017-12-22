@@ -100,7 +100,7 @@ namespace CraftingGame.State
         // Per level state
         private readonly List<LevelState> levels = new List<LevelState>();
 
-        public IModifiableTerrain Terrain { get; set; }
+        public CachedTerrainGenerator Terrain { get; set; }
 
         public IEnumerable<PlayerObject> Players => players;
         public IEnumerable<PlayerObject> ActivePlayers => Players.Where(p => p.Active);

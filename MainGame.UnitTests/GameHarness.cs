@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Terrain;
 using VectorMath;
 using System.IO;
+using Serialization;
 
 namespace MainGame.UnitTests
 {
@@ -66,13 +67,15 @@ namespace MainGame.UnitTests
 
         public void LoadGame(Stream stream)
         {
-            this.Game = CreateGame(mockRenderer.Object, terrain, playerInput);
+            this.Game = CreateGame(mockRenderer.Object, terrain);
             this.Game.State.LoadFromStream(stream);
+            this.Game.Activate(CreateInput("ui"), GenerateInputSets(playerInput));
         }
 
         public void StartGame()
         {
-            this.Game = CreateGame(mockRenderer.Object, terrain, playerInput);
+            this.Game = CreateGame(mockRenderer.Object, terrain);
+            this.Game.Activate(CreateInput("ui"), GenerateInputSets(playerInput));
 
             // Make player1 join the game
             this.Input();
@@ -101,6 +104,7 @@ namespace MainGame.UnitTests
 
         public TerrainType ReadTerrainType(Coordinate c)
         {
+            Game.Terrain.Generate(c, Plane);
             return Game.Terrain[c, Plane].Type;
         }
 
@@ -152,13 +156,12 @@ namespace MainGame.UnitTests
             return mockRenderer;
         }
 
-        private static PlatformerSceene CreateGame(IRenderer renderer, ITerrainGenerator generator, params InputMask[] players)
+        private static PlatformerSceene CreateGame(IRenderer renderer, ITerrainGenerator generator)
         {
             var mockFactory = new Mock<ITerrainFactory>();
             mockFactory.Setup(m => m.Create()).Returns(generator);
-            var game = new PlatformerSceene(new InMemoryStreamProvider(), renderer, null, new ActionQueue(), mockFactory.Object);
-            game.Activate(CreateInput("ui"), GenerateInputSets(players));
-            return game;
+            mockFactory.Setup(m => m.FromState(It.IsAny<StatefulObject>())).Returns(generator);
+            return new PlatformerSceene(new InMemoryStreamProvider(), renderer, null, new ActionQueue(), mockFactory.Object);
         }
 
         private static InputMask[] GenerateInputSets(params InputMask[] players)

@@ -83,9 +83,9 @@ namespace CraftingGame
             }
         }
 
-        public void Destroy(int u, int v)
+        public void Modify(int u, int v, TerrainType type)
         {
-            tiles[u, v].Type = TerrainType.Free;
+            tiles[u, v].Type = type;
         }
     }
 }

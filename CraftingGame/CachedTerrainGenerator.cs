@@ -13,6 +13,7 @@ namespace CraftingGame
 {
     public class CachedTerrainGenerator : IModifiableTerrain
     {
+        private readonly Dictionary<Voxel, TerrainType> terrainModifications = new Dictionary<Voxel, TerrainType>();
         private readonly ITerrainGenerator terrainGenerator;
         private readonly IList<TerrainSector> sectors = new List<TerrainSector>();
         private readonly Queue<TerrainSector> sectorLoadingQueue = new Queue<TerrainSector>();
@@ -94,11 +95,19 @@ namespace CraftingGame
 
         public void Destroy(Coordinate c, Plane p)
         {
+            Modify(c, p, TerrainType.Free);
+        }
+
+        private void Modify(Coordinate c, Plane p, TerrainType type)
+        {
+            // Register modification
+            terrainModifications[new Voxel(c, p)] = type;
+
             activeSector = FindSector(c.U, c.V, p.W);
 
             var u = c.U - activeSector.U * TerrainSector.SectorWidth;
             var v = c.V - activeSector.V * TerrainSector.SectorHeight;
-            activeSector.Destroy(u, v);
+            activeSector.Modify(u, v, type);
         }
 
         private TerrainSector FindSector(int x, int y, int z)
@@ -132,14 +141,44 @@ namespace CraftingGame
         {
             return new Dictionary<string, object>
             {
+                { "m", terrainModifications.Select(EncodeModification) },
                 { "c.t", terrainGenerator.ExtractState() }
             };
         }
 
+        private Dictionary<string, object> EncodeModification(KeyValuePair<Voxel, TerrainType> item)
+        {
+            return new Dictionary<string, object>
+            {
+                { "u", item.Key.U },
+                { "v", item.Key.V },
+                { "w", item.Key.W },
+                { "t", item.Value },
+            };
+        }
+
+        private static KeyValuePair<Voxel, TerrainType> DecodeModification(StatefulObject state)
+        {
+            var u = state.ReadMandatoryState<int>("u");
+            var v = state.ReadMandatoryState<int>("v");
+            var w = state.ReadMandatoryState<int>("w");
+            var type = state.ReadMandatoryState<int>("t");
+            return new KeyValuePair<Voxel, TerrainType>(new Voxel(u, v, w), (TerrainType)type);
+        }
+
         internal static CachedTerrainGenerator FromState(ITerrainFactory terrainFactory, StatefulObject state)
         {
-            var subState = state.ReadEmbeddedState("c.t");
-            return new CachedTerrainGenerator(terrainFactory.FromState(subState));
+            var terrainState = state.ReadEmbeddedState("c.t");
+            var self = new CachedTerrainGenerator(terrainFactory.FromState(terrainState));
+
+            // Apply modifications
+            var modifications = state.SafeReadList("m");
+            foreach(var modification in modifications.Select(DecodeModification))
+            {
+                self.Modify(modification.Key.Coordinate, modification.Key.Plane, modification.Value);
+            }
+
+            return self;
         }
     }
 }

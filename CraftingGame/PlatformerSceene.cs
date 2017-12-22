@@ -67,22 +67,27 @@ namespace CraftingGame
             State = new GameState(actionQueue, terrainFactory);
 
             // Load latest game state
+            var loaded = false;
             if (this.streamProvider.FileExists("state.json"))
             {
                 try
                 {
                     State.LoadFromStream(this.streamProvider.ReadFile("state.json"));
+                    loaded = true;
                 }
                 catch
                 {
                 }
             }
 
-            var cachedTerrain = new CachedTerrainGenerator(terrainFactory.Create());
-            SectorProbe = () => cachedTerrain.Sectors;
+            if(!loaded)
+            {
+                // Start new game
+                State.Terrain = new CachedTerrainGenerator(terrainFactory.Create());
+            }
 
-            State.Terrain = cachedTerrain;
-            this.level = new ProceduralLevel(cachedTerrain, Grid);
+            SectorProbe = () => State.Terrain.Sectors;
+            this.level = new ProceduralLevel(State.Terrain, Grid);
             var viewPort = renderer.GetViewport();
             View = new ViewportProjection(viewPort);
             View.Center(new Vector2(0, 0));

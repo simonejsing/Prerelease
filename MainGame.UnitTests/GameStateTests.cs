@@ -10,6 +10,7 @@ using System.Linq;
 using CraftingGame.State;
 using Serialization;
 using CraftingGame;
+using System.Collections.Generic;
 
 namespace MainGame.UnitTests
 {
