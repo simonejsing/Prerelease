@@ -19,8 +19,11 @@
     {
         public InputSet Input = new InputSet();
 
-        public InputMask()
+        public string PlayerBinding { get; }
+
+        public InputMask(string playerBinding)
         {
+            PlayerBinding = playerBinding;
             Reset();
         }
 

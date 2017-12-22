@@ -87,7 +87,7 @@ namespace CraftingGame.Physics
     public class GameState
     {
         // Global state
-        private readonly PlayerObject[] players;
+        private PlayerObject[] players;
 
         // Per level state
         private readonly List<LevelState> levels = new List<LevelState>();
@@ -99,9 +99,18 @@ namespace CraftingGame.Physics
 
         public Door DoorToEnter { get; set; }
 
-        public GameState(IEnumerable<PlayerObject> playerObject)
+        public GameState()
         {
-            this.players = playerObject.ToArray();
+            this.players = new PlayerObject[0];
+        }
+
+        public void AddPlayer(PlayerObject player)
+        {
+            if(this.players.Any(p => p.PlayerBinding == player.PlayerBinding))
+            {
+                throw new InvalidOperationException($"Attempt to add player that already exists in state '{player.PlayerBinding}'.");
+            }
+            this.players = this.players.Concat(new[] { player }).ToArray();
         }
 
         public void AddLevel(LevelState level)
@@ -114,7 +123,7 @@ namespace CraftingGame.Physics
             ActiveLevel = levels.First(l => string.Equals(l.Name, levelName));
         }
 
-        public void SaveToStream(MemoryStream stream)
+        public void SaveToStream(Stream stream)
         {
         }
 

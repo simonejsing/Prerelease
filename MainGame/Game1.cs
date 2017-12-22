@@ -19,14 +19,14 @@ namespace Prerelease.Main
         private ISceene activeSceene = null;
         private readonly IMonoInput keyboard, uiKeyboard;
         private readonly IMonoInput[] controllers;
-        private readonly InputMask uiInput = new InputMask();
-        private readonly InputMask inputMergeMask = new InputMask();
+        private readonly InputMask uiInput = new InputMask("ui");
+        private readonly InputMask inputMergeMask = new InputMask(null);
         private readonly InputMask[] inputMasks = new InputMask[4]
         {
-            new InputMask(),
-            new InputMask(),
-            new InputMask(),
-            new InputMask(),
+            new InputMask("player1"),
+            new InputMask("player2"),
+            new InputMask("player3"),
+            new InputMask("player4"),
         };
         private readonly ActionQueue actionQueue = new ActionQueue();
         private Action[] actionMap;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Contracts;
 using CraftingGame.Physics;
 using Object = CraftingGame.Physics.Object;
+using System.Linq;
 
 namespace CraftingGame
 {
@@ -18,7 +19,7 @@ namespace CraftingGame
             this.scope = scope;
         }
 
-        public void ResolveBindings(IEnumerable<Object> objects)
+        public void ResolveBindings(params Object[] objects)
         {
             foreach (var obj in objects)
             {
@@ -33,7 +34,7 @@ namespace CraftingGame
         {
             level.Blocks.SpriteBinding = scope.ResolveSprite(level.Blocks.SpriteBinding);
 
-            ResolveBindings(level.AllObjects);
+            ResolveBindings(level.AllObjects.ToArray());
         }
     }
 }

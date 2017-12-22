@@ -40,6 +40,7 @@ namespace CraftingGame.Controllers
 
             if (inputMask.Input.Moving)
             {
+                camera.Track(player);
                 camera.Follow();
             }
 

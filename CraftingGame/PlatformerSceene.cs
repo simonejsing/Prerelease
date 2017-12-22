@@ -25,6 +25,7 @@ namespace CraftingGame
         private SpriteResolver spriteResolver;
         private PhysicsEngine physics;
         private IFont debugFont = null;
+        private InputMask[] inputMasks;
 
         // Terrain
         private readonly CachedTerrainGenerator cachedTerrain;
@@ -49,11 +50,12 @@ namespace CraftingGame
         public Plane Plane { get; } = new Plane(0);
 
         // Game state
-        public GameState State { get; private set; }
+        public GameState State { get; }
 
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainGenerator terrain = null)
             : base("Platformer", renderer, ui, actionQueue)
         {
+            State = new GameState();
             this.cachedTerrain = new CachedTerrainGenerator(
                 terrain ?? new Generator(TerrainDepth, TerrainHeight, TerrainSeaLevel));
             this.level = new ProceduralLevel(this.cachedTerrain, Grid, Plane);
@@ -70,21 +72,10 @@ namespace CraftingGame
         {
             base.Activate(uiInput, inputMasks);
 
+            this.inputMasks = inputMasks;
+
             spriteResolver = new SpriteResolver(scope);
             debugFont = scope.LoadFont("ConsoleFont");
-
-            var players = new List<PlayerObject>
-            {
-                new PlayerObject(actionQueue, inputMasks[0], new Plane(0), new Vector2(), new Vector2(30, 30), "Chicken", Color.Red),
-                new PlayerObject(actionQueue, inputMasks[1], new Plane(0), new Vector2(), new Vector2(30, 30), "Chicken", Color.Green),
-                new PlayerObject(actionQueue, inputMasks[2], new Plane(0), new Vector2(), new Vector2(30, 30), "Chicken", Color.Blue),
-                new PlayerObject(actionQueue, inputMasks[3], new Plane(0), new Vector2(), new Vector2(30, 30), "Chicken", Color.Yellow),
-            };
-            spriteResolver.ResolveBindings(players);
-
-            State = new GameState(players);
-            Camera.Track(State.Players.First());
-            Camera.Follow();
 
             var proceduralManager = new ProceduralObjectManager(cachedTerrain, Grid, Plane);
             physics = new PhysicsEngine(proceduralManager, UpdateStep);
@@ -110,6 +101,9 @@ namespace CraftingGame
 
         public override void Update(float timestep)
         {
+            // TODO: This does not need to happen every frame!
+            JoinPlayers();
+
             // Enter selected door now
             if (State.DoorToEnter != null)
             {
@@ -124,7 +118,8 @@ namespace CraftingGame
             // Handle UI inputs
             freeCameraController.Update(UiInput);
 
-            foreach (var player in State.Players)
+            // TODO: This will be inefficient if lots of players have joined the game and the state keeps track of them all
+            foreach (var player in State.Players.Where(p => p.InputBound))
             {
                 playerController.Update(player);
             }
@@ -139,7 +134,7 @@ namespace CraftingGame
             // Apply physics to enemies.
             foreach (var enemy in State.ActiveLevel.Enemies)
             {
-                enemy.Velocity = new Vector2(enemy.Facing.X*Constants.ENEMY_VELOCITY, 0);
+                enemy.Velocity = new Vector2(enemy.Facing.X * Constants.ENEMY_VELOCITY, 0);
                 physics.ApplyToObject(enemy, zeroVector);
             }
 
@@ -149,6 +144,35 @@ namespace CraftingGame
             }
 
             State.ActiveLevel.CleanUp();
+        }
+
+        private void JoinPlayers()
+        {
+            // Check for new players joining the game
+            foreach (var inputMask in inputMasks)
+            {
+                // Find matching player
+                var player = State.Players.FirstOrDefault(p => p.PlayerBinding == inputMask.PlayerBinding);
+                if (player == null)
+                {
+                    // New player joined
+                    CreatePlayer(inputMask);
+                }
+                else if (!player.InputBound)
+                {
+                    // Reconnect
+                    player.BindInput(inputMask);
+                }
+            }
+        }
+
+        private void CreatePlayer(InputMask inputMask)
+        {
+            var player = new PlayerObject(ActionQueue, inputMask.PlayerBinding, new Plane(0), Vector2.Zero, new Vector2(30, 30), "Chicken", Color.Red);
+            spriteResolver.ResolveBindings(player);
+            playerController.SpawnPlayer(player);
+            player.BindInput(inputMask);
+            State.AddPlayer(player);
         }
 
         private void TransitionThroughDoor(Door door)
@@ -179,7 +203,7 @@ namespace CraftingGame
             // Render terrain
             terrainWidget.Render(Grid, View, Plane);
 
-            foreach (var obj in State.Players.Where(p => p.Active && !p.Dead))
+            foreach (var obj in State.ActivePlayers.Where(p => !p.Dead))
             {
                 RenderObject(obj);
             }

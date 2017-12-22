@@ -61,7 +61,7 @@ namespace MainGame.UnitTests
         {
             this.mockRenderer = mockRenderer;
             this.terrain = terrain;
-            this.playerInput = CreateInput();
+            this.playerInput = CreateInput("player1");
         }
 
         public void LoadGame(Stream stream)
@@ -73,6 +73,10 @@ namespace MainGame.UnitTests
         public void StartGame()
         {
             this.Game = CreateGame(mockRenderer.Object, terrain, playerInput);
+
+            // Make player1 join the game
+            this.Input();
+            this.Game.Update(0.1f);
         }
 
         public void Input(
@@ -151,7 +155,7 @@ namespace MainGame.UnitTests
         private static PlatformerSceene CreateGame(IRenderer renderer, ITerrainGenerator generator, params InputMask[] players)
         {
             var game = new PlatformerSceene(renderer, null, new ActionQueue(), generator);
-            game.Activate(CreateInput(), GenerateInputSets(players));
+            game.Activate(CreateInput("ui"), GenerateInputSets(players));
             return game;
         }
 
@@ -159,16 +163,16 @@ namespace MainGame.UnitTests
         {
             return new InputMask[4]
             {
-                players.Length > 0 ? players[0] : CreateInput(),
-                players.Length > 1 ? players[1] : CreateInput(),
-                players.Length > 2 ? players[2] : CreateInput(),
-                players.Length > 3 ? players[3] : CreateInput(),
+                players.Length > 0 ? players[0] : CreateInput("player1"),
+                players.Length > 1 ? players[1] : CreateInput("player2"),
+                players.Length > 2 ? players[2] : CreateInput("player3"),
+                players.Length > 3 ? players[3] : CreateInput("player4"),
             };
         }
 
-        private static InputMask CreateInput()
+        private static InputMask CreateInput(string playerBinding)
         {
-            return new InputMask { Input = new InputSet() { Active = false } };
+            return new InputMask(playerBinding) { Input = new InputSet() { Active = false } };
         }
     }
 }

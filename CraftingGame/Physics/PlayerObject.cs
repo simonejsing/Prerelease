@@ -6,10 +6,12 @@ namespace CraftingGame.Physics
 {
     public class PlayerObject : MovableObject, ICollectingObject
     {
-        public InputMask InputMask { get; }
+        public string PlayerBinding { get; }
+        public InputMask InputMask { get; private set; }
+        public bool InputBound { get; private set; }
+        public bool Active { get; set; }
 
         public Vector2 LookDirection { get; set; }
-        public bool Active { get; set; }
         public Color Color { get; }
         public Weapon Weapon { get; }
         public int HitPoints { get; set; }
@@ -17,16 +19,26 @@ namespace CraftingGame.Physics
 
         public IInventory Inventory { get; }
 
-        public PlayerObject(ActionQueue actionQueue, InputMask inputMask, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPlane, startingPosition, size)
+        public PlayerObject(ActionQueue actionQueue, string playerBinding, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPlane, startingPosition, size)
         {
             Weapon = new Weapon();
             Inventory = new Inventory(100);
-            InputMask = inputMask;
-            Active = false;
+            PlayerBinding = playerBinding;
+            InputBound = false;
             SpriteBinding = new ObjectBinding<ISprite>(spritePath);
             Color = color;
             HitPoints = 1;
             ObjectCollision += OnObjectCollision;
+        }
+
+        public void BindInput(InputMask inputMask)
+        {
+            if(inputMask.PlayerBinding != PlayerBinding)
+            {
+                throw new InvalidOperationException($"Attempt to bind invalid input '{inputMask.PlayerBinding}' to player '{PlayerBinding}'.");
+            }
+            this.InputMask = inputMask;
+            this.InputBound = true;
         }
 
         private void OnObjectCollision(object sender, ICollidableObject target, Collision collision)
