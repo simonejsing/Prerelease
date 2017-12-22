@@ -1,10 +1,12 @@
 ﻿using System;
 using Contracts;
 using VectorMath;
+using Serialization;
+using System.Collections.Generic;
 
 namespace CraftingGame.Physics
 {
-    public class PlayerObject : MovableObject, ICollectingObject
+    public class PlayerObject : MovableObject, ICollectingObject, IStatefulEntity
     {
         public string PlayerBinding { get; }
         public InputMask InputMask { get; private set; }
@@ -19,8 +21,11 @@ namespace CraftingGame.Physics
 
         public IInventory Inventory { get; }
 
-        public PlayerObject(ActionQueue actionQueue, string playerBinding, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPlane, startingPosition, size)
+        public Guid Id { get; }
+
+        public PlayerObject(ActionQueue actionQueue, Guid id, string playerBinding, Plane startingPlane, IReadonlyVector startingPosition, IReadonlyVector size, string spritePath, Color color) : base(actionQueue, startingPlane, startingPosition, size)
         {
+            this.Id = id;
             Weapon = new Weapon();
             Inventory = new Inventory(100);
             PlayerBinding = playerBinding;
@@ -49,6 +54,37 @@ namespace CraftingGame.Physics
             {
                 obj.Velocity += new Vector2(Math.Sign(collision.Force.X) * 0.5f, 0);
             }
+        }
+
+        internal static PlayerObject FromState(StatefulObject state)
+        {
+            return new PlayerObject(
+                state.ActionQueue,
+                state.Id,
+                state.ReadMandatoryState<string>("bind"),
+                new Plane(state.SafeReadValue("pl", 0)),
+                state.SafeReadVector("p"),
+                state.SafeReadVector("s"),
+                state.ReadMandatoryState<string>("sprite"),
+                state.SafeReadColor("c"));
+        }
+
+        public IDictionary<string, object> ExtractState()
+        {
+            return new Dictionary<string, object>
+            {
+                { "bind", PlayerBinding },
+                { "sprite", SpriteBinding.Path },
+                { "pl", Plane.W },
+                { "p.x", Position.X },
+                { "p.y", Position.Y },
+                { "s.x", Size.X },
+                { "s.y", Size.Y },
+                { "c.r", Color.r },
+                { "c.g", Color.g },
+                { "c.b", Color.b },
+                { "c.a", Color.a },
+            };
         }
     }
 }

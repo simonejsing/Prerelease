@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
+    <ProjectReference Include="..\Serialization\Serialization.csproj" />
     <ProjectReference Include="..\Terrain\Terrain.csproj" />
     <ProjectReference Include="..\VectorMath\VectorMath.csproj" />
   </ItemGroup>

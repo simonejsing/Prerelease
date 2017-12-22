@@ -17,7 +17,7 @@ namespace MainGame.UnitTests
         public void CollectableItemIsNotCollectedIfPlayerInventoryIsFull()
         {
             var action = new CollectAction();
-            var player = new PlayerObject(null, null, new Plane(0), Vector2.Zero, Vector2.Zero, "", Color.Red);
+            var player = new PlayerObject(null, Guid.NewGuid(), null, new Plane(0), Vector2.Zero, Vector2.Zero, "", Color.Red);
             FillInventory(player);
 
             var item = ItemFactory.Create(nameof(BlockOfRock));

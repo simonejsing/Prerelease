@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Contracts;
+using Serialization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -86,6 +88,8 @@ namespace CraftingGame.Physics
 
     public class GameState
     {
+        private readonly ActionQueue actionQueue;
+
         // Global state
         private PlayerObject[] players;
 
@@ -97,10 +101,9 @@ namespace CraftingGame.Physics
         public IEnumerable<LevelState> Levels => levels;
         public LevelState ActiveLevel { get; private set; }
 
-        public Door DoorToEnter { get; set; }
-
-        public GameState()
+        public GameState(ActionQueue actionQueue)
         {
+            this.actionQueue = actionQueue;
             this.players = new PlayerObject[0];
         }
 
@@ -125,10 +128,28 @@ namespace CraftingGame.Physics
 
         public void SaveToStream(Stream stream)
         {
+            var state = new SerializableState();
+            state.AddEntities("players", Players);
+            state.Serialize(stream);
         }
 
         public void LoadFromStream(Stream stream)
         {
+            var state = SerializableState.FromStream(stream);
+
+            // Load players
+            players = LoadEntities(state, "players", PlayerObject.FromState);
+        }
+
+        private T[] LoadEntities<T>(SerializableState state, string entityType, Func<StatefulObject, T> factory)
+        {
+            // Are there any?
+            if (!state.State.ContainsKey(entityType))
+            {
+                return new T[0];
+            }
+
+            return state.State[entityType].Select(e => factory(new StatefulObject(actionQueue, e.Key, e.Value))).ToArray();
         }
     }
 }

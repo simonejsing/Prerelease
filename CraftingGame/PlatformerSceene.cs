@@ -21,7 +21,6 @@ namespace CraftingGame
         // Use a fixed update step size.
         private const float UpdateStep = 1.0f;
 
-        private readonly ActionQueue actionQueue;
         private SpriteResolver spriteResolver;
         private PhysicsEngine physics;
         private IFont debugFont = null;
@@ -55,7 +54,7 @@ namespace CraftingGame
         public PlatformerSceene(IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainGenerator terrain = null)
             : base("Platformer", renderer, ui, actionQueue)
         {
-            State = new GameState();
+            State = new GameState(actionQueue);
             this.cachedTerrain = new CachedTerrainGenerator(
                 terrain ?? new Generator(TerrainDepth, TerrainHeight, TerrainSeaLevel));
             this.level = new ProceduralLevel(this.cachedTerrain, Grid, Plane);
@@ -65,7 +64,6 @@ namespace CraftingGame
             this.Camera = new Camera(View);
             //View.Scale(2.0f);
             renderer.Scale(1, -1);
-            this.actionQueue = actionQueue;
         }
 
         public override void Activate(InputMask uiInput, InputMask[] inputMasks)
@@ -103,12 +101,6 @@ namespace CraftingGame
         {
             // TODO: This does not need to happen every frame!
             JoinPlayers();
-
-            // Enter selected door now
-            if (State.DoorToEnter != null)
-            {
-                TransitionThroughDoor(State.DoorToEnter);
-            }
 
             cachedTerrain.Update(200);
 
@@ -168,21 +160,11 @@ namespace CraftingGame
 
         private void CreatePlayer(InputMask inputMask)
         {
-            var player = new PlayerObject(ActionQueue, inputMask.PlayerBinding, new Plane(0), Vector2.Zero, new Vector2(30, 30), "Chicken", Color.Red);
+            var player = new PlayerObject(ActionQueue, Guid.NewGuid(), inputMask.PlayerBinding, new Plane(0), Vector2.Zero, new Vector2(30, 30), "Chicken", Color.Red);
             spriteResolver.ResolveBindings(player);
             playerController.SpawnPlayer(player);
             player.BindInput(inputMask);
             State.AddPlayer(player);
-        }
-
-        private void TransitionThroughDoor(Door door)
-        {
-            switch (door.Destination.Type)
-            {
-                case DestinationType.Level:
-                    TransitionToLevel(door.Destination.Identifier);
-                    break;
-            }
         }
 
         private void TransitionToLevel(string levelName)

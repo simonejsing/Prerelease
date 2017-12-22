@@ -94,11 +94,6 @@ namespace CraftingGame.Controllers
 
             if (player.Grounded)
             {
-                if (inputMask.Input.Select)
-                {
-                    // Enter door if on door sprite (next frame update will carry out the transition
-                    state.DoorToEnter = state.ActiveLevel.Doors.FirstOrDefault(d => player.BoundingBox.Intersects(d.Center));
-                }
                 if (inputMask.Input.Jump)
                 {
                     instantVelocity = new Vector2(0, Constants.JUMP_SPEED);
