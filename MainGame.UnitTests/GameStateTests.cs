@@ -14,23 +14,25 @@ namespace MainGame.UnitTests
     [TestClass]
     public class GameStateTests
     {
-        /*[TestMethod]
-        public void TestSerializingDictionary()
+        [TestMethod]
+        public void TestInMemoryStreamProviderPersistsContent()
         {
-            var state = new SerializableState();
-            state.AddObject("player", 15);
+            const string filename = "file";
+            const string content = "some content in the file";
 
-            //using (var stream = new MemoryStream())
-            using (var stream = File.OpenWrite("state.json"))
+            var provider = new InMemoryStreamProvider();
+            provider.FileExists(filename).Should().BeFalse();
+            using (var writer = new StreamWriter(provider.WriteFile(filename)))
             {
-                state.Serialize(stream);
+                writer.Write(content);
             }
-            using(var stream = File.OpenRead("state.json"))
+
+            provider.FileExists(filename).Should().BeTrue();
+            using (var reader = new StreamReader(provider.ReadFile(filename)))
             {
-                var newState = SerializableState.FromStream(stream);
-                newState.State["player"].Should().Be(15);
+                reader.ReadToEnd().Should().Be(content);
             }
-        }*/
+        }
 
         [TestMethod]
         public void CanPersistPlayerObject()
