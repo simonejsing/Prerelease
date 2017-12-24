@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainGame", "MainGame\MainGame.csproj", "{F9047A69-93A4-4408-BD57-207CDF294818}"
 EndProject
@@ -13,17 +13,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainGame.UnitTests", "MainG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestNoise", "TestNoise\TestNoise.csproj", "{20E47F4F-DDB4-4EE5-B199-6F7B8B0F3C5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{FADE0799-E4FA-4C63-900A-E996FCDFB52B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{FADE0799-E4FA-4C63-900A-E996FCDFB52B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Renderer", "Renderer\Renderer.csproj", "{0C245534-2DAB-421D-ABDA-3ACF8F60F864}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Renderer", "Renderer\Renderer.csproj", "{0C245534-2DAB-421D-ABDA-3ACF8F60F864}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terrain", "Terrain\Terrain.csproj", "{042F191A-5693-47C9-9DB7-C142C6CD1D88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terrain", "Terrain\Terrain.csproj", "{042F191A-5693-47C9-9DB7-C142C6CD1D88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CraftingGame", "CraftingGame\CraftingGame.csproj", "{6CC105E8-2782-4606-B208-752D56144D04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CraftingGame", "CraftingGame\CraftingGame.csproj", "{6CC105E8-2782-4606-B208-752D56144D04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VectorMath", "VectorMath\VectorMath.csproj", "{D6FC4DA6-763D-4244-95A2-80851469F553}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VectorMath", "VectorMath\VectorMath.csproj", "{D6FC4DA6-763D-4244-95A2-80851469F553}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serialization", "Serialization\Serialization.csproj", "{420D9D2B-2756-4E74-BB66-ABA82CAFB81C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serialization", "Serialization\Serialization.csproj", "{420D9D2B-2756-4E74-BB66-ABA82CAFB81C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{117F9F07-35E2-4166-97ED-5839C402D5C9}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
