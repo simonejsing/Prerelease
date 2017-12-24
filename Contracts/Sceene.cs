@@ -43,6 +43,10 @@ namespace Contracts
             return new string[0];
         }
 
+        public virtual void Prerender(FrameCounter counter, double gameTimeMsec)
+        {
+        }
+
         public abstract void Render(FrameCounter counter, double gameTimeMsec);
 
         public virtual void Deactivate()

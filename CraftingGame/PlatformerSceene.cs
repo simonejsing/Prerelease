@@ -123,7 +123,7 @@ namespace CraftingGame
             collectAction = new CollectAction();
             digAction = new DigAction(ActionQueue, collectAction, State, Grid, State.Terrain);
 
-            terrainWidget = new TerrainWidget(Renderer, Terrain);
+            terrainWidget = new TerrainWidget(Renderer, State.Terrain);
             dynamicGridWidget = new DynamicGridWidget(Renderer, debugFont, BlockSize);
 
             freeCameraController = new FreeCameraController(Camera);
@@ -193,6 +193,11 @@ namespace CraftingGame
         private void TransitionToLevel(string levelName)
         {
             State.SetActiveLevel(levelName);
+        }
+
+        public override void Prerender(FrameCounter counter, double gameTimeMsec)
+        {
+            terrainWidget.Prerender(Grid, View, Plane);
         }
 
         public override void Render(FrameCounter counter, double gameTimeMsec)

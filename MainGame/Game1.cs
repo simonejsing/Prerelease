@@ -182,6 +182,8 @@ namespace Prerelease.Main
             {
                 renderCounter.Inc();
 
+                activeSceene.Prerender(renderCounter, gameTime.TotalGameTime.TotalMilliseconds);
+
                 renderer.Begin();
 
                 activeSceene.Render(renderCounter, gameTime.TotalGameTime.TotalMilliseconds);
@@ -194,7 +196,7 @@ namespace Prerelease.Main
                         debugFont,
                         Vector2.Zero,
                         string.Format(
-                            "U/D: {0:0.00}/{1:0.00}",
+                            "U/R: {0:0.00}/{1:0.00}",
                             updatePerfCounter.AverageMsec,
                             renderPerfCounter.AverageMsec),
                         excess ? Color.Red : Color.Green);

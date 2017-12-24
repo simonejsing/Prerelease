@@ -113,21 +113,37 @@ namespace CraftingGame
         private TerrainSector FindSector(int x, int y, int z)
         {
             // Handle negative coordinates
-            var u = DivideAndRoundDown(x, TerrainSector.SectorWidth);
-            var v = DivideAndRoundDown(y, TerrainSector.SectorHeight);
+            var index = SectorIndex(x, y);
 
-            if (activeSector?.U == u && activeSector?.V == v && activeSector?.W == z)
+            if (activeSector?.U == index.U && activeSector?.V == index.V && activeSector?.W == z)
                 return activeSector;
 
-            var sector = Sectors.FirstOrDefault(s => s.U == u && s.V == v && s.W == z);
+            var sector = Sectors.FirstOrDefault(s => s.U == index.U && s.V == index.V && s.W == z);
             if (sector == null)
             {
-                sector = new TerrainSector(terrainGenerator, u, v, z);
+                sector = new TerrainSector(terrainGenerator, index.U, index.V, z);
                 sectors.Add(sector);
                 sectorLoadingQueue.Enqueue(sector);
             }
 
             return sector;
+        }
+
+        public Coordinate SectorPosition(Coordinate index)
+        {
+            return new Coordinate(index.U * TerrainSector.SectorWidth, index.V * TerrainSector.SectorHeight);
+        }
+
+        public Coordinate SectorIndex(Coordinate coord)
+        {
+            return SectorIndex(coord.U, coord.V);
+        }
+
+        public Coordinate SectorIndex(int u, int v)
+        {
+            return new Coordinate(
+                DivideAndRoundDown(u, TerrainSector.SectorWidth),
+                DivideAndRoundDown(v, TerrainSector.SectorHeight));
         }
 
         private int DivideAndRoundDown(int numerator, int denominator)

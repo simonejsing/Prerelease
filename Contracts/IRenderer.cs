@@ -1,5 +1,5 @@
+using System;
 using VectorMath;
-using IReadonlyVector = VectorMath.IReadonlyVector;
 
 namespace Contracts
 {
@@ -19,6 +19,7 @@ namespace Contracts
         void RenderOpagueSprite(ISprite sprite, IReadonlyVector position, IReadonlyVector size, bool flipHorizontally = false);
         void RenderText(IFont font, IReadonlyVector position, string text, Color color);
         void RenderText(IFont font, IReadonlyVector position, string text, Color color, float rotation, IReadonlyVector origin, IReadonlyVector scale, float layerDepth = 0f);
+        ISprite RenderToTexture(int width, int height, Action renderAction);
         IRenderScope ActivateScope(string scopeName);
         void DeactivateScope(string scopeName);
     }
