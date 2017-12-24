@@ -92,7 +92,7 @@ namespace CraftingGame
             View.Center(new Vector2(0, 0));
             this.Camera = new Camera(View);
             //View.Scale(2.0f);
-            renderer.Scale(1, -1);
+            //renderer.Scale(1, -1);
         }
 
         public override void Exiting()
@@ -197,11 +197,14 @@ namespace CraftingGame
 
         public override void Prerender(FrameCounter counter, double gameTimeMsec)
         {
+            Renderer.ResetTransform();
             terrainWidget.Prerender(Grid, View, Plane);
         }
 
         public override void Render(FrameCounter counter, double gameTimeMsec)
         {
+            Renderer.ResetTransform();
+            Renderer.Scale(1, -1);
             Renderer.Clear(Color.Black);
 
             // Render terrain

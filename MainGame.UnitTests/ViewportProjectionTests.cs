@@ -105,6 +105,16 @@ namespace MainGame.UnitTests
             p.BottomRight.Y.Should().Be(-100);
         }
 
+        [TestMethod]
+        public void ViewportProjectionToTexture()
+        {
+            var projection = ViewportProjection.ToTexture(new Vector2(100, 100));
+            VerifyProjection(projection, new Vector2(0, 0), new Vector2(0, 100));
+            VerifyProjection(projection, new Vector2(100, 0), new Vector2(100, 100));
+            VerifyProjection(projection, new Vector2(0, 100), new Vector2(0, 0));
+            VerifyProjection(projection, new Vector2(100, 100), new Vector2(100, 0));
+        }
+
         private static void VerifyProjection(ViewportProjection projection, Vector2 point, Vector2 projectedPoint)
         {
             // Test projection from world to viewport

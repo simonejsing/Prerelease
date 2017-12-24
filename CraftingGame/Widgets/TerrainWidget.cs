@@ -131,11 +131,13 @@ namespace CraftingGame.Widgets
         {
             int textureWidth = TerrainSector.SectorWidth * (int)grid.Size.X;
             int textureHeight = TerrainSector.SectorHeight * (int)grid.Size.Y;
-            return renderer.RenderToTexture(textureWidth, textureHeight, () => PrerenderSector(grid, index));
+            var size = new Vector2(textureWidth, textureHeight);
+            return renderer.RenderToTexture(textureWidth, textureHeight, () => PrerenderSector(grid, index, size));
         }
 
-        private void PrerenderSector(Grid grid, Voxel index)
+        private void PrerenderSector(Grid grid, Voxel index, Vector2 textureSize)
         {
+            var textureView = ViewportProjection.ToTexture(textureSize);
             var startCoord = terrain.SectorPosition(index.Coordinate);
             for (var v = 0; v < TerrainSector.SectorHeight; v++)
             {
@@ -145,20 +147,8 @@ namespace CraftingGame.Widgets
                     var worldCoord = startCoord + localCoord;
                     terrain.Generate(worldCoord, index.Plane);
                     var block = terrain[worldCoord, index.Plane];
-                    var color = TerrainColor(block.Type);
-                    switch (block.Type)
-                    {
-                        case TerrainType.Dirt:
-                        case TerrainType.Rock:
-                        case TerrainType.Bedrock:
-                        case TerrainType.Sea:
-                            // Not sure why y needs to be negative...
-                            // The render y-order is flipped because we need to render to a texture that has (0,0) in the _top_ left corner.
-                            renderer.RenderRectangle(new Vector2(u * grid.Size.X, -(TerrainSector.SectorHeight - v - 1) * grid.Size.Y), grid.Size.FlipY, color);
-                            break;
-                        case TerrainType.Free:
-                            break;
-                    }
+                    var position = new Vector2(u, v) * grid.Size;
+                    RenderTerrainBlock(textureView, block.Type, position, grid.Size);
                 }
             }
         }
