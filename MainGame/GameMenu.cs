@@ -31,7 +31,7 @@ namespace Prerelease.Main
         }
 
         private int resetFrameCounter = 0;
-        public override void Update(float timestep)
+        public override void Update(FrameCounter counter, float timestep)
         {
             if (resetFrameCounter > 0)
             {
@@ -85,7 +85,7 @@ namespace Prerelease.Main
             textBox = new Vector2(200, -mainMenu.Length * TextHeight);
         }
 
-        public override void Render(double gameTimeMsec)
+        public override void Render(FrameCounter counter, double gameTimeMsec)
         {
             Renderer.Clear(Color.Black);
 

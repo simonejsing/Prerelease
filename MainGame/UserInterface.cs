@@ -39,7 +39,7 @@ namespace Prerelease.Main
         }
 
         private int resetFrameCounter = 0;
-        public void Update(InputMask[] inputMasks)
+        public void Update(FrameCounter counter, InputMask[] inputMasks)
         {
             if (currentDialog.Completed)
             {
@@ -78,7 +78,7 @@ namespace Prerelease.Main
             currentPage = 0;
         }
 
-        public void Render()
+        public void Render(FrameCounter counter)
         {
             if (currentDialog.Completed)
             {

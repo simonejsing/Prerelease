@@ -17,12 +17,15 @@
 
     public class InputMask
     {
+        public bool Bound { get; set; }
+
         public InputSet Input = new InputSet();
 
         public string PlayerBinding { get; }
 
         public InputMask(string playerBinding)
         {
+            Bound = false;
             PlayerBinding = playerBinding;
             Reset();
         }

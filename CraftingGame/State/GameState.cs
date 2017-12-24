@@ -93,17 +93,20 @@ namespace CraftingGame.State
     {
         private readonly ActionQueue actionQueue;
         private readonly ITerrainFactory terrainFactory;
+        private readonly List<PlayerObject> boundPlayers = new List<PlayerObject>();
 
         // Global state
-        private PlayerObject[] players;
+        private Dictionary<string, PlayerObject> knownPlayers;
 
         // Per level state
         private readonly List<LevelState> levels = new List<LevelState>();
 
         public CachedTerrainGenerator Terrain { get; set; }
 
-        public IEnumerable<PlayerObject> Players => players;
-        public IEnumerable<PlayerObject> ActivePlayers => Players.Where(p => p.Active);
+        public IEnumerable<PlayerObject> KnownPlayers => knownPlayers.Values;
+
+        public IEnumerable<PlayerObject> BoundPlayers => boundPlayers;
+        public IEnumerable<PlayerObject> ActivePlayers => boundPlayers.Where(p => p.Active);
         public IEnumerable<LevelState> Levels => levels;
         public LevelState ActiveLevel { get; private set; }
 
@@ -111,16 +114,7 @@ namespace CraftingGame.State
         {
             this.actionQueue = actionQueue;
             this.terrainFactory = terrainFactory;
-            this.players = new PlayerObject[0];
-        }
-
-        public void AddPlayer(PlayerObject player)
-        {
-            if(this.players.Any(p => p.PlayerBinding == player.PlayerBinding))
-            {
-                throw new InvalidOperationException($"Attempt to add player that already exists in state '{player.PlayerBinding}'.");
-            }
-            this.players = this.players.Concat(new[] { player }).ToArray();
+            this.knownPlayers = new Dictionary<string, PlayerObject>();
         }
 
         public void AddLevel(LevelState level)
@@ -136,7 +130,7 @@ namespace CraftingGame.State
         public void SaveToStream(Stream stream)
         {
             var state = new SerializableState();
-            state.AddEntities("players", Players);
+            state.AddEntities("players", KnownPlayers);
             state.AddEntities("terrain", new[] { Terrain });
             state.Serialize(stream);
         }
@@ -146,7 +140,7 @@ namespace CraftingGame.State
             var state = SerializableState.FromStream(stream);
 
             // Load players
-            players = LoadEntities(state, "players", PlayerObject.FromState);
+            knownPlayers = LoadEntities(state, "players", PlayerObject.FromState).ToDictionary(p => p.PlayerBinding, p => p);
 
             // Load terrain
             Terrain = LoadEntities(state, "terrain", s => CachedTerrainGenerator.FromState(terrainFactory, s)).First();
@@ -161,6 +155,50 @@ namespace CraftingGame.State
             }
 
             return state.State[entityType].Select(e => factory(new StatefulObject(actionQueue, e.Key, e.Value))).ToArray();
+        }
+
+        internal IEnumerable<PlayerObject> BindPlayers(IEnumerable<InputMask> unboundControls)
+        {
+            foreach (var inputMask in unboundControls)
+            {
+                // See if there exists a matching player
+                PlayerObject existingPlayer = null;
+                if (!knownPlayers.TryGetValue(inputMask.PlayerBinding, out existingPlayer))
+                {
+                    // New player joined
+                    var newPlayer = CreatePlayer(inputMask);
+                    AddPlayer(newPlayer);
+                    yield return newPlayer;
+                }
+                else if (!existingPlayer.InputBound)
+                {
+                    // Reconnect
+                    existingPlayer.BindInput(inputMask);
+                    boundPlayers.Add(existingPlayer);
+                }
+            }
+        }
+
+        private void AddPlayer(PlayerObject player)
+        {
+            this.knownPlayers.Add(player.PlayerBinding, player);
+        }
+
+        private PlayerObject CreatePlayer(InputMask inputMask)
+        {
+            var player = new PlayerObject(actionQueue)
+            {
+                Id = Guid.NewGuid(),
+                PlayerBinding = inputMask.PlayerBinding,
+                SpriteBinding = new ObjectBinding<ISprite>("Chicken"),
+                Plane = new Plane(0),
+                Size = new Vector2(30, 30),
+                Color = Color.Red
+            };
+
+            player.BindInput(inputMask);
+            boundPlayers.Add(player);
+            return player;
         }
     }
 }

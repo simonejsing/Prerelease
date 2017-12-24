@@ -20,9 +20,22 @@ namespace MainGame.UnitTests
         private readonly Mock<IRenderer> mockRenderer;
         private readonly ITerrainGenerator terrain;
         private readonly InputMask playerInput;
+        private readonly FrameCounter counter = new FrameCounter();
+
 
         public PlatformerSceene Game { get; private set; }
-        public PlayerObject Player => Game.State.Players.First();
+
+        internal void Update(float timeStep)
+        {
+            Game.Update(counter, timeStep);
+        }
+
+        internal void Render(float timeStep)
+        {
+            Game.Render(counter, timeStep);
+        }
+
+        public PlayerObject Player => Game.State.KnownPlayers.First();
         public Coordinate PlayerCoordinate => Game.Grid.PointToGridCoordinate(Player.Center);
         public Plane Plane => Player.Plane;
 
@@ -79,7 +92,7 @@ namespace MainGame.UnitTests
 
             // Make player1 join the game
             this.Input();
-            this.Game.Update(0.1f);
+            this.Update(0.1f);
         }
 
         public void Input(

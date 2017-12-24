@@ -29,7 +29,7 @@ namespace Contracts
         {
         }
 
-        public abstract void Update(float timestep);
+        public abstract void Update(FrameCounter counter, float timestep);
 
         public virtual void Activate(InputMask uiInput, InputMask[] inputMasks)
         {
@@ -43,7 +43,7 @@ namespace Contracts
             return new string[0];
         }
 
-        public abstract void Render(double gameTimeMsec);
+        public abstract void Render(FrameCounter counter, double gameTimeMsec);
 
         public virtual void Deactivate()
         {

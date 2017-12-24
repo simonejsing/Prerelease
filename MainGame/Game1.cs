@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Contracts;
 using CraftingGame;
 using Microsoft.Xna.Framework;
@@ -16,6 +17,12 @@ namespace Prerelease.Main
     public class Game1 : Game
     {
         public const bool Debug = true;
+
+        private PerfCounter renderPerfCounter = new PerfCounter(15);
+        private PerfCounter updatePerfCounter = new PerfCounter(15);
+
+        private FrameCounter renderCounter = new FrameCounter();
+        private FrameCounter updateCounter = new FrameCounter();
 
         private ISceene activeSceene = null;
         private readonly IMonoInput keyboard;
@@ -122,40 +129,33 @@ namespace Prerelease.Main
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Cap at 60 fps
-            /*renderElapsedTimeMsec += gameTime.ElapsedGameTime.Milliseconds;
-            if (renderElapsedTimeMsec < msecPerFrame)
+            updatePerfCounter.Execute(() =>
             {
-                return;
-            }
-            renderElapsedTimeMsec -= msecPerFrame;*/
+                updateCounter.Inc();
+                var timestep = gameTime.ElapsedGameTime.Milliseconds / msecPerFrame;
+                var time = (float)gameTime.TotalGameTime.TotalSeconds;
+                var deltaT = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            var timestep = gameTime.ElapsedGameTime.Milliseconds/msecPerFrame;
+                uiInput.Apply(uiKeyboard.ReadInput());
 
-            updateFrame++;
+                if (uiKeyboard.KeyPressed(Keys.Escape))
+                {
+                    activeSceene.Exiting();
+                    Exit();
+                }
 
-            var time = (float)gameTime.TotalGameTime.TotalSeconds;
-            var deltaT = (float)gameTime.ElapsedGameTime.TotalSeconds;
+                currentInputs = MergeInputs(keyboard, controllers[1]);
+                inputMasks[0].Apply(currentInputs);
+                inputMasks[1].Apply(controllers[0].ReadInput());
+                inputMasks[2].Apply(controllers[2].ReadInput());
+                inputMasks[3].Apply(controllers[3].ReadInput());
+                activeSceene.Update(updateCounter, timestep);
+                userInterface.Update(updateCounter, inputMasks);
 
-            uiInput.Apply(uiKeyboard.ReadInput());
+                ProcessActions();
 
-            if (uiKeyboard.KeyPressed(Keys.Escape))
-            {
-                activeSceene.Exiting();
-                Exit();
-            }
-
-            currentInputs = MergeInputs(keyboard, controllers[1]);
-            inputMasks[0].Apply(currentInputs);
-            inputMasks[1].Apply(controllers[0].ReadInput());
-            inputMasks[2].Apply(controllers[2].ReadInput());
-            inputMasks[3].Apply(controllers[3].ReadInput());
-            activeSceene.Update(timestep);
-            userInterface.Update(inputMasks);
-
-            ProcessActions();
-
-            base.Update(gameTime);
+                base.Update(gameTime);
+            });
         }
 
         /// <summary>
@@ -178,46 +178,44 @@ namespace Prerelease.Main
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            renderFrame++;
-
-            renderer.Begin();
-
-            activeSceene.Render(gameTime.TotalGameTime.TotalMilliseconds);
-            userInterface.Render();
-
-            if (Debug)
+            renderPerfCounter.Execute(() =>
             {
-                renderer.RenderText(
-                    debugFont,
-                    Vector2.Zero,
-                    string.Format(
-                        "U/D: {0}/{1} [{2}{3}{4}{5}{6}{7}]",
-                        updateFrame,
-                        renderFrame,
-                        inputMasks[0].Input.Left ? "L" : (currentInputs.Left ? "l" : "-"),
-                        inputMasks[0].Input.Right ? "R" : (currentInputs.Right ? "r" : "-"),
-                        inputMasks[0].Input.Up ? "U" : (currentInputs.Up ? "u" : "-"),
-                        inputMasks[0].Input.Down ? "D" : (currentInputs.Down ? "d" : "-"),
-                        inputMasks[0].Input.Attack ? "A" : (currentInputs.Attack ? "a" : "-"),
-                        inputMasks[0].Input.Select ? "S" : (currentInputs.Select ? "s" : "-")),
-                    Color.Red);
+                renderCounter.Inc();
 
-                var cursor = Vector2.Zero;
-                foreach (var diagnosticsString in activeSceene.DiagnosticsString())
+                renderer.Begin();
+
+                activeSceene.Render(renderCounter, gameTime.TotalGameTime.TotalMilliseconds);
+                userInterface.Render(renderCounter);
+
+                if (Debug)
                 {
-                    cursor -= new Vector2(0, 20);
-
+                    var excess = updatePerfCounter.ExceedsThresshold || renderPerfCounter.ExceedsThresshold;
                     renderer.RenderText(
                         debugFont,
-                        cursor,
-                        diagnosticsString,
-                        Color.Red);
+                        Vector2.Zero,
+                        string.Format(
+                            "U/D: {0:0.00}/{1:0.00}",
+                            updatePerfCounter.AverageMsec,
+                            renderPerfCounter.AverageMsec),
+                        excess ? Color.Red : Color.Green);
+
+                    var cursor = Vector2.Zero;
+                    foreach (var diagnosticsString in activeSceene.DiagnosticsString())
+                    {
+                        cursor -= new Vector2(0, 20);
+
+                        renderer.RenderText(
+                            debugFont,
+                            cursor,
+                            diagnosticsString,
+                            Color.Red);
+                    }
                 }
-            }
 
-            renderer.End();
+                renderer.End();
 
-            base.Draw(gameTime);
+                base.Draw(gameTime);
+            });
         }
 
         private void ProcessActions()

@@ -19,9 +19,9 @@ namespace MainGame.UnitTests
 RRR");
             harness.StartGame();
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.Input(right: true, attack: true);
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.VerifyTerrain(
 @"...
 .0.
@@ -37,7 +37,7 @@ RR.");
             // Teleport player ontop of item and collect the item
             harness.Player.Position = harness.Game.Grid.GridCoordinateToPoint(dropCoord);
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
 
             // Verify inventory contains dropped item
             harness.Player.Inventory.Count("BlockOfRock").Should().Be(1);
@@ -52,9 +52,9 @@ R0R
 RRR");
             harness.StartGame();
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.Input(attack: true);
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.VerifyTerrain(
 @"RRR
 R0R
@@ -70,9 +70,9 @@ RRR");
 RRR");
             harness.StartGame();
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.Input(right: true, attack: true);
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.VerifyTerrain(
 @"...
 .0.
@@ -88,9 +88,9 @@ R0.
 RRR");
             harness.StartGame();
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.Input(left: true, attack: true);
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.VerifyTerrain(
 @"...
 .0.
@@ -106,9 +106,9 @@ RRR");
 RRR");
             harness.StartGame();
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.Input(down: true, right: true, attack: true);
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.VerifyTerrain(
 @"...
 .0.
@@ -124,9 +124,9 @@ RR.");
 RRR");
             harness.StartGame();
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.Input(down: true, left: true, attack: true);
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.VerifyTerrain(
 @"...
 .0.
@@ -142,9 +142,9 @@ RRR");
 RRR");
             harness.StartGame();
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.Input(down: true, attack: true);
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.VerifyTerrain(
 @"...
 .0.
@@ -160,9 +160,9 @@ R.R");
 RRR");
             harness.StartGame();
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.Input(up: true, attack: true);
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.VerifyTerrain(
 @"R.R
 .0.
@@ -178,9 +178,9 @@ RRR");
 RRR");
             harness.StartGame();
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.Input(up: true, left: true, attack: true);
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.VerifyTerrain(
 @".RR
 .0.
@@ -196,9 +196,9 @@ RRR");
 RRR");
             harness.StartGame();
             harness.Input();
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.Input(up: true, right: true, attack: true);
-            harness.Game.Update(0.1f);
+            harness.Update(0.1f);
             harness.VerifyTerrain(
 @"RR.
 .0.

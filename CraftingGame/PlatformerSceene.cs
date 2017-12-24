@@ -57,7 +57,6 @@ namespace CraftingGame
         public PlatformerSceene(IStreamProvider streamProvider, IRenderer renderer, IUserInterface ui, ActionQueue actionQueue) 
             : this(streamProvider, renderer, ui, actionQueue, new TerrainFactory(TerrainDepth, TerrainHeight, TerrainSeaLevel))
         {
-
         }
 
         public PlatformerSceene(IStreamProvider streamProvider, IRenderer renderer, IUserInterface ui, ActionQueue actionQueue, ITerrainFactory terrainFactory)
@@ -108,7 +107,7 @@ namespace CraftingGame
             this.inputMasks = inputMasks;
 
             spriteResolver = new SpriteResolver(scope);
-            spriteResolver.ResolveBindings(State.Players.ToArray());
+            spriteResolver.ResolveBindings(State.KnownPlayers.ToArray());
 
             debugFont = scope.LoadFont("ConsoleFont");
 
@@ -134,10 +133,12 @@ namespace CraftingGame
             TransitionToLevel(level.Name);
         }
 
-        public override void Update(float timestep)
+        public override void Update(FrameCounter counter, float timestep)
         {
-            // TODO: This does not need to happen every frame!
-            JoinPlayers();
+            if (counter.HundredFrame)
+            {
+                JoinPlayers();
+            }
 
             // Update level to generate terrain
             this.level.Update();
@@ -148,8 +149,7 @@ namespace CraftingGame
             // Handle UI inputs
             freeCameraController.Update(UiInput);
 
-            // TODO: This will be inefficient if lots of players have joined the game and the state keeps track of them all
-            foreach (var player in State.Players.Where(p => p.InputBound))
+            foreach (var player in State.BoundPlayers)
             {
                 playerController.Update(player);
             }
@@ -179,39 +179,15 @@ namespace CraftingGame
         private void JoinPlayers()
         {
             // Check for new players joining the game
-            foreach (var inputMask in inputMasks)
+            var unboundControls = inputMasks.Where(i => i.Bound == false);
+            if (unboundControls.Any())
             {
-                // Find matching player
-                var player = State.Players.FirstOrDefault(p => p.PlayerBinding == inputMask.PlayerBinding);
-                if (player == null)
+                foreach(var newPlayer in State.BindPlayers(unboundControls))
                 {
-                    // New player joined
-                    CreatePlayer(inputMask);
-                }
-                else if (!player.InputBound)
-                {
-                    // Reconnect
-                    player.BindInput(inputMask);
+                    spriteResolver.ResolveBindings(newPlayer);
+                    playerController.SpawnPlayer(newPlayer);
                 }
             }
-        }
-
-        private void CreatePlayer(InputMask inputMask)
-        {
-            var player = new PlayerObject(ActionQueue)
-            {
-                Id = Guid.NewGuid(),
-                PlayerBinding = inputMask.PlayerBinding,
-                SpriteBinding = new ObjectBinding<ISprite>("Chicken"),
-                Plane = new Plane(0),
-                Size = new Vector2(30, 30),
-                Color = Color.Red
-            };
-
-            spriteResolver.ResolveBindings(player);
-            playerController.SpawnPlayer(player);
-            player.BindInput(inputMask);
-            State.AddPlayer(player);
         }
 
         private void TransitionToLevel(string levelName)
@@ -219,7 +195,7 @@ namespace CraftingGame
             State.SetActiveLevel(levelName);
         }
 
-        public override void Render(double gameTimeMsec)
+        public override void Render(FrameCounter counter, double gameTimeMsec)
         {
             Renderer.Clear(Color.Black);
 
@@ -258,7 +234,7 @@ namespace CraftingGame
 
         public override string[] DiagnosticsString()
         {
-            var player = State.Players.FirstOrDefault();
+            var player = State.ActivePlayers.FirstOrDefault();
             var playerPos = player?.Position ?? Vector2.Zero;
             var sectors = SectorProbe().ToArray();
             return new[]

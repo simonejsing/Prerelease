@@ -39,6 +39,7 @@ namespace CraftingGame.Physics
                 throw new InvalidOperationException($"Attempt to bind invalid input '{inputMask.PlayerBinding}' to player '{PlayerBinding}'.");
             }
             this.InputMask = inputMask;
+            this.InputMask.Bound = true;
             this.InputBound = true;
         }
 
