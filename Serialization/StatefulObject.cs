@@ -45,26 +45,6 @@ namespace Serialization
                 SafeReadValue($"{propertyName}:a", def.a));
         }
 
-        public static IDictionary<string, object> EncodeVector(string propertyName, Vector2 vector)
-        {
-            return new Dictionary<string, object>
-            {
-                { $"{propertyName}:x", vector.X },
-                { $"{propertyName}:y", vector.Y },
-            };
-        }
-
-        public static IDictionary<string, object> EncodeColor(string propertyName, Color color)
-        {
-            return new Dictionary<string, object>
-            {
-                { $"{propertyName}:r", color.r },
-                { $"{propertyName}:g", color.g },
-                { $"{propertyName}:b", color.b },
-                { $"{propertyName}:a", color.a },
-            };
-        }
-
         public StatefulObject ReadEmbeddedState(string propertyName)
         {
             var subState = SafeReadEmbeddedState(propertyName, new Dictionary<string, object>());

@@ -7,6 +7,6 @@ namespace Serialization
     public interface IStatefulEntity
     {
         Guid Id { get; }
-        IDictionary<string, object> ExtractState();
+        void ExtractState(StatefulObjectBuilder builder);
     }
 }

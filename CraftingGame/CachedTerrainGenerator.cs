@@ -137,13 +137,10 @@ namespace CraftingGame
             return (numerator-denominator+1)/denominator;
         }
 
-        public IDictionary<string, object> ExtractState()
+        public void ExtractState(StatefulObjectBuilder builder)
         {
-            return new Dictionary<string, object>
-            {
-                { "m", terrainModifications.Select(EncodeModification) },
-                { "c.t", terrainGenerator.ExtractState() }
-            };
+            builder.Add("m", terrainModifications.Select(EncodeModification));
+            builder.EmbedState("c.t", terrainGenerator);
         }
 
         private Dictionary<string, object> EncodeModification(KeyValuePair<Voxel, TerrainType> item)

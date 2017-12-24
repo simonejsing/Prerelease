@@ -59,20 +59,11 @@ namespace CraftingGame.Physics
             this.Color = state.SafeReadColor("p.c");
         }
 
-        public override IDictionary<string, object> ExtractState()
+        public override void ExtractState(StatefulObjectBuilder builder)
         {
-            return ConcatenateState(base.ExtractState(), GetState());
-        }
-
-        private IDictionary<string, object> GetState()
-        {
-            return ConcatenateState(
-                new Dictionary<string, object>
-                {
-                    { "p.bind", PlayerBinding },
-                },
-                StatefulObject.EncodeColor("p.c", Color)
-            );
+            base.ExtractState(builder);
+            builder.Add("p.bind", PlayerBinding);
+            builder.EncodeColor("p.c", Color);
         }
 
         public static PlayerObject FromState(StatefulObject state)

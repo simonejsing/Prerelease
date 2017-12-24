@@ -51,9 +51,10 @@ namespace MainGame.UnitTests
                 Size = new Vector2(30, 30),
                 Color = Color.Red,
             };
-            var state = player.ExtractState();
+            var builder = new StatefulObjectBuilder();
+            player.ExtractState(builder);
 
-            var newPlayer = PlayerObject.FromState(new StatefulObject(null, player.Id, state));
+            var newPlayer = PlayerObject.FromState(new StatefulObject(null, player.Id, builder.State));
             newPlayer.Id.Should().Be(player.Id);
             newPlayer.PlayerBinding.Should().Be("player1");
             newPlayer.Plane.W.Should().Be(5);

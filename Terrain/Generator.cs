@@ -161,15 +161,12 @@ namespace Terrain
             return value;
         }
 
-        public IDictionary<string, object> ExtractState()
+        public void ExtractState(StatefulObjectBuilder builder)
         {
-            return new Dictionary<string, object>
-            {
-                { "seed", this.Seed },
-                { "md", this.MaxDepth },
-                { "mh", this.MaxHeight },
-                { "sl", this.SeaLevel },
-            };
+            builder.Add("seed", this.Seed);
+            builder.Add("md", this.MaxDepth);
+            builder.Add("mh", this.MaxHeight);
+            builder.Add("sl", this.SeaLevel);
         }
 
         public static ITerrainGenerator FromState(StatefulObject state)

@@ -43,21 +43,12 @@ namespace CraftingGame.Physics
             this.Grounded = state.SafeReadValue("m.g", false);
         }
 
-        public override IDictionary<string, object> ExtractState()
+        public override void ExtractState(StatefulObjectBuilder builder)
         {
-            return ConcatenateState(base.ExtractState(), GetState());
-        }
-
-        private IDictionary<string, object> GetState()
-        {
-            return ConcatenateState(
-                new Dictionary<string, object>
-                {
-                    { "m.g", this.Grounded }
-                },
-                StatefulObject.EncodeVector("m.a", this.Acceleration),
-                StatefulObject.EncodeVector("m.v", this.Velocity)
-            );
+            base.ExtractState(builder);
+            builder.Add("m.g", this.Grounded);
+            builder.EncodeVector("m.a", this.Acceleration);
+            builder.EncodeVector("m.v", this.Velocity);
         }
     }
 }

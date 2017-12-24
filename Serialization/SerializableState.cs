@@ -32,7 +32,14 @@ namespace Serialization
 
         public void AddEntities(string entityType, IEnumerable<IStatefulEntity> entities)
         {
-            State.Add(entityType, entities.ToDictionary(e => e.Id, e => e.ExtractState()));
+            State.Add(entityType, entities.ToDictionary(e => e.Id, e => BuildState(e)));
+        }
+
+        private static IDictionary<string, object> BuildState(IStatefulEntity entity)
+        {
+            var builder = new StatefulObjectBuilder();
+            entity.ExtractState(builder);
+            return builder.State;
         }
 
         public void Serialize(Stream stream)

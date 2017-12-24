@@ -56,24 +56,13 @@ namespace CraftingGame.Physics
             this.Facing = state.SafeReadVector("o.f", new Vector2(1, 0));
         }
 
-        protected static IDictionary<string, object> ConcatenateState(IDictionary<string, object> baseState, params IDictionary<string, object>[] states)
+        public virtual void ExtractState(StatefulObjectBuilder builder)
         {
-            var merged = states.SelectMany(s => s).ToDictionary(d => d.Key, d => d.Value);
-            return baseState.Concat(merged).ToDictionary(d => d.Key, d => d.Value);
-        }
-
-        public virtual IDictionary<string, object> ExtractState()
-        {
-            return ConcatenateState(
-                new Dictionary<string, object>
-                {
-                    { "o.sprite", SpriteBinding.Path },
-                    { "o.pl", Plane.W },
-                },
-                StatefulObject.EncodeVector("o.p", Position),
-                StatefulObject.EncodeVector("o.s", Size),
-                StatefulObject.EncodeVector("o.f", Facing)
-            );
+            builder.Add("o.sprite", SpriteBinding.Path);
+            builder.Add("o.pl", Plane.W);
+            builder.EncodeVector("o.p", Position);
+            builder.EncodeVector("o.s", Size);
+            builder.EncodeVector("o.f", Facing);
         }
     }
 }

@@ -38,16 +38,9 @@ namespace CraftingGame.Physics
             base.Load(state);
         }
 
-        public override IDictionary<string, object> ExtractState()
+        public override void ExtractState(StatefulObjectBuilder builder)
         {
-            return ConcatenateState(base.ExtractState(), GetState());
-        }
-
-        private IDictionary<string, object> GetState()
-        {
-            return new Dictionary<string, object>
-            {
-            };
+            base.ExtractState(builder);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,9 +105,8 @@ namespace MainGame.UnitTests
             return generationCounter;
         }
 
-        public IDictionary<string, object> ExtractState()
+        public void ExtractState(StatefulObjectBuilder builder)
         {
-            return new Dictionary<string, object>();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +32,9 @@ namespace Terrain
             generator.Generate(c * Inv, p);
         }
 
-        public IDictionary<string, object> ExtractState()
+        public void ExtractState(StatefulObjectBuilder builder)
         {
-            return generator.ExtractState();
+            generator.ExtractState(builder);
         }
     }
 }
