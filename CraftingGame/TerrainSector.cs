@@ -17,15 +17,18 @@ namespace CraftingGame
         private readonly TerrainBlock[,] tiles;
         private int updateCount = 0;
 
-        private readonly Coordinate topLeft;
-        private readonly Plane plane;
+        private readonly Coordinate bottomLeft;
 
-        public int U { get; }
-        public int V { get; }
-        public int W { get; }
+        public Voxel Index { get; }
+        public int U => Index.U;
+        public int V => Index.V;
+        public int W => Index.W;
         public bool FullyLoaded { get; private set; }
 
         public TerrainBlock this[int u, int v] => tiles[u, v];
+
+        //public event TerrainModificationEventHandler TerrainModification;
+        public event EventHandler<TerrainModificationEvent> TerrainModification;
 
         // Update a given number of tiles
         public int Update(int numberOfTiles)
@@ -56,11 +59,8 @@ namespace CraftingGame
         {
             this.generator = generator;
             FullyLoaded = false;
-            U = u;
-            V = v;
-            W = w;
-            this.topLeft = new Coordinate(U, V) * new Coordinate(SectorWidth, SectorHeight);
-            this.plane = new Plane(w);
+            Index = new Voxel(u, v, w);
+            this.bottomLeft = new Coordinate(U, V) * new Coordinate(SectorWidth, SectorHeight);
             tiles = new TerrainBlock[SectorWidth, SectorHeight];
             for (int y = 0; y < SectorHeight; y++)
             {
@@ -79,13 +79,19 @@ namespace CraftingGame
         {
             if (tiles[u, v].Type == TerrainType.NotGenerated)
             {
-                tiles[u, v] = generator[this.topLeft + new Coordinate(u, v), this.plane];
+                tiles[u, v] = generator[this.bottomLeft + new Coordinate(u, v), this.Index.Plane];
             }
         }
 
         public void Modify(int u, int v, TerrainType type)
         {
             tiles[u, v].Type = type;
+            OnTerrainModified(new Coordinate(u, v));
+        }
+
+        private void OnTerrainModified(Coordinate localCoord)
+        {
+            TerrainModification?.Invoke(this, new TerrainModificationEvent(Index, localCoord, this.bottomLeft + localCoord));
         }
     }
 }

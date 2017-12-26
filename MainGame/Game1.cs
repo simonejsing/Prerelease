@@ -44,8 +44,6 @@ namespace Prerelease.Main
         private Engine renderer;
         private UserInterface userInterface;
         private IFont debugFont;
-        private int updateFrame = 0;
-        private int renderFrame = 0;
 
         private const float fps = 60.0f;
         private const float msecPerFrame = 1000.0f / fps;

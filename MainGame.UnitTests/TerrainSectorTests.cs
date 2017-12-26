@@ -131,5 +131,19 @@ namespace MainGame.UnitTests
             generator.Sectors.Should().HaveCount(1);
             generator[coord, new Plane(0)].Type.Should().Be(TerrainType.Free);
         }
+
+        [TestMethod]
+        public void ShouldFireEventOnModificationOfTerrain()
+        {
+            var sector = new TerrainSector(new TerrainStub(), 10, 15, 2);
+            EventTracer.With<TerrainModificationEvent>(handler => sector.TerrainModification += handler)
+                .Action(() => sector.Modify(5, 5, TerrainType.Dirt))
+                .RaisedEvent(
+                    e => 
+                        e.Index == new Voxel(10, 15, 2) && 
+                        e.LocalCoord == new Coordinate(5, 5) &&
+                        e.GlobalCoord == new Coordinate(10 * TerrainSector.SectorWidth, 15 * TerrainSector.SectorHeight) + new Coordinate(5, 5))
+                .Should().BeTrue();
+        }
     }
 }

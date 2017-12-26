@@ -57,6 +57,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CraftingGameTests.cs" />
+    <Compile Include="EventTracer.cs" />
     <Compile Include="GameHarness.cs" />
     <Compile Include="GameStateTests.cs" />
     <Compile Include="InMemoryStreamProvider.cs" />

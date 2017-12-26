@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VectorMath;
 using FluentAssertions;
+using Terrain;
 
 namespace MainGame.UnitTests
 {
@@ -70,6 +71,14 @@ namespace MainGame.UnitTests
         {
             var v = new Vector2(0, -1);
             v.Angle.Should().Be((float)-Math.PI/2.0f);
+        }
+
+        [TestMethod]
+        public void TestManhattanDistance()
+        {
+            var c1 = new Coordinate(-1, -1);
+            var c2 = new Coordinate(-1, -1);
+            Coordinate.ManhattanDistance(c1, c2).Should().Be(0);
         }
     }
 }

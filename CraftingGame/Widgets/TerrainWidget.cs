@@ -6,13 +6,24 @@ using VectorMath;
 
 namespace CraftingGame.Widgets
 {
+    internal class PrerenderedTerrainSector
+    {
+        public ISprite Sprite { get; }
+
+        public PrerenderedTerrainSector(ISprite sprite)
+        {
+            this.Sprite = sprite ?? throw new ArgumentNullException(nameof(sprite));
+        }
+    }
+
     internal class TerrainWidget
     {
         private readonly IRenderer renderer;
         private readonly CachedTerrainGenerator terrain;
 
         // Pre-rendered sectors
-        private readonly Dictionary<Voxel, ISprite> sectorSprites = new Dictionary<Voxel, ISprite>();
+        private readonly QuadTree<PrerenderedTerrainSector> sectorSprites = new QuadTree<PrerenderedTerrainSector>();
+        //private readonly Dictionary<Voxel, ISprite> sectorSprites = new Dictionary<Voxel, ISprite>();
 
         public TerrainWidget(IRenderer renderer, CachedTerrainGenerator terrain)
         {
@@ -24,11 +35,16 @@ namespace CraftingGame.Widgets
         {
             // TODO: Limit to pre-rendering one sector per cycle, this causes lag - could we pre-render incrementally?
             ForeachVisibleSector(grid, view, plane, voxel => {
-                if (sectorSprites.ContainsKey(voxel))
+                var sectorSprite = sectorSprites[voxel];
+                if(sectorSprite != null)
+                {
+                    // TODO: Check for pending modifications
                     return;
+                }
 
                 // Render to sprite and cache.
-                var sectorSprite = PrerenderSectorToTexture(grid, voxel);
+                var sprite = PrerenderSectorToTexture(grid, voxel);
+                sectorSprite = new PrerenderedTerrainSector(sprite);
                 sectorSprites.Add(voxel, sectorSprite);
             });
         }
@@ -56,10 +72,12 @@ namespace CraftingGame.Widgets
                 var bottomLeft = new Vector2(voxel.U * TerrainSector.SectorWidth, voxel.V * TerrainSector.SectorHeight) * grid.Size;
                 var size = new Vector2(TerrainSector.SectorWidth, TerrainSector.SectorHeight) * grid.Size;
 
-                if (sectorSprites.TryGetValue(voxel, out ISprite sectorSprite))
+                var sectorSprite = sectorSprites[voxel];
+                if(sectorSprite != null)
+                //if (sectorSprites.TryGetValue(voxel, out ISprite sectorSprite))
                 {
                     // Render the sector sprite
-                    RenderTexture(view, bottomLeft, size, sectorSprite);
+                    RenderTexture(view, bottomLeft, size, sectorSprite.Sprite);
                 }
                 else
                 {

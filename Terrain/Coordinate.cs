@@ -48,6 +48,11 @@ namespace Terrain
             return $"({U},{V})";
         }
 
+        public static int ManhattanDistance(Coordinate coord, Coordinate c)
+        {
+            return Math.Abs(coord.U - c.U) + Math.Abs(coord.V - c.V);
+        }
+
         public override int GetHashCode()
         {
             int hash = 17;
