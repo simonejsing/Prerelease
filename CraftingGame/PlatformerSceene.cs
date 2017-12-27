@@ -123,7 +123,7 @@ namespace CraftingGame
             collectAction = new CollectAction();
             digAction = new DigAction(ActionQueue, collectAction, State, Grid, State.Terrain);
 
-            terrainWidget = new TerrainWidget(Renderer, State.Terrain);
+            terrainWidget = new TerrainWidget(Renderer, State.Terrain, debugFont);
             dynamicGridWidget = new DynamicGridWidget(Renderer, debugFont, BlockSize);
 
             freeCameraController = new FreeCameraController(Camera);

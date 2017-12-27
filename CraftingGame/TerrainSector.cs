@@ -30,6 +30,11 @@ namespace CraftingGame
         //public event TerrainModificationEventHandler TerrainModification;
         public event EventHandler<TerrainModificationEvent> TerrainModification;
 
+        public Coordinate GlobalCoordinate(Coordinate localCoord)
+        {
+            return new Coordinate(localCoord.U * SectorWidth, localCoord.V * SectorHeight);
+        }
+
         // Update a given number of tiles
         public int Update(int numberOfTiles)
         {

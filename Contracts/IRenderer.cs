@@ -16,10 +16,13 @@ namespace Contracts
         void DrawLine(IReadonlyVector point, float length, float angle, Color color, float thickness);
         void RenderPixel(IReadonlyVector position, Color color);
         void RenderRectangle(IReadonlyVector position, IReadonlyVector size, Color color);
+        void RenderOpagueSprite(IGpuTexture texture, IReadonlyVector position, IReadonlyVector size, bool flipHorizontally = false);
         void RenderOpagueSprite(ISprite sprite, IReadonlyVector position, IReadonlyVector size, bool flipHorizontally = false);
         void RenderText(IFont font, IReadonlyVector position, string text, Color color);
         void RenderText(IFont font, IReadonlyVector position, string text, Color color, float rotation, IReadonlyVector origin, IReadonlyVector scale, float layerDepth = 0f);
-        ISprite RenderToTexture(int width, int height, Action renderAction);
+        IGpuTexture InitializeGpuTexture(int width, int height);
+        void RenderToGpuTexture(IGpuTexture sprite, Action renderAction);
+        ISprite CreateTexture(int width, int height, Action renderAction);
         IRenderScope ActivateScope(string scopeName);
         void DeactivateScope(string scopeName);
     }

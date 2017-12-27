@@ -114,24 +114,28 @@ namespace CraftingGame
         {
             // Handle negative coordinates
             var index = SectorIndex(x, y);
+            return GetSector(index, z);
+        }
 
-            if (activeSector?.U == index.U && activeSector?.V == index.V && activeSector?.W == z)
+        public TerrainSector GetSector(Voxel index)
+        {
+            return GetSector(index.Coordinate, index.W);
+        }
+
+        private TerrainSector GetSector(Coordinate index, int w)
+        {
+            if (activeSector?.U == index.U && activeSector?.V == index.V && activeSector?.W == w)
                 return activeSector;
 
-            var sector = Sectors.FirstOrDefault(s => s.U == index.U && s.V == index.V && s.W == z);
+            var sector = Sectors.FirstOrDefault(s => s.U == index.U && s.V == index.V && s.W == w);
             if (sector == null)
             {
-                sector = new TerrainSector(terrainGenerator, index.U, index.V, z);
+                sector = new TerrainSector(terrainGenerator, index.U, index.V, w);
                 sectors.Add(sector);
                 sectorLoadingQueue.Enqueue(sector);
             }
 
             return sector;
-        }
-
-        public Coordinate SectorPosition(Coordinate index)
-        {
-            return new Coordinate(index.U * TerrainSector.SectorWidth, index.V * TerrainSector.SectorHeight);
         }
 
         public Coordinate SectorIndex(Coordinate coord)

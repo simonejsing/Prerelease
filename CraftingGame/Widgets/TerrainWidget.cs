@@ -1,51 +1,51 @@
 using Contracts;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using Terrain;
 using VectorMath;
 
 namespace CraftingGame.Widgets
 {
-    internal class PrerenderedTerrainSector
-    {
-        public ISprite Sprite { get; }
-
-        public PrerenderedTerrainSector(ISprite sprite)
-        {
-            this.Sprite = sprite ?? throw new ArgumentNullException(nameof(sprite));
-        }
-    }
-
     internal class TerrainWidget
     {
         private readonly IRenderer renderer;
         private readonly CachedTerrainGenerator terrain;
+        private readonly IFont debugFont;
 
         // Pre-rendered sectors
         private readonly QuadTree<PrerenderedTerrainSector> sectorSprites = new QuadTree<PrerenderedTerrainSector>();
-        //private readonly Dictionary<Voxel, ISprite> sectorSprites = new Dictionary<Voxel, ISprite>();
 
-        public TerrainWidget(IRenderer renderer, CachedTerrainGenerator terrain)
+        public TerrainWidget(IRenderer renderer, CachedTerrainGenerator terrain, IFont debugFont)
         {
             this.renderer = renderer;
             this.terrain = terrain;
+            this.debugFont = debugFont;
         }
 
         public void Prerender(Grid grid, ViewportProjection view, Plane plane)
         {
             // TODO: Limit to pre-rendering one sector per cycle, this causes lag - could we pre-render incrementally?
-            ForeachVisibleSector(grid, view, plane, voxel => {
+            ForeachVisibleSector(grid, view, plane, voxel =>
+            {
+
                 var sectorSprite = sectorSprites[voxel];
-                if(sectorSprite != null)
+                if(sectorSprite == null)
                 {
-                    // TODO: Check for pending modifications
-                    return;
+                    var sector = terrain.GetSector(voxel);
+                    sectorSprite = CreateTexture(grid, voxel, sector);
+                    sectorSprites.Add(voxel, sectorSprite);
                 }
 
-                // Render to sprite and cache.
-                var sprite = PrerenderSectorToTexture(grid, voxel);
-                sectorSprite = new PrerenderedTerrainSector(sprite);
-                sectorSprites.Add(voxel, sectorSprite);
+                if (sectorSprite.Redraw)
+                {
+                    PrerenderToTexture(sectorSprite, () => PrerenderSector(grid, sectorSprite));
+                    sectorSprite.Initialized = true;
+                }
+                else if (sectorSprite.TerrainModified)
+                {
+                    PrerenderToTexture(sectorSprite, () => RefreshPrerenderedSector(grid, sectorSprite));
+                    sectorSprite.ClearModification();
+                }
             });
         }
 
@@ -77,7 +77,7 @@ namespace CraftingGame.Widgets
                 //if (sectorSprites.TryGetValue(voxel, out ISprite sectorSprite))
                 {
                     // Render the sector sprite
-                    RenderTexture(view, bottomLeft, size, sectorSprite.Sprite);
+                    RenderTexture(view, bottomLeft, size, sectorSprite.Texture);
                 }
                 else
                 {
@@ -91,6 +91,9 @@ namespace CraftingGame.Widgets
                 RenderVector(view, bottomLeft, Matrix2x2.ProjectY * size, Color.Red, 3.0f);
                 RenderVector(view, bottomLeft + size, (Matrix2x2.ProjectX * size).FlipX, Color.Red, 3.0f);
                 RenderVector(view, bottomLeft + size, Matrix2x2.ProjectY * size, Color.Red, 3.0f);
+
+                // Render sector index
+                RenderText(view, bottomLeft, Color.Red, $"({sectorSprite.Index.U},{sectorSprite.Index.V})");
             });
         }
 
@@ -115,17 +118,7 @@ namespace CraftingGame.Widgets
         private void RenderTerrainBlock(ViewportProjection view, TerrainType type, Vector2 position, Vector2 size)
         {
             var color = TerrainColor(type);
-            switch (type)
-            {
-                case TerrainType.Dirt:
-                case TerrainType.Rock:
-                case TerrainType.Bedrock:
-                case TerrainType.Sea:
-                    RenderRectangle(view, position, size, color);
-                    break;
-                case TerrainType.Free:
-                    break;
-            }
+            RenderRectangle(view, position, size, color);
         }
 
         private Color TerrainColor(TerrainType type)
@@ -141,39 +134,64 @@ namespace CraftingGame.Widgets
                 case TerrainType.Sea:
                     return Color.Blue;
                 default:
-                    return Color.Black;
+                    return new Color(0, 0, 0, 1);
             }
         }
 
-        private ISprite PrerenderSectorToTexture(Grid grid, Voxel index)
+        private PrerenderedTerrainSector CreateTexture(Grid grid, Voxel index, TerrainSector sector)
         {
             int textureWidth = TerrainSector.SectorWidth * (int)grid.Size.X;
             int textureHeight = TerrainSector.SectorHeight * (int)grid.Size.Y;
-            var size = new Vector2(textureWidth, textureHeight);
-            return renderer.RenderToTexture(textureWidth, textureHeight, () => PrerenderSector(grid, index, size));
+            var textureView = ViewportProjection.ToTexture(new Vector2(textureWidth, textureHeight));
+            var sprite = renderer.InitializeGpuTexture(textureWidth, textureHeight);
+            return new PrerenderedTerrainSector(sector, textureView, sprite);
         }
 
-        private void PrerenderSector(Grid grid, Voxel index, Vector2 textureSize)
+        private void PrerenderToTexture(PrerenderedTerrainSector sector, Action renderAction)
         {
-            var textureView = ViewportProjection.ToTexture(textureSize);
-            var startCoord = terrain.SectorPosition(index.Coordinate);
+            renderer.RenderToGpuTexture(sector.Texture, renderAction);
+        }
+
+        private void PrerenderSector(Grid grid, PrerenderedTerrainSector sector)
+        {
             for (var v = 0; v < TerrainSector.SectorHeight; v++)
             {
                 for (var u = 0; u < TerrainSector.SectorHeight; u++)
                 {
-                    var localCoord = new Coordinate(u, v);
-                    var worldCoord = startCoord + localCoord;
-                    terrain.Generate(worldCoord, index.Plane);
-                    var block = terrain[worldCoord, index.Plane];
-                    var position = new Vector2(u, v) * grid.Size;
-                    RenderTerrainBlock(textureView, block.Type, position, grid.Size);
+                    PrerenderBlock(grid, sector, u, v);
                 }
             }
+        }
+
+        private void RefreshPrerenderedSector(Grid grid, PrerenderedTerrainSector sectorSprite)
+        {
+            foreach (var coord in sectorSprite.Modifications)
+            {
+                PrerenderBlock(grid, sectorSprite, coord);
+            }
+        }
+
+        private void PrerenderBlock(Grid grid, PrerenderedTerrainSector sector, Coordinate coord)
+        {
+            PrerenderBlock(grid, sector, coord.U, coord.V);
+        }
+
+        private void PrerenderBlock(Grid grid, PrerenderedTerrainSector sector, int u, int v)
+        {
+            sector.TerrainSector.Generate(u, v);
+            var block = sector.TerrainSector[u, v];
+            var position = new Vector2(u, v) * grid.Size;
+            RenderTerrainBlock(sector.Projection, block.Type, position, grid.Size);
         }
 
         private void RenderVector(ViewportProjection view, Vector2 point, Vector2 vector, Color color, float thickness)
         {
             renderer.RenderVector(view.MapToViewport(point), view.MapSizeToViewport(vector), color, thickness);
+        }
+
+        private void RenderText(ViewportProjection view, Vector2 point, Color color, string text)
+        {
+            renderer.RenderText(debugFont, view.MapToViewport(point), text, color);
         }
 
         private void RenderRectangle(ViewportProjection view, Vector2 point, Vector2 size, Color color)
@@ -185,13 +203,13 @@ namespace CraftingGame.Widgets
             renderer.RenderRectangle(view.MapToViewport(point), view.MapSizeToViewport(size.FlipY), color);
         }
 
-        private void RenderTexture(ViewportProjection view, Vector2 point, Vector2 size, ISprite sprite)
+        private void RenderTexture(ViewportProjection view, Vector2 point, Vector2 size, IGpuTexture texture)
         {
             // The renderer expects to get the top left screen pixel and a positive size (after scale)
             // since we have flipped the y axis, we must correct by giving a negative height size
             // and add the height to the origin.
             point = new Vector2(point.X, point.Y + size.Y);
-            renderer.RenderOpagueSprite(sprite, view.MapToViewport(point), view.MapSizeToViewport(size.FlipY));
+            renderer.RenderOpagueSprite(texture, view.MapToViewport(point), view.MapSizeToViewport(size.FlipY));
         }
     }
 }

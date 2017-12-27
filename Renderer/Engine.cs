@@ -115,12 +115,23 @@ namespace Renderer
             spriteBatch.Draw(Pixel, rect, ToXnaColor(color));
         }
 
+        public void RenderOpagueSprite(IGpuTexture texture, IReadonlyVector position, IReadonlyVector size, bool flipHorizontally = false)
+        {
+            var t = (GpuTexture)texture;
+            RenderOpagueTexture(t.RenderTarget, t.SourceRectangle, position, size, flipHorizontally);
+        }
+
         public void RenderOpagueSprite(ISprite sprite, IReadonlyVector position, IReadonlyVector size, bool flipHorizontally = false)
         {
-            var s = (Sprite) sprite;
+            var s = (Sprite)sprite;
+            RenderOpagueTexture(s.Texture, s.SourceRectangle, position, size, flipHorizontally);
+        }
+
+        private void RenderOpagueTexture(Texture2D texture, IReadonlyRectangle sourceRect, IReadonlyVector position, IReadonlyVector size, bool flipHorizontally)
+        {
             var effect = flipHorizontally ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
             Rectangle rect = new Rectangle(ToXnaPoint(transform.Apply(position)), ToXnaPoint(transform.Apply(size)));
-            spriteBatch.Draw(s.Texture, rect, ToXnaRect(s.SourceRectangle), Color.White, 0f, Vector2.Zero, effect, 0f);
+            spriteBatch.Draw(texture, rect, ToXnaRect(sourceRect), Color.White, 0f, Vector2.Zero, effect, 0f);
         }
 
         private static Rectangle? ToXnaRect(IReadonlyRectangle rectangle)
@@ -194,15 +205,57 @@ namespace Renderer
             return new Microsoft.Xna.Framework.Point((int)position.X, (int)position.Y);
         }
 
-        public ISprite RenderToTexture(int width, int height, Action renderAction)
+        public IGpuTexture InitializeGpuTexture(int width, int height)
         {
-            var renderTarget = new RenderTarget2D(device, width, height, false, device.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
-            device.SetRenderTarget(renderTarget);
+            var renderTarget = new RenderTarget2D(
+                device,
+                width,
+                height,
+                false,
+                device.PresentationParameters.BackBufferFormat,
+                DepthFormat.Depth24,
+                device.PresentationParameters.MultiSampleCount,
+                RenderTargetUsage.PreserveContents);
+
+            return new GpuTexture(renderTarget, new VectorMath.Vector2(width, height));
+        }
+
+        public void RenderToGpuTexture(IGpuTexture texture, Action renderAction)
+        {
+            var target = ((GpuTexture)texture).RenderTarget;
+            device.SetRenderTarget(target);
             Begin();
             renderAction();
             End();
             device.SetRenderTarget(null);
-            return new Sprite(renderTarget);
+        }
+
+        public ISprite CreateTexture(int width, int height, Action renderAction)
+        {
+            using (var renderTarget = new RenderTarget2D(
+                device, 
+                width, 
+                height, 
+                false, 
+                device.PresentationParameters.BackBufferFormat, 
+                DepthFormat.Depth24,
+                device.PresentationParameters.MultiSampleCount,
+                RenderTargetUsage.PreserveContents))
+            {
+                device.SetRenderTarget(renderTarget);
+                Begin();
+                renderAction();
+                End();
+                device.SetRenderTarget(null);
+
+                // Copy to texture.
+                Texture2D texture = new Texture2D(device, width, height);
+                Color[] content = new Color[width * height];
+                renderTarget.GetData(content);
+                texture.SetData(content);
+
+                return new Sprite(texture);
+            }
         }
     }
 }
