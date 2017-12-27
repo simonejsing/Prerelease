@@ -187,6 +187,13 @@ namespace CraftingGame
                     spriteResolver.ResolveBindings(newPlayer);
                     playerController.SpawnPlayer(newPlayer);
                 }
+
+                var playerToFollow = State.BoundPlayers.FirstOrDefault();
+                if(playerToFollow != null)
+                {
+                    Camera.Track(playerToFollow);
+                    Camera.Follow();
+                }
             }
         }
 
