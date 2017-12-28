@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Terrain;
 
@@ -25,6 +26,8 @@ namespace CraftingGame
     {
         private Dictionary<Voxel, QuadNode<TTree>> cache = new Dictionary<Voxel, QuadNode<TTree>>();
         private QuadNode<TTree> pointer;
+
+        public IEnumerable<TTree> Items => cache.Values.Select(n => n.Value);
 
         public QuadTree()
         {

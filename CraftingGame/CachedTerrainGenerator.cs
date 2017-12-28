@@ -15,12 +15,11 @@ namespace CraftingGame
     {
         private readonly Dictionary<Voxel, TerrainType> terrainModifications = new Dictionary<Voxel, TerrainType>();
         private readonly ITerrainGenerator terrainGenerator;
-        private readonly IList<TerrainSector> sectors = new List<TerrainSector>();
         private readonly Queue<TerrainSector> sectorLoadingQueue = new Queue<TerrainSector>();
         private TerrainSector activeLoadingSector;
-        private TerrainSector activeSector;
+        private QuadTree<TerrainSector> sectors = new QuadTree<TerrainSector>();
 
-        public IEnumerable<TerrainSector> Sectors => sectors;
+        public IEnumerable<TerrainSector> Sectors => sectors.Items;
 
         public CachedTerrainGenerator(ITerrainGenerator terrainGenerator)
         {
@@ -38,21 +37,18 @@ namespace CraftingGame
         {
             get
             {
-                activeSector = FindSector(c.U, c.V, p.W);
-
-                // Convert to sector u,v coordinates
-                var u = c.U - activeSector.U * TerrainSector.SectorWidth;
-                var v = c.V - activeSector.V * TerrainSector.SectorHeight;
-                return activeSector[u, v];
+                var sector = FindSector(c.U, c.V, p.W);
+                var localCoord = sector.LocalCoordinate(c);
+                return sector[localCoord.U, localCoord.V];
             }
         }
 
         public void SetActiveSector(int x, int y, int z)
         {
-            activeSector = FindSector(x, y, z);
-            if (!activeSector.FullyLoaded)
+            var sector = FindSector(x, y, z);
+            if (!sector.FullyLoaded)
             {
-                sectorLoadingQueue.Enqueue(activeSector);
+                sectorLoadingQueue.Enqueue(sector);
             }
         }
 
@@ -85,12 +81,9 @@ namespace CraftingGame
 
         public void Generate(Coordinate c, Plane p)
         {
-            activeSector = FindSector(c.U, c.V, p.W);
-
-            // Convert to sector u,v coordinates
-            var u = c.U - activeSector.U * TerrainSector.SectorWidth;
-            var v = c.V - activeSector.V * TerrainSector.SectorHeight;
-            activeSector.Generate(u, v);
+            var sector = FindSector(c.U, c.V, p.W);
+            var localCoord = sector.LocalCoordinate(c);
+            sector.Generate(localCoord.U, localCoord.V);
         }
 
         public void Destroy(Coordinate c, Plane p)
@@ -102,39 +95,27 @@ namespace CraftingGame
         {
             // Register modification
             terrainModifications[new Voxel(c, p)] = type;
-
-            activeSector = FindSector(c.U, c.V, p.W);
-
-            var u = c.U - activeSector.U * TerrainSector.SectorWidth;
-            var v = c.V - activeSector.V * TerrainSector.SectorHeight;
-            activeSector.Modify(u, v, type);
+            var sector = FindSector(c.U, c.V, p.W);
+            var localCoord = sector.LocalCoordinate(c);
+            sector.Modify(localCoord.U, localCoord.V, type);
         }
 
         private TerrainSector FindSector(int x, int y, int z)
         {
             // Handle negative coordinates
             var index = SectorIndex(x, y);
-            return GetSector(index, z);
+            return GetSector(new Voxel(index, new Plane(z)));
         }
 
         public TerrainSector GetSector(Voxel index)
         {
-            return GetSector(index.Coordinate, index.W);
-        }
-
-        private TerrainSector GetSector(Coordinate index, int w)
-        {
-            if (activeSector?.U == index.U && activeSector?.V == index.V && activeSector?.W == w)
-                return activeSector;
-
-            var sector = Sectors.FirstOrDefault(s => s.U == index.U && s.V == index.V && s.W == w);
-            if (sector == null)
+            var sector = sectors[index];
+            if(sector == null)
             {
-                sector = new TerrainSector(terrainGenerator, index.U, index.V, w);
-                sectors.Add(sector);
+                sector = new TerrainSector(terrainGenerator, index);
+                sectors.Add(index, sector);
                 sectorLoadingQueue.Enqueue(sector);
             }
-
             return sector;
         }
 

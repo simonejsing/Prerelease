@@ -27,12 +27,16 @@ namespace CraftingGame
 
         public TerrainBlock this[int u, int v] => tiles[u, v];
 
-        //public event TerrainModificationEventHandler TerrainModification;
         public event EventHandler<TerrainModificationEvent> TerrainModification;
+
+        public Coordinate LocalCoordinate(Coordinate c)
+        {
+            return c - new Coordinate(U * SectorWidth, V * SectorHeight);
+        }
 
         public Coordinate GlobalCoordinate(Coordinate localCoord)
         {
-            return new Coordinate(localCoord.U * SectorWidth, localCoord.V * SectorHeight);
+            return localCoord + new Coordinate(U * SectorWidth, V * SectorHeight);
         }
 
         // Update a given number of tiles
@@ -60,11 +64,15 @@ namespace CraftingGame
             return updateCount - originalCount;
         }
 
-        public TerrainSector(ITerrainGenerator generator, int u, int v, int w)
+        public TerrainSector(ITerrainGenerator generator, int u, int v, int w) : this(generator, new Voxel(u, v, w))
+        {
+        }
+
+        public TerrainSector(ITerrainGenerator generator, Voxel index)
         {
             this.generator = generator;
+            Index = index;
             FullyLoaded = false;
-            Index = new Voxel(u, v, w);
             this.bottomLeft = new Coordinate(U, V) * new Coordinate(SectorWidth, SectorHeight);
             tiles = new TerrainBlock[SectorWidth, SectorHeight];
             for (int y = 0; y < SectorHeight; y++)
