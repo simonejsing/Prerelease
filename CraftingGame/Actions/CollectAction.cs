@@ -9,7 +9,7 @@ namespace CraftingGame.Actions
 {
     public class CollectAction
     {
-        public void Invoke(object sender, ICollectableObject source, ICollectingObject target)
+        public static void Invoke(object sender, ICollectableObject source, ICollectingObject target)
         {
             if (target.Inventory.Add(source.Item.Name))
             {

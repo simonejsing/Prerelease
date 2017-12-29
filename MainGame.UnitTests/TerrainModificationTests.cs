@@ -4,6 +4,8 @@ using Terrain;
 using FluentAssertions;
 using System.Linq;
 using Contracts;
+using CraftingGame.Items;
+using CraftingGame;
 
 namespace MainGame.UnitTests
 {
@@ -20,7 +22,7 @@ RRR");
             harness.StartGame();
             harness.Input();
             harness.Update(0.1f);
-            harness.Input(right: true, attack: true);
+            harness.Input(right: true, down: true, attack: true);
             harness.Update(0.1f);
             harness.VerifyTerrain(
 @"...
@@ -202,6 +204,30 @@ RRR");
             harness.VerifyTerrain(
 @"RR.
 .0.
+RRR");
+        }
+
+        [TestMethod]
+        public void PlayerCanPlaceBlockAbove()
+        {
+            var harness = GameHarness.CreateFromMap(
+@"RRR
+R.R
+.0.
+RRR
+RRR");
+            harness.StartGame();
+            harness.Player.Inventory.Add(nameof(BlockOfDirt));
+            harness.Player.Equip(harness.Game.State.ItemFactory.EquipableItemFromTerrain(TerrainType.Dirt));
+            harness.Input();
+            harness.Update(0.1f);
+            harness.Input(up: true, right: false, attack: true);
+            harness.Update(0.1f);
+            harness.VerifyTerrain(
+@"RRR
+RDR
+.0.
+RRR
 RRR");
         }
 

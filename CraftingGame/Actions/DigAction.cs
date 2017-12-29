@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using CraftingGame.Items;
 using CraftingGame.Physics;
 using CraftingGame.State;
 using System;
@@ -11,18 +12,16 @@ using VectorMath;
 
 namespace CraftingGame.Actions
 {
-    public class DigAction
+    internal class DigAction
     {
         private readonly ActionQueue actionQueue;
-        private readonly CollectAction collectAction;
         private readonly GameState state;
         private readonly Grid grid;
         private readonly IModifiableTerrain terrain;
 
-        public DigAction(ActionQueue actionQueue, CollectAction collectAction, GameState state, Grid grid, IModifiableTerrain terrain)
+        public DigAction(ActionQueue actionQueue, GameState state, Grid grid, IModifiableTerrain terrain)
         {
             this.actionQueue = actionQueue;
-            this.collectAction = collectAction;
             this.state = state;
             this.grid = grid;
             this.terrain = terrain;
@@ -59,7 +58,7 @@ namespace CraftingGame.Actions
                     terrain.Destroy(digCoord, player.Plane);
 
                     // Drop an item of the terrain type.
-                    var item = ItemFactory.FromTerrain(type);
+                    var item = ItemFactory.ItemFromTerrain(type);
                     if (item != null)
                     {
                         var size = new Vector2(10, 10);
@@ -71,7 +70,7 @@ namespace CraftingGame.Actions
                             Position = position,
                             Size = size,
                         };
-                        itemObject.Collect += collectAction.Invoke;
+                        //itemObject.Collect += collectAction.Invoke;
                         state.ActiveLevel.AddCollectableObjects(itemObject);
                     }
                     break;

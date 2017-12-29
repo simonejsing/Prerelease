@@ -4,6 +4,8 @@ using VectorMath;
 using Serialization;
 using System.Collections.Generic;
 using CraftingGame.State;
+using CraftingGame.Items;
+using CraftingGame.Actions;
 
 namespace CraftingGame.Physics
 {
@@ -17,19 +19,26 @@ namespace CraftingGame.Physics
         public Vector2 LookDirection { get; set; }
         public Color Color { get; set; }
 
-        public Weapon Weapon { get; }
+        public IEquipableItem EquipedItem { get; set; }
         public int HitPoints { get; set; }
         public bool Dead => HitPoints <= 0;
 
         public IInventory Inventory { get; }
+        public object Target { get; internal set; }
 
         public PlayerObject(ActionQueue actionQueue) : base(actionQueue)
         {
-            Weapon = new Weapon();
             Inventory = new Inventory(100);
+            EquipedItem = new NoopItem();
             InputBound = false;
             HitPoints = 1;
             ObjectCollision += OnObjectCollision;
+        }
+
+        public void Equip(IEquipableItem item)
+        {
+            EquipedItem = item;
+            item.Equip(this);
         }
 
         public void BindInput(InputMask inputMask)

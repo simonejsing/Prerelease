@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Terrain;
 using CraftingGame;
+using CraftingGame.Items;
 
 namespace MainGame.UnitTests
 {
@@ -18,7 +19,7 @@ namespace MainGame.UnitTests
 
             foreach(var type in itemTypes)
             {
-                ItemFactory.Create(type.Name).Should().NotBeNull($"item type {type} should be constructable. Did you miss adding to the factory?");
+                ItemFactory.CreateItem(type.Name).Should().NotBeNull($"item type {type} should be constructable. Did you miss adding to the factory?");
             }
         }
 
@@ -35,7 +36,7 @@ namespace MainGame.UnitTests
                     case TerrainType.Bedrock:
                         break;
                     default:
-                        ItemFactory.FromTerrain(type).Should().NotBeNull($"terrain type {type} should be minable");
+                        ItemFactory.ItemFromTerrain(type).Should().NotBeNull($"terrain type {type} should be minable");
                         break;
                 }
             }

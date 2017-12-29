@@ -69,7 +69,8 @@ namespace MainGame.UnitTests
         public void CanPersistTerrainConfiguration()
         {
             var factory = new TerrainFactory(10, 10, 8, seed: 512);
-            var state = new GameState(null, factory)
+            var grid = new Grid(30, 30);
+            var state = new GameState(null, grid, factory)
             {
                 Terrain = new CachedTerrainGenerator(factory.Create())
             };
@@ -81,7 +82,7 @@ namespace MainGame.UnitTests
 
                 // Load game state
                 var newFactory = new TerrainFactory(100, 100, 80, seed: 0);
-                var newState = new GameState(null, newFactory);
+                var newState = new GameState(null, grid, newFactory);
                 newState.LoadFromStream(stream);
                 newState.Terrain.MaxDepth.Should().Be(10);
                 newState.Terrain.MaxHeight.Should().Be(10);

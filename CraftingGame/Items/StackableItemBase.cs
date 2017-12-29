@@ -8,7 +8,7 @@ using Terrain;
 
 namespace CraftingGame.Items
 {
-    public abstract class StackableItemBase
+    public abstract class StackableItemBase : ItemBase
     {
         public abstract string Name { get; }
         public abstract bool Consumable { get; }

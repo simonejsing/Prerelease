@@ -9,6 +9,7 @@ using Terrain;
 using VectorMath;
 using CraftingGame.Actions;
 using CraftingGame.State;
+using CraftingGame.Items;
 
 namespace CraftingGame
 {
@@ -63,7 +64,7 @@ namespace CraftingGame
             : base("Platformer", renderer, ui, actionQueue)
         {
             this.streamProvider = streamProvider;
-            State = new GameState(actionQueue, terrainFactory);
+            State = new GameState(actionQueue, Grid, terrainFactory);
 
             // Load latest game state
             var loaded = false;
@@ -83,6 +84,12 @@ namespace CraftingGame
             {
                 // Start new game
                 State.Terrain = new CachedTerrainGenerator(terrainFactory.Create());
+            }
+
+            // Hand players a pick axe
+            foreach(var player in State.KnownPlayers)
+            {
+                player.Equip(new PickAxe(State));
             }
 
             SectorProbe = () => State.Terrain.Sectors;
@@ -121,7 +128,7 @@ namespace CraftingGame
             State.Terrain.SetActiveSector((int)activeView.TopLeft.X, (int)activeView.TopLeft.Y, Plane.W);
 
             collectAction = new CollectAction();
-            digAction = new DigAction(ActionQueue, collectAction, State, Grid, State.Terrain);
+            digAction = new DigAction(ActionQueue, State, Grid, State.Terrain);
 
             terrainWidget = new TerrainWidget(Renderer, State.Terrain, debugFont);
             dynamicGridWidget = new DynamicGridWidget(Renderer, debugFont, BlockSize);
@@ -184,6 +191,7 @@ namespace CraftingGame
             {
                 foreach(var newPlayer in State.BindPlayers(unboundControls))
                 {
+                    newPlayer.Equip(new PickAxe(State));
                     spriteResolver.ResolveBindings(newPlayer);
                     playerController.SpawnPlayer(newPlayer);
                 }

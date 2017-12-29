@@ -91,6 +91,11 @@ namespace CraftingGame
             Modify(c, p, TerrainType.Free);
         }
 
+        public void Place(Coordinate c, Plane p, TerrainType type)
+        {
+            Modify(c, p, type);
+        }
+
         private void Modify(Coordinate c, Plane p, TerrainType type)
         {
             // Register modification

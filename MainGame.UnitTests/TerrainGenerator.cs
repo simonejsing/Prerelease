@@ -63,10 +63,15 @@ namespace MainGame.UnitTests
         {
             switch (char.ToUpper(c))
             {
+                case '.':
+                case '0':
+                    return TerrainType.Free;
+                case 'D':
+                    return TerrainType.Dirt;
                 case 'R':
                     return TerrainType.Rock;
                 default:
-                    return TerrainType.Free;
+                    throw new InvalidOperationException($"Attempt to generate terrain block from unknown symbol '{c}'.");
             }
         }
     }

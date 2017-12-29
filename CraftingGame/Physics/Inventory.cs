@@ -51,7 +51,7 @@ namespace CraftingGame.Physics
                 return new NoopItem();
 
             items[name]--;
-            return ItemFactory.Create(name);
+            return ItemFactory.CreateItem(name);
         }
 
         public void Consume(PlayerObject player, string name)
@@ -59,7 +59,7 @@ namespace CraftingGame.Physics
             if (!CanTake(name))
                 return;
 
-            var item = ItemFactory.Create(name);
+            var item = ItemFactory.CreateItem(name);
             if(item.Consumable)
             {
                 items[name]--;

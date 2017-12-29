@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using CraftingGame.Items;
 using CraftingGame.Physics;
 using Serialization;
 using System;
@@ -91,7 +92,6 @@ namespace CraftingGame.State
 
     public class GameState
     {
-        private readonly ActionQueue actionQueue;
         private readonly ITerrainFactory terrainFactory;
         private readonly List<PlayerObject> boundPlayers = new List<PlayerObject>();
 
@@ -101,7 +101,10 @@ namespace CraftingGame.State
         // Per level state
         private readonly List<LevelState> levels = new List<LevelState>();
 
+        public ActionQueue ActionQueue { get; }
+        public Grid Grid { get; }
         public CachedTerrainGenerator Terrain { get; set; }
+        public ItemFactory ItemFactory { get; }
 
         public IEnumerable<PlayerObject> KnownPlayers => knownPlayers.Values;
 
@@ -110,10 +113,12 @@ namespace CraftingGame.State
         public IEnumerable<LevelState> Levels => levels;
         public LevelState ActiveLevel { get; private set; }
 
-        public GameState(ActionQueue actionQueue, ITerrainFactory terrainFactory)
+        public GameState(ActionQueue actionQueue, Grid grid, ITerrainFactory terrainFactory)
         {
-            this.actionQueue = actionQueue;
+            this.ActionQueue = actionQueue;
+            this.Grid = grid;
             this.terrainFactory = terrainFactory;
+            this.ItemFactory = new ItemFactory(this);
             this.knownPlayers = new Dictionary<string, PlayerObject>();
         }
 
@@ -154,7 +159,7 @@ namespace CraftingGame.State
                 return new T[0];
             }
 
-            return state.State[entityType].Select(e => factory(new StatefulObject(actionQueue, e.Key, e.Value))).ToArray();
+            return state.State[entityType].Select(e => factory(new StatefulObject(ActionQueue, e.Key, e.Value))).ToArray();
         }
 
         internal IEnumerable<PlayerObject> BindPlayers(IEnumerable<InputMask> unboundControls)
@@ -186,7 +191,7 @@ namespace CraftingGame.State
 
         private PlayerObject CreatePlayer(InputMask inputMask)
         {
-            var player = new PlayerObject(actionQueue)
+            var player = new PlayerObject(ActionQueue)
             {
                 Id = Guid.NewGuid(),
                 PlayerBinding = inputMask.PlayerBinding,

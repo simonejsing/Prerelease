@@ -93,25 +93,26 @@ namespace CraftingGame.Controllers
                 player.Velocity = new Vector2(0.0f, player.Velocity.Y);
             }
 
+            player.EquipedItem.Update();
+
             if (player.Grounded)
             {
                 if (inputMask.Input.Jump)
                 {
                     instantVelocity = new Vector2(0, Constants.JUMP_SPEED);
                 }
-                if (inputMask.Input.Attack && player.Weapon.CanFire)
+                if (inputMask.Input.Attack && !player.EquipedItem.OnCooldown)
                 {
-                    player.Weapon.Cooldown = 10;
-                    OnDig(player);
+                    //player.EquipedItem.Cooldown = 10;
+                    player.EquipedItem.Attack();
+                    //OnDig(player);
                 }
             }
 
-            if (inputMask.Input.Attack && player.Weapon.CanFire)
+            if (inputMask.Input.Attack && !player.EquipedItem.OnCooldown)
             {
                 //state.ActiveLevel.AddProjectiles(FireWeapon(player));
             }
-
-            player.Weapon.Update();
 
             inputMask.Reset();
 
@@ -129,22 +130,9 @@ namespace CraftingGame.Controllers
         {
             player.Acceleration = Vector2.Zero;
             player.Velocity = Vector2.Zero;
-            player.Weapon.Cooldown = 0;
+            player.EquipedItem.Reset();
             player.HitPoints = 1;
             player.Position = new Vector2(state.ActiveLevel.SpawnPoint);
-        }
-
-        private Projectile FireWeapon(PlayerObject player)
-        {
-            player.Weapon.Cooldown = 10;
-            return new Projectile(player.ActionQueue, player)
-            {
-                Color = player.Color,
-                Plane = player.Plane,
-                Position = player.Center,
-                Size = new Vector2(1, 1),
-                Velocity = new Vector2(Constants.PROJECTILE_VELOCITY * player.Facing.X, 0.0f)
-            };
         }
     }
 }
