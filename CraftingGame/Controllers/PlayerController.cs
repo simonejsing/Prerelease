@@ -9,26 +9,17 @@ using VectorMath;
 
 namespace CraftingGame.Controllers
 {
-    public delegate void DigEventHandler(object sender, PlayerObject player);
-
     internal class PlayerController
     {
         private readonly GameState state;
         private readonly PhysicsEngine physicsEngine;
         private readonly Camera camera;
 
-        public event DigEventHandler Dig;
-
         public PlayerController(GameState state, PhysicsEngine physicsEngine, Camera camera)
         {
             this.state = state;
             this.physicsEngine = physicsEngine;
             this.camera = camera;
-        }
-
-        public void OnDig(PlayerObject player)
-        {
-            Dig?.Invoke(this, player);
         }
 
         public void Update(PlayerObject player)
@@ -103,9 +94,7 @@ namespace CraftingGame.Controllers
                 }
                 if (inputMask.Input.Attack && !player.EquipedItem.OnCooldown)
                 {
-                    //player.EquipedItem.Cooldown = 10;
                     player.EquipedItem.Attack();
-                    //OnDig(player);
                 }
             }
 

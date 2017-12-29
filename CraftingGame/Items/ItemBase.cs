@@ -8,7 +8,7 @@ namespace CraftingGame.Items
     public class ItemBase
     {
         protected int CooldownFrames { get; set; }
-        public bool OnCooldown => CooldownFrames > 0;
+        public virtual bool OnCooldown => CooldownFrames > 0;
 
         public virtual void Update()
         {

@@ -8,7 +8,7 @@ namespace CraftingGame.Items
         public override bool Consumable => false;
         public override bool Placable => false;
 
-        public bool OnCooldown => false;
+        public override bool OnCooldown => false;
 
         public NoopItem()
         {
@@ -18,11 +18,7 @@ namespace CraftingGame.Items
         {
         }
 
-        public void Update()
-        {
-        }
-
-        public void Reset()
+        public override void Update()
         {
         }
 
