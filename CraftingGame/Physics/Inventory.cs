@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Terrain;
 
 namespace CraftingGame.Physics
 {
@@ -40,9 +41,21 @@ namespace CraftingGame.Physics
             return items.ContainsKey(name) ? items[name] : 0;
         }
 
+        public bool CanTake(TerrainType type)
+        {
+            var name = ItemFactory.ItemFromTerrain(type).Name;
+            return CanTake(name);
+        }
+
         public bool CanTake(string name)
         {
             return items.ContainsKey(name) && items[name] > 0;
+        }
+
+        public StackableItemBase Take(TerrainType type)
+        {
+            var name = ItemFactory.ItemFromTerrain(type).Name;
+            return Take(name);
         }
 
         public StackableItemBase Take(string name)

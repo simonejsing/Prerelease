@@ -8,7 +8,7 @@ using VectorMath;
 
 namespace CraftingGame.Items
 {
-    public class PickAxe : TerrainModifyingItem
+    internal class PickAxe : TerrainModifyingItem
     {
         public PickAxe(GameState state) : base(state)
         {

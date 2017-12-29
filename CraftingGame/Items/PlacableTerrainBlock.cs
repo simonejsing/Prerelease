@@ -7,7 +7,7 @@ using Terrain;
 
 namespace CraftingGame.Items
 {
-    public class PlacableTerrainBlock : TerrainModifyingItem
+    internal class PlacableTerrainBlock : TerrainModifyingItem
     {
         private TerrainType blockType;
 
@@ -23,8 +23,11 @@ namespace CraftingGame.Items
 
         public override void Attack()
         {
-            if (Target.Coordinate.HasValue)
+            if (Wielder != null && Target.Coordinate.HasValue && Wielder.Inventory.CanTake(blockType))
             {
+                // Consume item from inventory
+                Wielder.Inventory.Take(blockType);
+
                 var targetCoord = Target.Coordinate.Value;
                 var type = state.Terrain[targetCoord, Wielder.Plane].Type;
                 if(type == TerrainType.Free)
