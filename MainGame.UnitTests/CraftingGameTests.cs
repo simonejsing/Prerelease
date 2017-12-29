@@ -29,6 +29,7 @@ namespace MainGame.UnitTests
             var blockCoord = new Coordinate(0, 0);
             var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
             harness.StartGame();
+            harness.Game.View.Center(Vector2.Zero);
             harness.Render(0.1f);
             harness.VerifyBlockRendered(blockCoord);
         }
@@ -39,19 +40,9 @@ namespace MainGame.UnitTests
             var blockCoord = new Coordinate(2, 1);
             var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
             harness.StartGame();
+            harness.Game.View.Center(Vector2.Zero);
             harness.Render(0.1f);
             harness.VerifyBlockRendered(blockCoord);
-        }
-
-        [TestMethod]
-        public void DoesNotRenderTerrainBlockWhenOutOfView()
-        {
-            var blockCoord = new Coordinate(2, 1);
-            var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
-            harness.StartGame();
-            harness.Game.View.Translate(GameHarness.DefaultViewPort * 10);
-            harness.Render(0.1f);
-            harness.VerifyBlockRendered(blockCoord, Times.Never());
         }
 
         [TestMethod]
@@ -60,22 +51,11 @@ namespace MainGame.UnitTests
             var blockCoord = new Coordinate(0, 0);
             var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
             harness.StartGame();
+            harness.Game.View.Center(Vector2.Zero);
             // Zoom out by 10%
             harness.Game.View.Scale(1.1f);
             harness.Render(0.1f);
             harness.VerifyBlockRendered(blockCoord);
-        }
-
-        [TestMethod]
-        public void DoesNotRenderTerrainBlockWhenZoomedIn()
-        {
-            var blockCoord = new Coordinate(2, 2);
-            var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
-            harness.StartGame();
-            // Zoom in by 100%
-            harness.Game.View.Scale(0.5f);
-            harness.Render(0.1f);
-            harness.VerifyBlockRendered(blockCoord, Times.Never());
         }
 
         [TestMethod]
@@ -84,6 +64,7 @@ namespace MainGame.UnitTests
             var blockCoord = new Coordinate(0, 0);
             var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
             harness.StartGame();
+            harness.Game.View.Center(Vector2.Zero);
             harness.Game.View.Translate(new Vector2(10, 20));
             harness.Render(0.1f);
             harness.VerifyBlockRendered(blockCoord);

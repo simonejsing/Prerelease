@@ -115,10 +115,24 @@ namespace CraftingGame.Widgets
             }
         }
 
-        private void RenderTerrainBlock(ViewportProjection view, TerrainType type, Vector2 position, Vector2 size)
+        private void RenderTerrainBlock(ViewportProjection view, TerrainType type, Vector2 position, Vector2 size, bool overwrite)
         {
             var color = TerrainColor(type);
-            RenderRectangle(view, position, size, color);
+            switch (type)
+            {
+                case TerrainType.Dirt:
+                case TerrainType.Rock:
+                case TerrainType.Bedrock:
+                case TerrainType.Sea:
+                    RenderRectangle(view, position, size, color);
+                    break;
+                default:
+                    if (overwrite)
+                    {
+                        RenderRectangle(view, position, size, color);
+                    }
+                    break;
+            }
         }
 
         private Color TerrainColor(TerrainType type)
@@ -158,7 +172,7 @@ namespace CraftingGame.Widgets
             {
                 for (var u = 0; u < TerrainSector.SectorHeight; u++)
                 {
-                    PrerenderBlock(grid, sector, u, v);
+                    PrerenderBlock(grid, sector, u, v, false);
                 }
             }
         }
@@ -167,21 +181,21 @@ namespace CraftingGame.Widgets
         {
             foreach (var coord in sectorSprite.Modifications)
             {
-                PrerenderBlock(grid, sectorSprite, coord);
+                PrerenderBlock(grid, sectorSprite, coord, true);
             }
         }
 
-        private void PrerenderBlock(Grid grid, PrerenderedTerrainSector sector, Coordinate coord)
+        private void PrerenderBlock(Grid grid, PrerenderedTerrainSector sector, Coordinate coord, bool overwrite)
         {
-            PrerenderBlock(grid, sector, coord.U, coord.V);
+            PrerenderBlock(grid, sector, coord.U, coord.V, overwrite);
         }
 
-        private void PrerenderBlock(Grid grid, PrerenderedTerrainSector sector, int u, int v)
+        private void PrerenderBlock(Grid grid, PrerenderedTerrainSector sector, int u, int v, bool overwrite)
         {
             sector.TerrainSector.Generate(u, v);
             var block = sector.TerrainSector[u, v];
             var position = new Vector2(u, v) * grid.Size;
-            RenderTerrainBlock(sector.Projection, block.Type, position, grid.Size);
+            RenderTerrainBlock(sector.Projection, block.Type, position, grid.Size, overwrite);
         }
 
         private void RenderVector(ViewportProjection view, Vector2 point, Vector2 vector, Color color, float thickness)
