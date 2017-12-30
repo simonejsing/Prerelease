@@ -30,12 +30,6 @@ namespace CraftingGame.Controllers
             if (!player.Active)
                 return;
 
-            if (inputMask.Input.Moving)
-            {
-                camera.Track(player);
-                camera.Follow();
-            }
-
             bool horizontalInput = false;
 
             var instantVelocity = Vector2.Zero;
@@ -49,6 +43,21 @@ namespace CraftingGame.Controllers
 
             if (player.Dead)
                 return;
+
+            if (inputMask.InputToggled(i => i.CycleNextEquipment, true))
+            {
+                player.EquipNextItem();
+            }
+            else if (inputMask.InputToggled(i => i.CyclePreviousEquipment, true))
+            {
+                player.EquipPreviousItem();
+            }
+
+            if (inputMask.Input.Moving)
+            {
+                camera.Track(player);
+                camera.Follow();
+            }
 
             // Update look direction according to inputs
             player.LookDirection = new Vector2();

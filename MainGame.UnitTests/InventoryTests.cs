@@ -5,6 +5,7 @@ using CraftingGame.Items;
 using VectorMath;
 using FluentAssertions;
 using Contracts;
+using CraftingGame.Items.Creatable;
 
 namespace MainGame.UnitTests
 {

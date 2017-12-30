@@ -7,7 +7,7 @@ using Contracts;
 using VectorMath;
 using CraftingGame.Physics;
 
-namespace CraftingGame.Items
+namespace CraftingGame.Items.Creatable
 {
     public sealed class ConsumableFlower : StackableItemBase
     {

@@ -1,6 +1,6 @@
 ﻿using CraftingGame.Physics;
 
-namespace CraftingGame.Items
+namespace CraftingGame.Items.Creatable
 {
     internal class NoopItem : StackableItemBase, IEquipableItem
     {

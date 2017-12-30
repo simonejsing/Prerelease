@@ -6,20 +6,26 @@ using System.Collections.Generic;
 using CraftingGame.State;
 using CraftingGame.Items;
 using CraftingGame.Actions;
+using System.Linq;
+using CraftingGame.Items.Creatable;
 
 namespace CraftingGame.Physics
 {
     public class PlayerObject : MovableObject, ICollectingObject
     {
+        private IEquipableItem[] equipment = new IEquipableItem[0];
+        private int equipIndex = 0;
+
         public string PlayerBinding { get; set; }
         public InputMask InputMask { get; private set; }
         public bool InputBound { get; private set; }
         public bool Active { get; set; }
 
         public Vector2 LookDirection { get; set; }
+
         public Color Color { get; set; }
 
-        public IEquipableItem EquipedItem { get; set; }
+        public IEquipableItem EquipedItem => equipIndex < equipment.Length ? equipment[equipIndex] : new NoopItem();
         public int HitPoints { get; set; }
         public bool Dead => HitPoints <= 0;
 
@@ -29,16 +35,35 @@ namespace CraftingGame.Physics
         public PlayerObject(ActionQueue actionQueue) : base(actionQueue)
         {
             Inventory = new Inventory(100);
-            EquipedItem = new NoopItem();
             InputBound = false;
             HitPoints = 1;
             ObjectCollision += OnObjectCollision;
         }
 
-        public void Equip(IEquipableItem item)
+        public void EquipNextItem()
         {
-            EquipedItem = item;
-            item.Equip(this);
+            equipIndex = (equipIndex + 1) % equipment.Length;
+        }
+
+        public void EquipPreviousItem()
+        {
+            equipIndex--;
+            if (equipIndex < 0)
+            {
+                equipIndex = Math.Max(0, equipment.Length - 1);
+            }
+        }
+
+        public void SelectEquipmentByName(string name)
+        {
+            for(var i = 0; i < equipment.Length; i++)
+            {
+                if(equipment[i].Name == name)
+                {
+                    equipIndex = i;
+                    break;
+                }
+            }
         }
 
         public void BindInput(InputMask inputMask)
@@ -84,6 +109,12 @@ namespace CraftingGame.Physics
             };
             player.Load(state);
             return player;
+        }
+
+        public void AddEquipment(IEquipableItem item)
+        {
+            item.Equip(this);
+            equipment = equipment.Concat(new[] { item }).ToArray();
         }
     }
 }

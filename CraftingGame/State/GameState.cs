@@ -147,6 +147,11 @@ namespace CraftingGame.State
             // Load players
             knownPlayers = LoadEntities(state, "players", PlayerObject.FromState).ToDictionary(p => p.PlayerBinding, p => p);
 
+            foreach(var player in knownPlayers.Values)
+            {
+                EquipPlayerItems(player);
+            }
+
             // Load terrain
             Terrain = LoadEntities(state, "terrain", s => CachedTerrainGenerator.FromState(terrainFactory, s)).First();
         }
@@ -201,9 +206,17 @@ namespace CraftingGame.State
                 Color = Color.Red
             };
 
+            EquipPlayerItems(player);
             player.BindInput(inputMask);
             boundPlayers.Add(player);
             return player;
+        }
+
+        private void EquipPlayerItems(PlayerObject player)
+        {
+            player.AddEquipment(new PickAxe(this));
+            player.AddEquipment(new PlacableTerrainBlock(this, TerrainType.Dirt));
+            player.AddEquipment(new PlacableTerrainBlock(this, TerrainType.Rock));
         }
     }
 }

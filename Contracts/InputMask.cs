@@ -1,4 +1,6 @@
-﻿namespace Contracts
+﻿using System;
+
+namespace Contracts
 {
     public struct InputSet
     {
@@ -12,6 +14,9 @@
         public bool Select;
         public bool Restart;
 
+        public bool CycleNextEquipment;
+        public bool CyclePreviousEquipment;
+
         public bool Moving => Active && (Left || Right || Up || Down || Jump);
     }
 
@@ -19,6 +24,7 @@
     {
         public bool Bound { get; set; }
 
+        public InputSet PreviousInput = new InputSet();
         public InputSet Input = new InputSet();
 
         public string PlayerBinding { get; }
@@ -39,12 +45,23 @@
             Input.Down |= gameInput.Down;
             Input.Attack |= gameInput.Attack;
             Input.Jump |= gameInput.Jump;
+            Input.CycleNextEquipment |= gameInput.CycleNextEquipment;
+            Input.CyclePreviousEquipment |= gameInput.CyclePreviousEquipment;
             Input.Select |= gameInput.Select;
             Input.Restart |= gameInput.Restart;
         }
 
+        public bool InputToggled(Func<InputSet, bool> predicat, bool desiredState)
+        {
+            var previousInputState = predicat(PreviousInput);
+            var inputState = predicat(Input);
+            return inputState == desiredState && previousInputState != inputState;
+        }
+
         public void Reset()
         {
+            PreviousInput = Input;
+
             Input.Active = false;
             Input.Left = false;
             Input.Right = false;
@@ -52,6 +69,8 @@
             Input.Down = false;
             Input.Attack = false;
             Input.Jump = false;
+            Input.CycleNextEquipment = false;
+            Input.CyclePreviousEquipment = false;
             Input.Select = false;
             Input.Restart = false;
         }

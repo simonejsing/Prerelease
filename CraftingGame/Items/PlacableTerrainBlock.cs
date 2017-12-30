@@ -11,6 +11,8 @@ namespace CraftingGame.Items
     {
         private TerrainType blockType;
 
+        public override string Name => $"Block ({blockType.ToString()})";
+
         public PlacableTerrainBlock(GameState state, TerrainType type) : base(state)
         {
             this.blockType = type;
@@ -23,7 +25,7 @@ namespace CraftingGame.Items
 
         public override void Attack()
         {
-            if (Wielder != null && Target.Coordinate.HasValue && Wielder.Inventory.CanTake(blockType))
+            if (Wielder != null && Wielder.Inventory.CanTake(blockType) && Target.IsValid)
             {
                 // Consume item from inventory
                 Wielder.Inventory.Take(blockType);

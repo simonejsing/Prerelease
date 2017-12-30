@@ -6,6 +6,7 @@ using System.Linq;
 using Contracts;
 using CraftingGame.Items;
 using CraftingGame;
+using CraftingGame.Items.Creatable;
 
 namespace MainGame.UnitTests
 {
@@ -217,8 +218,9 @@ R.R
 RRR
 RRR");
             harness.StartGame();
+            var dirtBlockName = harness.Game.State.ItemFactory.EquipableItemFromTerrain(TerrainType.Dirt);
             harness.Player.Inventory.Add(nameof(BlockOfDirt));
-            harness.Player.Equip(harness.Game.State.ItemFactory.EquipableItemFromTerrain(TerrainType.Dirt));
+            harness.Player.SelectEquipmentByName(dirtBlockName.Name);
             harness.Input();
             harness.Update(0.1f);
             harness.Input(up: true, right: false, attack: true);

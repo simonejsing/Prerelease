@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terrain;
 
-namespace CraftingGame.Items
+namespace CraftingGame.Items.Creatable
 {
     public sealed class BlockOfDirt : StackableItemBase
     {

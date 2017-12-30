@@ -15,6 +15,7 @@ namespace CraftingGame.Items
         private PlayerObject wielder;
 
         public Coordinate? Coordinate { get; private set; }
+        public bool IsValid => wielder != null && Coordinate.HasValue && validTerrain(GetTerrainType(Coordinate.Value));
 
         public TerrainTarget(GameState state, Func<TerrainType, bool> validTerrain)
         {
@@ -24,7 +25,21 @@ namespace CraftingGame.Items
 
         public void Update()
         {
-            Coordinate = FindTarget();
+            // Drop current target if it is too far away
+            if (Coordinate.HasValue)
+            {
+                var wielderCoord = GetWielderCoord();
+                if (Terrain.Coordinate.ManhattanDistance(wielderCoord, Coordinate.Value) > 3)
+                {
+                    Coordinate = null;
+                }
+            }
+
+            var newTarget = FindTarget();
+            if (newTarget.HasValue)
+            {
+                Coordinate = newTarget;
+            }
         }
 
         public void Equip(PlayerObject player)
@@ -41,12 +56,12 @@ namespace CraftingGame.Items
             }
 
             // Find the spot below and in front of the player's center
-            var wielderCoord = state.Grid.PointToGridCoordinate(wielder.Center);
+            var wielderCoord = GetWielderCoord();
             var targetCoord = LookingAtCoordinate(wielderCoord, wielder.LookDirection);
 
             // Can the player dig here?
             state.Terrain.Generate(targetCoord, wielder.Plane);
-            var type = state.Terrain[targetCoord, wielder.Plane].Type;
+            var type = GetTerrainType(targetCoord);
             if (!validTerrain(type))
             {
                 return null;
@@ -57,6 +72,16 @@ namespace CraftingGame.Items
             }
 
             return targetCoord;
+        }
+
+        private TerrainType GetTerrainType(Coordinate targetCoord)
+        {
+            return state.Terrain[targetCoord, wielder.Plane].Type;
+        }
+
+        private Coordinate GetWielderCoord()
+        {
+            return state.Grid.PointToGridCoordinate(wielder.Center);
         }
 
         private static Coordinate LookingAtCoordinate(Coordinate coord, Vector2 lookDirection)

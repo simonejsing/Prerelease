@@ -10,6 +10,8 @@ namespace CraftingGame.Items
 {
     internal class PickAxe : TerrainModifyingItem
     {
+        public override string Name => "Pick axe";
+
         public PickAxe(GameState state) : base(state)
         {
         }
@@ -21,7 +23,7 @@ namespace CraftingGame.Items
 
         public override void Attack()
         {
-            if (Target.Coordinate.HasValue)
+            if (Target.IsValid)
             {
                 CooldownFrames = 30;
 

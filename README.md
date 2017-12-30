@@ -1,6 +1,15 @@
 # Prerelease
 
 ## TODO list
+Alpha missing features:
+* Render equiped item target
+* Save inventory state
+* Render drops
+* Save drops
+
+Beta features:
+* Longer targeting range
+
 Rendering:
 * Render drops
 * Prerender drops to texture per sector

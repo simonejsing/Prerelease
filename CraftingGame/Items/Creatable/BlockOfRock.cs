@@ -7,7 +7,7 @@ using Contracts;
 using VectorMath;
 using Terrain;
 
-namespace CraftingGame.Items
+namespace CraftingGame.Items.Creatable
 {
     public sealed class BlockOfRock : StackableItemBase
     {

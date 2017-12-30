@@ -7,6 +7,7 @@ using CraftingGame.Items;
 using CraftingGame.Actions;
 using CraftingGame;
 using FluentAssertions;
+using CraftingGame.Items.Creatable;
 
 namespace MainGame.UnitTests
 {

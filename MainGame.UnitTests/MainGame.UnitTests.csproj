@@ -68,6 +68,7 @@
     <Compile Include="TerrainSectorTests.cs" />
     <Compile Include="GridTests.cs" />
     <Compile Include="ActionTests.cs" />
+    <Compile Include="TerrainTargetTests.cs" />
     <Compile Include="VectorMathTests.cs" />
     <Compile Include="CameraTests.cs" />
     <Compile Include="InventoryTests.cs" />

@@ -85,12 +85,6 @@ namespace CraftingGame
                 State.Terrain = new CachedTerrainGenerator(terrainFactory.Create());
             }
 
-            // Hand players a pick axe
-            foreach(var player in State.KnownPlayers)
-            {
-                player.Equip(new PickAxe(State));
-            }
-
             SectorProbe = () => State.Terrain.Sectors;
             this.level = new ProceduralLevel(State.Terrain, Grid);
             var viewPort = renderer.GetViewport();
@@ -188,7 +182,6 @@ namespace CraftingGame
             {
                 foreach(var newPlayer in State.BindPlayers(unboundControls))
                 {
-                    newPlayer.Equip(new PickAxe(State));
                     spriteResolver.ResolveBindings(newPlayer);
                     playerController.SpawnPlayer(newPlayer);
                 }
@@ -261,7 +254,7 @@ namespace CraftingGame
             {
                 string.Format("View: {0}", View.Projection.TopLeft),
                 string.Format("Sectors: {0}/{1}", sectors.Count(s => s.FullyLoaded), sectors.Count()),
-                string.Format("Player: {0}", playerPos),
+                string.Format("Player: {0} - {1}", playerPos, player?.EquipedItem?.Name ?? "None"),
                 string.Format("Inventory: {0}", player?.Inventory?.TotalCount ?? 0),
             };
         }

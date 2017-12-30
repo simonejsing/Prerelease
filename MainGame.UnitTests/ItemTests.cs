@@ -45,7 +45,7 @@ namespace MainGame.UnitTests
         private Type[] GetAllItemTypes()
         {
             var assembly = typeof(ItemFactory).Assembly;
-            return assembly.GetTypes().Where(t => String.Equals(t.Namespace, "CraftingGame.Items", StringComparison.Ordinal) && !t.IsAbstract).ToArray();
+            return assembly.GetTypes().Where(t => String.Equals(t.Namespace, "CraftingGame.Items.Creatable", StringComparison.Ordinal) && !t.IsAbstract).ToArray();
         }
     }
 }

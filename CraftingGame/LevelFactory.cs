@@ -8,6 +8,7 @@ using VectorMath;
 using CraftingGame.Items;
 using CraftingGame.State;
 using Object = CraftingGame.Physics.Object;
+using CraftingGame.Items.Creatable;
 
 namespace CraftingGame
 {
