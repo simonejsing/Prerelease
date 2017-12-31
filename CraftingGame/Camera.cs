@@ -8,7 +8,7 @@ namespace CraftingGame
         public enum CameraMode { Free, Follow }
 
         private readonly ViewportProjection view;
-        private Object trackingObject;
+        private Object[] trackingObjects = new Object[0];
 
         public CameraMode Mode { get; private set; }
 
@@ -20,9 +20,14 @@ namespace CraftingGame
 
         public void Update()
         {
-            if (this.Mode == CameraMode.Follow && trackingObject != null)
+            if (this.Mode == CameraMode.Follow && trackingObjects.Length > 0)
             {
-                this.view.Center(trackingObject.Center);
+                var center = Vector2.Zero;
+                foreach(var obj in trackingObjects)
+                {
+                    center += obj.Center;
+                }
+                this.view.Center(center / trackingObjects.Length);
             }
         }
 
@@ -41,9 +46,9 @@ namespace CraftingGame
             this.Mode = CameraMode.Follow;
         }
 
-        public void Track(Object obj)
+        public void Track(params Object[] objs)
         {
-            trackingObject = obj;
+            trackingObjects = objs;
         }
     }
 }

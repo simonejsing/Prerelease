@@ -186,12 +186,13 @@ namespace CraftingGame
                     playerController.SpawnPlayer(newPlayer);
                 }
 
-                var playerToFollow = State.BoundPlayers.FirstOrDefault();
+                Camera.Track(State.BoundPlayers.ToArray());
+                /*var playerToFollow = State.BoundPlayers.FirstOrDefault();
                 if(playerToFollow != null)
                 {
                     Camera.Track(playerToFollow);
                     Camera.Follow();
-                }
+                }*/
             }
         }
 

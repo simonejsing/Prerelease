@@ -4,6 +4,9 @@
 Alpha missing features:
 * Render player's target
 
+Bugs:
+* Player does not collect drops immediately, first when center is inside drop
+
 Beta features:
 * Longer targeting range
 * Make player able to squeeze through 1x1 block gaps
