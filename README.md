@@ -3,7 +3,6 @@
 ## TODO list
 Alpha missing features:
 * Render player's target
-* Save inventory state
 * Cap maximum number of drops visible
 
 Beta features:

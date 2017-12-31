@@ -3,9 +3,7 @@ using Contracts;
 using VectorMath;
 using Serialization;
 using System.Collections.Generic;
-using CraftingGame.State;
 using CraftingGame.Items;
-using CraftingGame.Actions;
 using System.Linq;
 using CraftingGame.Items.Creatable;
 
@@ -13,6 +11,7 @@ namespace CraftingGame.Physics
 {
     public class PlayerObject : MovableObject, ICollectingObject
     {
+        private Inventory inventory;
         private IEquipableItem[] equipment = new IEquipableItem[0];
         private int equipIndex = 0;
 
@@ -27,12 +26,12 @@ namespace CraftingGame.Physics
         public int HitPoints { get; set; }
         public bool Dead => HitPoints <= 0;
 
-        public IInventory Inventory { get; }
+        public IInventory Inventory => inventory;
         public object Target { get; internal set; }
 
         public PlayerObject(ActionQueue actionQueue) : base(actionQueue)
         {
-            Inventory = new Inventory(100);
+            inventory = new Inventory(100);
             InputBound = false;
             HitPoints = 1;
             ObjectCollision += OnObjectCollision;
@@ -89,12 +88,14 @@ namespace CraftingGame.Physics
         {
             base.Load(state);
             this.PlayerBinding = state.ReadMandatoryState<string>("p.bind");
+            this.inventory = Physics.Inventory.FromState(state.ReadEmbeddedState("p.inventory"));
         }
 
         public override void ExtractState(StatefulObjectBuilder builder)
         {
             base.ExtractState(builder);
             builder.Add("p.bind", PlayerBinding);
+            builder.EmbedState("p.inventory", inventory);
         }
 
         public static PlayerObject FromState(StatefulObject state)

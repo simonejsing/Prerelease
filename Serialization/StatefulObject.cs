@@ -14,6 +14,7 @@ namespace Serialization
 
         public ActionQueue ActionQueue { get; }
         public Guid Id { get; }
+        public IEnumerable<string> Keys => state.Keys;
 
         public StatefulObject(ActionQueue actionQueue, Guid key, IDictionary<string, object> state)
         {
@@ -60,6 +61,12 @@ namespace Serialization
         {
             var list = SafeOperation(propertyName, o => ((JArray)o).ToObject<List<IDictionary<string, object>>>(), new List<IDictionary<string, object>>());
             return list.Select(i => new StatefulObject(this.ActionQueue, this.Id, i)).ToList();
+        }
+
+        public StatefulObject SafeReadDictionary(string propertyName)
+        {
+            var dict = SafeOperation(propertyName, o => ((JObject)o).ToObject<Dictionary<string, object>>(), new Dictionary<string, object>());
+            return new StatefulObject(this.ActionQueue, this.Id, dict);
         }
 
         private IDictionary<string, object> SafeReadEmbeddedState(string propertyName, IDictionary<string, object> defaultValue)
