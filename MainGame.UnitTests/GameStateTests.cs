@@ -11,6 +11,7 @@ using CraftingGame.State;
 using Serialization;
 using CraftingGame;
 using System.Collections.Generic;
+using CraftingGame.Items;
 
 namespace MainGame.UnitTests
 {
@@ -109,6 +110,28 @@ namespace MainGame.UnitTests
                 () => GameHarness.CreateSolidBlockGame(TerrainType.Rock),
                 h => h.Game.Terrain.Destroy(modificationCoord, new Plane(0)),
                 h => h.ReadTerrainType(modificationCoord).Should().Be(TerrainType.Free));
+        }
+
+        [TestMethod]
+        public void GameStateLimitsNumberOfCollecableObjectsToTwenty()
+        {
+            var state = CreateDefaultState();
+            for(var i = 0; i < 21; i++)
+            {
+                var item = ItemFactory.ItemFromTerrain(TerrainType.Dirt);
+                var itemObject = new ItemObject(state.ActionQueue, item);
+                state.ActiveLevel.AddCollectableObjects(itemObject);
+            }
+            state.ActiveLevel.CollectableObjects.Count().Should().Be(20);
+        }
+
+        private static GameState CreateDefaultState()
+        {
+            var factory = new TerrainFactory(100, 100, 80);
+            var state = new GameState(new ActionQueue(), new Grid(30, 30), factory);
+            state.AddLevel(new LevelState("level", Vector2.Zero));
+            state.SetActiveLevel("level");
+            return state;
         }
 
         private static void TestGameStateModification(Func<GameHarness> constructor, Action<GameHarness> modifier, Action<GameHarness> verifier)

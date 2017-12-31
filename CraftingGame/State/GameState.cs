@@ -21,7 +21,8 @@ namespace CraftingGame.State
         private readonly List<MovableObject> crates = new List<MovableObject>();
         private readonly List<Door> doors = new List<Door>();
         private readonly List<StaticObject> staticObjects = new List<StaticObject>();
-        private readonly List<ItemObject> collectableObjects = new List<ItemObject>();
+        private readonly ItemObject[] collectableObjects = new ItemObject[20];
+        private int collectableObjectIndex = 0;
 
         public IReadonlyVector SpawnPoint { get; }
         public BlockGrid Blocks { get; private set; }
@@ -32,7 +33,7 @@ namespace CraftingGame.State
         public IEnumerable<MovableObject> Crates => crates;
         public IEnumerable<Door> Doors => doors;
         public IEnumerable<StaticObject> StaticObjects => staticObjects;
-        public IEnumerable<ItemObject> CollectableObjects => collectableObjects;
+        public IEnumerable<ItemObject> CollectableObjects => collectableObjects.Where(o => o != null);
 
         public IEnumerable<Object> AllObjects => ((IEnumerable<Object>)enemies).Concat(projectiles).Concat(crates).Concat(doors).Concat(staticObjects).Concat(collectableObjects);
 
@@ -69,7 +70,11 @@ namespace CraftingGame.State
 
         public void AddCollectableObjects(params ItemObject[] levelCollectableObjects)
         {
-            collectableObjects.AddRange(levelCollectableObjects);
+            foreach(var obj in levelCollectableObjects)
+            {
+                collectableObjects[collectableObjectIndex] = obj;
+                collectableObjectIndex = (collectableObjectIndex + 1) % collectableObjects.Length;
+            }
         }
 
         public void AddProjectiles(params Projectile[] projectile)
@@ -86,7 +91,13 @@ namespace CraftingGame.State
             enemies.RemoveAll(e => e.Dead);
 
             // Remove collected items
-            collectableObjects.RemoveAll(c => c.Collected);
+            for(var i = 0; i < collectableObjects.Length; i++)
+            {
+                if (collectableObjects[i]?.Collected ?? false)
+                {
+                    collectableObjects[i] = null;
+                }
+            }
         }
     }
 

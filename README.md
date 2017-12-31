@@ -3,7 +3,6 @@
 ## TODO list
 Alpha missing features:
 * Render player's target
-* Cap maximum number of drops visible
 
 Beta features:
 * Longer targeting range
