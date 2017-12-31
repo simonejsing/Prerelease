@@ -135,7 +135,7 @@ namespace CraftingGame.Widgets
             }
         }
 
-        private Color TerrainColor(TerrainType type)
+        public static Color TerrainColor(TerrainType type)
         {
             switch (type)
             {

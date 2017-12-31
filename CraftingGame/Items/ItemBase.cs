@@ -5,8 +5,10 @@ using CraftingGame.Actions;
 
 namespace CraftingGame.Items
 {
-    public class ItemBase
+    public abstract class ItemBase
     {
+        public abstract string Name { get; }
+        public virtual int Quantity => 1;
         protected int CooldownFrames { get; set; }
         public virtual bool OnCooldown => CooldownFrames > 0;
 

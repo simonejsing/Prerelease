@@ -16,6 +16,7 @@ namespace CraftingGame.Physics
 
         bool Add(string item);
         int Count(string name);
+        int Count(TerrainType type);
         bool CanTake(string name);
         bool CanTake(TerrainType type);
         StackableItemBase Take(string name);

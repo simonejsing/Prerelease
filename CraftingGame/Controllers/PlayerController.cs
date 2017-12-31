@@ -101,15 +101,11 @@ namespace CraftingGame.Controllers
                 {
                     instantVelocity = new Vector2(0, Constants.JUMP_SPEED);
                 }
-                if (inputMask.Input.Attack && !player.EquipedItem.OnCooldown)
-                {
-                    player.EquipedItem.Attack();
-                }
             }
 
             if (inputMask.Input.Attack && !player.EquipedItem.OnCooldown)
             {
-                //state.ActiveLevel.AddProjectiles(FireWeapon(player));
+                player.EquipedItem.Attack();
             }
 
             inputMask.Reset();

@@ -11,7 +11,6 @@ namespace CraftingGame.Items
     {
         protected GameState state;
 
-        public abstract string Name { get; }
         public PlayerObject Wielder { get; private set; }
         public TerrainTarget Target { get; }
 

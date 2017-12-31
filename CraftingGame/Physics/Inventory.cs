@@ -37,6 +37,12 @@ namespace CraftingGame.Physics
             return true;
         }
 
+        public int Count(TerrainType type)
+        {
+            var name = ItemFactory.ItemFromTerrain(type).Name;
+            return Count(name);
+        }
+
         public int Count(string name)
         {
             return items.ContainsKey(name) ? items[name] : 0;

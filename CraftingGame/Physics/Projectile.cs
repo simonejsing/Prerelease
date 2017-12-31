@@ -5,7 +5,6 @@ namespace CraftingGame.Physics
 {
     public class Projectile : MovableObject, IProjectile
     {
-        public Color Color { get; set; }
         public Object Shooter { get; }
         public bool Expired => lifetime <= 0;
 

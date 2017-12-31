@@ -25,6 +25,7 @@ namespace CraftingGame.Physics
         {
         }
 
+        public Color Color => Color.Black;
         public Rect2 BoundingBox => new Rect2(Position, Size);
         public Vector2 Position { get; set; }
         public Vector2 Facing => blockFacing;

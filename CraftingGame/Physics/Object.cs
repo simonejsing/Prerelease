@@ -29,6 +29,8 @@ namespace CraftingGame.Physics
             set { BoundingBox = new Rect2(BoundingBox.TopLeft, value); }
         }
 
+        public Color Color { get; set; }
+
         public IBinding<ISprite> SpriteBinding { get; set; }
         public GameAction Action { get; set; }
 
@@ -54,6 +56,7 @@ namespace CraftingGame.Physics
             this.Position = state.SafeReadVector("o.p");
             this.Size = state.SafeReadVector("o.s");
             this.Facing = state.SafeReadVector("o.f", new Vector2(1, 0));
+            this.Color = state.SafeReadColor("o.c");
         }
 
         public virtual void ExtractState(StatefulObjectBuilder builder)
@@ -63,6 +66,7 @@ namespace CraftingGame.Physics
             builder.EncodeVector("o.p", Position);
             builder.EncodeVector("o.s", Size);
             builder.EncodeVector("o.f", Facing);
+            builder.EncodeColor("o.c", Color);
         }
     }
 }

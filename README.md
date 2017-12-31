@@ -2,13 +2,14 @@
 
 ## TODO list
 Alpha missing features:
-* Render equiped item target
+* Render player's target
 * Save inventory state
-* Render drops
-* Save drops
+* Cap maximum number of drops visible
 
 Beta features:
 * Longer targeting range
+* Make player able to squeeze through 1x1 block gaps
+* Save drops
 
 Rendering:
 * Render drops

@@ -10,7 +10,6 @@ namespace CraftingGame.Items
 {
     public abstract class StackableItemBase : ItemBase
     {
-        public abstract string Name { get; }
         public abstract bool Consumable { get; }
         public abstract bool Placable { get; }
 

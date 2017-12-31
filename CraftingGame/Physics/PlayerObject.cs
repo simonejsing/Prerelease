@@ -23,8 +23,6 @@ namespace CraftingGame.Physics
 
         public Vector2 LookDirection { get; set; }
 
-        public Color Color { get; set; }
-
         public IEquipableItem EquipedItem => equipIndex < equipment.Length ? equipment[equipIndex] : new NoopItem();
         public int HitPoints { get; set; }
         public bool Dead => HitPoints <= 0;
@@ -91,14 +89,12 @@ namespace CraftingGame.Physics
         {
             base.Load(state);
             this.PlayerBinding = state.ReadMandatoryState<string>("p.bind");
-            this.Color = state.SafeReadColor("p.c");
         }
 
         public override void ExtractState(StatefulObjectBuilder builder)
         {
             base.ExtractState(builder);
             builder.Add("p.bind", PlayerBinding);
-            builder.EncodeColor("p.c", Color);
         }
 
         public static PlayerObject FromState(StatefulObject state)

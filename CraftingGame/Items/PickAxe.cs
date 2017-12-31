@@ -2,6 +2,7 @@
 using CraftingGame.Actions;
 using CraftingGame.Physics;
 using CraftingGame.State;
+using CraftingGame.Widgets;
 using System;
 using Terrain;
 using VectorMath;
@@ -50,6 +51,7 @@ namespace CraftingGame.Items
                                 Plane = Wielder.Plane,
                                 Position = position,
                                 Size = size,
+                                Color = TerrainWidget.TerrainColor(type)
                             };
                             itemObject.Collect += CollectAction.Invoke;
                             state.ActiveLevel.AddCollectableObjects(itemObject);

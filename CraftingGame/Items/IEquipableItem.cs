@@ -8,6 +8,7 @@ namespace CraftingGame.Items
     public interface IEquipableItem
     {
         string Name { get; }
+        int Quantity { get; }
         bool OnCooldown { get; }
 
         void Attack();

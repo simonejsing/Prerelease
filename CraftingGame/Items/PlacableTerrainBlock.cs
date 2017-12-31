@@ -13,6 +13,8 @@ namespace CraftingGame.Items
 
         public override string Name => $"Block ({blockType.ToString()})";
 
+        public override int Quantity => Wielder?.Inventory?.Count(blockType) ?? 0;
+
         public PlacableTerrainBlock(GameState state, TerrainType type) : base(state)
         {
             this.blockType = type;

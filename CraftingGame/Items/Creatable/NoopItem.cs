@@ -5,6 +5,7 @@ namespace CraftingGame.Items.Creatable
     internal class NoopItem : StackableItemBase, IEquipableItem
     {
         public override string Name => "Noop";
+        public override int Quantity => 0;
         public override bool Consumable => false;
         public override bool Placable => false;
 

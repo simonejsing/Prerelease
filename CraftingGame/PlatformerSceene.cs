@@ -220,6 +220,11 @@ namespace CraftingGame
                 RenderObject(obj);
             }
 
+            foreach(var obj in State.ActiveLevel.CollectableObjects)
+            {
+                RenderRectangle(obj);
+            }
+
             /*
             foreach (var obj in objectManager.RenderOrder)
             {
@@ -245,18 +250,39 @@ namespace CraftingGame
             Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, View.MapToViewport(origin), View.MapSizeToViewport(size), obj.Facing.X < 0);
         }
 
+        private void RenderRectangle(IRenderableObject obj)
+        {
+            // The renderer expects to get the top left screen pixel and a positive size (after scale)
+            // since we have flipped the y axis, we must correct by giving a negative height size
+            // and add the height to the origin.
+            var origin = new Vector2(obj.Position.X, obj.Position.Y + obj.Size.Y);
+            var size = new Vector2(obj.Size.X, -obj.Size.Y);
+            Renderer.RenderRectangle(View.MapToViewport(origin), View.MapSizeToViewport(size), obj.Color);
+        }
+
         public override string[] DiagnosticsString()
         {
-            var player = State.ActivePlayers.FirstOrDefault();
-            var playerPos = player?.Position ?? Vector2.Zero;
+            var lines = new List<string>();
+
             var sectors = SectorProbe().ToArray();
-            return new[]
+            lines.Add(string.Format("View: {0}", View.Projection.TopLeft));
+            lines.Add(string.Format("Sectors: {0}/{1}", sectors.Count(s => s.FullyLoaded), sectors.Count()));
+
+            foreach(var player in State.ActivePlayers)
             {
-                string.Format("View: {0}", View.Projection.TopLeft),
-                string.Format("Sectors: {0}/{1}", sectors.Count(s => s.FullyLoaded), sectors.Count()),
-                string.Format("Player: {0} - {1}", playerPos, player?.EquipedItem?.Name ?? "None"),
-                string.Format("Inventory: {0}", player?.Inventory?.TotalCount ?? 0),
-            };
+                var itemName = player?.EquipedItem?.Name ?? "None";
+                var itemQuantity = player?.EquipedItem?.Quantity ?? 0;
+                lines.Add(
+                    string.Format(
+                        "{0}: {1}, {2} - {3} : {4}",
+                        player?.PlayerBinding ?? "",
+                        player?.Position ?? Vector2.Zero,
+                        player?.Inventory?.TotalCount ?? 0,
+                        itemName,
+                        itemQuantity));
+            }
+
+            return lines.ToArray();
         }
     }
 }
