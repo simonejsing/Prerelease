@@ -10,18 +10,18 @@ namespace CraftingGame
         private Matrix2x2 viewInverseTransform = Matrix2x2.Identity;
         private Vector2 viewTranslation = Vector2.Zero;
 
-        public Vector2 ViewPort { get; }
+        public Vector2 DisplaySize { get; }
         public Vector2 Origin { get; }
         // The projection of the viewport into the game world
         public Rect2 Projection { get; private set; }
 
-        public ViewportProjection(IReadonlyVector viewPort) : this(viewPort, Vector2.Zero)
+        public ViewportProjection(IReadonlyVector displaySize) : this(displaySize, Vector2.Zero)
         {
         }
 
-        public ViewportProjection(IReadonlyVector viewPort, IReadonlyVector origin)
+        public ViewportProjection(IReadonlyVector displaySize, IReadonlyVector origin)
         {
-            this.ViewPort = new Vector2(viewPort);
+            this.DisplaySize = new Vector2(displaySize);
             this.Origin = new Vector2(origin);
             UpdateProjection();
         }
@@ -41,7 +41,7 @@ namespace CraftingGame
 
         public void Center(IReadonlyVector point)
         {
-            viewTranslation = -0.5f * (viewTransform*ViewPort).FlipY + point;
+            viewTranslation = -0.5f * (viewTransform*DisplaySize).FlipY + point;
             UpdateProjection();
         }
 
@@ -60,7 +60,7 @@ namespace CraftingGame
 
         private void UpdateProjection()
         {
-            Projection = new Rect2(MapToWorld(Vector2.Zero), MapSizeToWorld(ViewPort));
+            Projection = new Rect2(MapToWorld(Vector2.Zero), MapSizeToWorld(DisplaySize));
         }
 
         public Vector2 MapToWorld(IReadonlyVector viewPortPixel)
@@ -81,6 +81,17 @@ namespace CraftingGame
         public Vector2 MapSizeToViewport(IReadonlyVector size)
         {
             return viewInverseTransform * size;
+        }
+
+        public ViewportProjection[] SplitVertically()
+        {
+            var leftViewport = new ViewportProjection(new Vector2(DisplaySize.X / 2, DisplaySize.Y));
+            var rightViewport = new ViewportProjection(new Vector2(DisplaySize.X / 2, DisplaySize.Y), new Vector2(-DisplaySize.X / 2, 0));
+            return new ViewportProjection[]
+            {
+                leftViewport,
+                rightViewport,
+            };
         }
     }
 }

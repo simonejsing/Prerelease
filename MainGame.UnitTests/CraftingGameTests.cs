@@ -29,7 +29,7 @@ namespace MainGame.UnitTests
             var blockCoord = new Coordinate(0, 0);
             var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
             harness.StartGame();
-            harness.Game.View.Center(Vector2.Zero);
+            harness.Game.DisplayView.Center(Vector2.Zero);
             harness.Render(0.1f);
             harness.VerifyBlockRendered(blockCoord);
         }
@@ -40,7 +40,7 @@ namespace MainGame.UnitTests
             var blockCoord = new Coordinate(2, 1);
             var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
             harness.StartGame();
-            harness.Game.View.Center(Vector2.Zero);
+            harness.Game.DisplayView.Center(Vector2.Zero);
             harness.Render(0.1f);
             harness.VerifyBlockRendered(blockCoord);
         }
@@ -51,9 +51,9 @@ namespace MainGame.UnitTests
             var blockCoord = new Coordinate(0, 0);
             var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
             harness.StartGame();
-            harness.Game.View.Center(Vector2.Zero);
+            harness.Game.DisplayView.Center(Vector2.Zero);
             // Zoom out by 10%
-            harness.Game.View.Scale(1.1f);
+            harness.Game.DisplayView.Scale(1.1f);
             harness.Render(0.1f);
             harness.VerifyBlockRendered(blockCoord);
         }
@@ -64,8 +64,8 @@ namespace MainGame.UnitTests
             var blockCoord = new Coordinate(0, 0);
             var harness = GameHarness.CreateSingleBlockGame(blockCoord, TerrainType.Rock);
             harness.StartGame();
-            harness.Game.View.Center(Vector2.Zero);
-            harness.Game.View.Translate(new Vector2(10, 20));
+            harness.Game.DisplayView.Center(Vector2.Zero);
+            harness.Game.DisplayView.Translate(new Vector2(10, 20));
             harness.Render(0.1f);
             harness.VerifyBlockRendered(blockCoord);
         }

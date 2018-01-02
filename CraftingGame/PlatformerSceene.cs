@@ -47,9 +47,11 @@ namespace CraftingGame
         private FreeCameraController freeCameraController;
         private PlayerController playerController;
 
+        public View[] ActiveViews { get; private set; }
+        public Camera FirstCamera => ActiveViews.First().Camera;
+
         public IModifiableTerrain Terrain => State.Terrain;
-        public Camera Camera { get; private set; }
-        public ViewportProjection View { get; private set; }
+        public ViewportProjection DisplayView { get; private set; }
         public Grid Grid { get; } = new Grid(BlockSize, BlockSize);
         public Plane Plane { get; } = new Plane(0);
 
@@ -110,10 +112,11 @@ namespace CraftingGame
 
             SectorProbe = () => State.Terrain.Sectors;
             this.level = new ProceduralLevel(State.Terrain, Grid);
-            var viewPort = Renderer.GetDisplaySize();
-            View = new ViewportProjection(viewPort);
-            View.Center(new Vector2(0, 0));
-            this.Camera = new Camera(View);
+            var displaySize = Renderer.GetDisplaySize();
+            DisplayView = new ViewportProjection(displaySize);
+            DisplayView.Center(new Vector2(0, 0));
+
+            ConfigureSingleScreen();
             //View.Scale(2.0f);
             //renderer.Scale(1, -1);
         }
@@ -137,10 +140,10 @@ namespace CraftingGame
             var proceduralManager = new ProceduralObjectManager(State.Terrain, Grid, Plane);
             physics = new PhysicsEngine(proceduralManager, UpdateStep);
 
-            level.Load(View, Plane);
+            level.Load(DisplayView, Plane);
             State.AddLevel(level.State);
 
-            var activeView = View.Projection;
+            var activeView = DisplayView.Projection;
             State.Terrain.SetActiveSector((int)activeView.TopLeft.X, (int)activeView.TopLeft.Y, Plane.W);
 
             collectAction = new CollectAction();
@@ -148,7 +151,7 @@ namespace CraftingGame
             terrainWidget = new TerrainWidget(Renderer, State.Terrain, debugFont);
             dynamicGridWidget = new DynamicGridWidget(Renderer, debugFont, BlockSize);
 
-            freeCameraController = new FreeCameraController(Camera);
+            freeCameraController = new FreeCameraController(FirstCamera);
             playerController = new PlayerController(State, physics);
 
             playerController.PlayerActivated += UpdateCameraFocus;
@@ -159,8 +162,34 @@ namespace CraftingGame
 
         private void UpdateCameraFocus(object sender, PlayerGameStateEvent args)
         {
-            Camera.Track(State.ActivePlayers.ToArray());
-            Camera.Follow();
+            //ConfigureSingleScreen();
+            ConfigureSplitScreen();
+        }
+
+        private void ConfigureSingleScreen()
+        {
+            ActiveViews = new[] { new View(DisplayView, new Camera(DisplayView)) };
+            var player = State.ActivePlayers.FirstOrDefault();
+            if(player != null)
+            {
+                ActiveViews[0].Camera.Track(player);
+                ActiveViews[0].Camera.Follow();
+            }
+        }
+
+        private void ConfigureSplitScreen()
+        {
+            // Configure split screen
+            ActiveViews = DisplayView.SplitVertically().Select(v => new View(v, new Camera(v))).ToArray();
+            var player = State.ActivePlayers.FirstOrDefault();
+            if(player != null)
+            {
+                ActiveViews[0].Camera.Track(player);
+                ActiveViews[0].Camera.Follow();
+                //ActiveViews[1].Camera.Track(State.ActivePlayers.Skip(1).First());
+                ActiveViews[1].Camera.Track(player);
+                ActiveViews[1].Camera.Follow();
+            }
         }
 
         public override void Update(FrameCounter counter, float timestep)
@@ -174,7 +203,10 @@ namespace CraftingGame
             this.level.Update();
 
             // Camera follows player
-            Camera.Update();
+            foreach(var view in ActiveViews)
+            {
+                view.Camera.Update();
+            }
 
             // Handle UI inputs
             freeCameraController.Update(UiInput);
@@ -234,67 +266,77 @@ namespace CraftingGame
         public override void Prerender(FrameCounter counter, double gameTimeMsec)
         {
             Renderer.ResetTransform();
-            terrainWidget.Prerender(Grid, View, Plane);
+            foreach (var splitview in ActiveViews)
+            {
+                var viewport = splitview.Viewport;
+                terrainWidget.Prerender(Grid, viewport, Plane);
+            }
         }
 
         public override void Render(FrameCounter counter, double gameTimeMsec)
         {
-            Renderer.Begin();
-
-            Renderer.SetScissorRectangle(Vector2.Zero, View.ViewPort);
-
-            Renderer.ResetTransform();
-            Renderer.Scale(1, -1);
             Renderer.Clear(Color.Black);
-
-            // Render terrain
-            terrainWidget.Render(Grid, View, Plane);
-
-            foreach (var obj in State.ActivePlayers.Where(p => !p.Dead))
+            foreach (var splitview in ActiveViews)
+            //foreach (var splitview in new[] { View })
             {
-                RenderObject(obj);
+                var viewport = splitview.Viewport;
+                Renderer.Begin();
+
+                //Renderer.SetScissorRectangle(splitview.MapToViewport(Vector2.Zero), splitview.DisplaySize);
+                Renderer.SetScissorRectangle(-viewport.Origin, viewport.DisplaySize);
+
+                Renderer.ResetTransform();
+                Renderer.Scale(1, -1);
+
+                // Render terrain
+                terrainWidget.Render(Grid, viewport, Plane);
+
+                foreach (var obj in State.ActivePlayers.Where(p => !p.Dead))
+                {
+                    RenderObject(viewport, obj);
+                }
+
+                foreach (var obj in State.ActiveLevel.CollectableObjects)
+                {
+                    RenderRectangle(viewport, obj);
+                }
+
+                /*
+                foreach (var obj in objectManager.RenderOrder)
+                {
+                    Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, obj.Position, obj.Size, obj.Facing.X < 0);
+                }
+
+                foreach (var projectile in State.ActiveLevel.Projectiles)
+                {
+                    Renderer.RenderRectangle(projectile.Position, projectile.Size, projectile.Color);
+                }
+                */
+
+                dynamicGridWidget.Render(viewport);
+
+                Renderer.End();
             }
-
-            foreach(var obj in State.ActiveLevel.CollectableObjects)
-            {
-                RenderRectangle(obj);
-            }
-
-            /*
-            foreach (var obj in objectManager.RenderOrder)
-            {
-                Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, obj.Position, obj.Size, obj.Facing.X < 0);
-            }
-
-            foreach (var projectile in State.ActiveLevel.Projectiles)
-            {
-                Renderer.RenderRectangle(projectile.Position, projectile.Size, projectile.Color);
-            }
-            */
-
-            dynamicGridWidget.Render(View);
-
-            Renderer.End();
         }
 
-        private void RenderObject(IRenderableObject obj)
+        private void RenderObject(ViewportProjection view, IRenderableObject obj)
         {
             // The renderer expects to get the top left screen pixel and a positive size (after scale)
             // since we have flipped the y axis, we must correct by giving a negative height size
             // and add the height to the origin.
             var origin = new Vector2(obj.Position.X, obj.Position.Y + obj.Size.Y);
             var size = new Vector2(obj.Size.X, -obj.Size.Y);
-            Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, View.MapToViewport(origin), View.MapSizeToViewport(size), obj.Facing.X < 0);
+            Renderer.RenderOpagueSprite(obj.SpriteBinding.Object, view.MapToViewport(origin), view.MapSizeToViewport(size), obj.Facing.X < 0);
         }
 
-        private void RenderRectangle(IRenderableObject obj)
+        private void RenderRectangle(ViewportProjection view, IRenderableObject obj)
         {
             // The renderer expects to get the top left screen pixel and a positive size (after scale)
             // since we have flipped the y axis, we must correct by giving a negative height size
             // and add the height to the origin.
             var origin = new Vector2(obj.Position.X, obj.Position.Y + obj.Size.Y);
             var size = new Vector2(obj.Size.X, -obj.Size.Y);
-            Renderer.RenderRectangle(View.MapToViewport(origin), View.MapSizeToViewport(size), obj.Color);
+            Renderer.RenderRectangle(view.MapToViewport(origin), view.MapSizeToViewport(size), obj.Color);
         }
 
         public override string[] DiagnosticsString()
@@ -302,7 +344,7 @@ namespace CraftingGame
             var lines = new List<string>();
 
             var sectors = SectorProbe().ToArray();
-            lines.Add(string.Format("View: {0}", View.Projection.TopLeft));
+            lines.Add(string.Format("View: {0}", DisplayView.Projection.TopLeft));
             lines.Add(string.Format("Sectors: {0}/{1}", sectors.Count(s => s.FullyLoaded), sectors.Count()));
 
             foreach(var player in State.ActivePlayers)

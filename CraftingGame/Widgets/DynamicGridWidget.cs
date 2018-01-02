@@ -34,7 +34,7 @@ namespace CraftingGame.Widgets
                 if (y == 0)
                     c = Color.DarkGray;
                 var p = view.MapToViewport(new Vector2(0, y * gridSize));
-                renderer.RenderVector(new Vector2(0, p.Y), new Vector2(view.ViewPort.X, 0), c, 3);
+                renderer.RenderVector(new Vector2(0, p.Y), new Vector2(view.DisplaySize.X, 0), c, 3);
 
                 // Render y-labels
                 renderer.RenderText(
@@ -52,7 +52,7 @@ namespace CraftingGame.Widgets
                 if (x == 0)
                     c = Color.DarkGray;
                 var p = view.MapToViewport(new Vector2(x * gridSize, 0));
-                renderer.RenderVector(new Vector2(p.X, 0), new Vector2(0, -view.ViewPort.Y), c, 3);
+                renderer.RenderVector(new Vector2(p.X, 0), new Vector2(0, -view.DisplaySize.Y), c, 3);
 
                 // Render x-labels
                 renderer.RenderText(

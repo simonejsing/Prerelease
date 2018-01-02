@@ -188,6 +188,7 @@ namespace Prerelease.Main
                 if (Debug)
                 {
                     renderer.Begin();
+                    renderer.SetScissorRectangle(Vector2.Zero, renderer.GetDisplaySize());
 
                     var excess = updatePerfCounter.ExceedsThresshold || renderPerfCounter.ExceedsThresshold;
                     renderer.RenderText(
