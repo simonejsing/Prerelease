@@ -13,13 +13,14 @@ namespace CraftingGame.Controllers
     {
         private readonly GameState state;
         private readonly PhysicsEngine physicsEngine;
-        private readonly Camera camera;
 
-        public PlayerController(GameState state, PhysicsEngine physicsEngine, Camera camera)
+        public event EventHandler<PlayerGameStateEvent> PlayerActivated;
+        public event EventHandler<PlayerGameStateEvent> PlayerDeactivated;
+
+        public PlayerController(GameState state, PhysicsEngine physicsEngine)
         {
             this.state = state;
             this.physicsEngine = physicsEngine;
-            this.camera = camera;
         }
 
         public void Update(PlayerObject player)
@@ -27,8 +28,22 @@ namespace CraftingGame.Controllers
             var inputMask = player.InputMask;
 
             player.Active = inputMask.Input.Active;
+            if (inputMask.InputToggled(i => i.Active))
+            {
+                if (player.Active)
+                {
+                    PlayerActivated?.Invoke(this, new PlayerGameStateEvent(player));
+                }
+                else
+                {
+                    PlayerDeactivated?.Invoke(this, new PlayerGameStateEvent(player));
+                }
+            }
+
             if (!player.Active)
+            {
                 return;
+            }
 
             bool horizontalInput = false;
 
@@ -51,11 +66,6 @@ namespace CraftingGame.Controllers
             else if (inputMask.InputToggled(i => i.CyclePreviousEquipment, true))
             {
                 player.EquipPreviousItem();
-            }
-
-            if (inputMask.Input.Moving)
-            {
-                camera.Follow();
             }
 
             // Update look direction according to inputs

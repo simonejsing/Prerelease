@@ -119,7 +119,6 @@ namespace MainGame.UnitTests
 
         public TerrainType ReadTerrainType(Coordinate c)
         {
-            Game.Terrain.Generate(c, Plane);
             return Game.Terrain[c, Plane].Type;
         }
 

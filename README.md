@@ -3,7 +3,6 @@
 ## TODO list
 Alpha missing features:
 * Split-screen camera/render
-* Bug: Camera accounts for invisible player(s) when centering
 * Ores: Diamond, Gold, Iron
 * Save when running on xbox - how?
 

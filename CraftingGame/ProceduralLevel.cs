@@ -35,7 +35,7 @@ namespace CraftingGame
             foreach (var point in points)
             {
                 var coord = grid.PointToGridCoordinate(point);
-                Terrain.Generate(coord, plane);
+                var block = Terrain[coord, plane];
             }
 
             // Pre-load visible terrain
@@ -47,7 +47,6 @@ namespace CraftingGame
             do
             {
                 spawnCoord.V++;
-                Terrain.Generate(spawnCoord, plane);
                 type = Terrain[spawnCoord, plane].Type;
             } while (type != TerrainType.Free);
 

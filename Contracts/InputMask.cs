@@ -51,6 +51,13 @@ namespace Contracts
             Input.Restart |= gameInput.Restart;
         }
 
+        public bool InputToggled(Func<InputSet, bool> predicat)
+        {
+            var previousInputState = predicat(PreviousInput);
+            var inputState = predicat(Input);
+            return previousInputState != inputState;
+        }
+
         public bool InputToggled(Func<InputSet, bool> predicat, bool desiredState)
         {
             var previousInputState = predicat(PreviousInput);

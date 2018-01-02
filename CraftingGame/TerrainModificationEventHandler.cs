@@ -16,7 +16,4 @@ namespace CraftingGame
             GlobalCoord = globalCoord;
         }
     }
-
-    //type TerrainModificationEventHandler = EventHandler<TerrainModificationEvent>;
-    //public delegate void TerrainModificationEventHandler(object sender, TerrainModificationEvent args);
 }

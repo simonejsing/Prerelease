@@ -85,7 +85,6 @@ namespace MainGame.UnitTests
                 plane,
                 new TerrainBlock() { Type = TerrainType.Dirt });
             var generator = new CachedTerrainGenerator(terrainStub);
-            generator.Generate(coord, plane);
             var block = generator[coord, plane];
             var block2 = generator[coord, plane];
             block.Type.Should().Be(TerrainType.Dirt);
@@ -101,15 +100,11 @@ namespace MainGame.UnitTests
             var height = new Coordinate(0, TerrainSector.SectorHeight);
             var plane = new Plane(12);
             var generator = new CachedTerrainGenerator(new TerrainStub());
-            generator.Generate(coord, plane);
-            generator.Generate(coord + width, plane);
-            generator.Generate(coord + height, plane);
-            generator.Generate(coord, new Plane(12 + 1));
-            generator.Sectors.Should().HaveCount(4);
             generator[coord, plane].Type.Should().Be(TerrainType.Free);
             generator[coord + width, plane].Type.Should().Be(TerrainType.Free);
             generator[coord + height, plane].Type.Should().Be(TerrainType.Free);
             generator[coord, new Plane(12 + 1)].Type.Should().Be(TerrainType.Free);
+            generator.Sectors.Should().HaveCount(4);
         }
 
         [TestMethod]
@@ -117,9 +112,8 @@ namespace MainGame.UnitTests
         {
             var generator = new CachedTerrainGenerator(new TerrainStub());
             var coord = new Coordinate(-10 - TerrainSector.SectorWidth, -15 - TerrainSector.SectorHeight);
-            generator.Generate(coord, new Plane(0));
-            generator.Sectors.Should().HaveCount(1);
             generator[coord, new Plane(0)].Type.Should().Be(TerrainType.Free);
+            generator.Sectors.Should().HaveCount(1);
         }
 
         [TestMethod]
@@ -127,9 +121,8 @@ namespace MainGame.UnitTests
         {
             var generator = new CachedTerrainGenerator(new TerrainStub());
             var coord = new Coordinate(-10 - TerrainSector.SectorWidth, -100);
-            generator.Generate(coord, new Plane(0));
-            generator.Sectors.Should().HaveCount(1);
             generator[coord, new Plane(0)].Type.Should().Be(TerrainType.Free);
+            generator.Sectors.Should().HaveCount(1);
         }
 
         [TestMethod]

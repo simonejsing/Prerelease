@@ -64,7 +64,7 @@ RRR");
 
         private static TerrainTarget TargetNotFreeTerrain(GameHarness harness)
         {
-            var target = new TerrainTarget(harness.Game.State, t => t != TerrainType.Free);
+            var target = new TerrainTarget(harness.Game.State, (c,t) => t != TerrainType.Free);
             target.Equip(harness.Player);
             return target;
         }

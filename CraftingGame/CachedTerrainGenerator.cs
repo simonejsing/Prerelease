@@ -11,7 +11,7 @@ using VectorMath;
 
 namespace CraftingGame
 {
-    public class CachedTerrainGenerator : IModifiableTerrain
+    public class CachedTerrainGenerator : IModifiableTerrain, IStatefulEntity
     {
         private readonly Dictionary<Voxel, TerrainType> terrainModifications = new Dictionary<Voxel, TerrainType>();
         private readonly ITerrainGenerator terrainGenerator;
@@ -26,12 +26,12 @@ namespace CraftingGame
             this.terrainGenerator = terrainGenerator;
         }
 
+        public Guid Id { get; set; }
+
         public int Seed => terrainGenerator.Seed;
         public int SeaLevel => terrainGenerator.SeaLevel;
         public int MaxDepth => terrainGenerator.MaxDepth;
         public int MaxHeight => terrainGenerator.MaxHeight;
-
-        public Guid Id { get; set; }
 
         public TerrainBlock this[Coordinate c, Plane p]
         {
@@ -39,13 +39,14 @@ namespace CraftingGame
             {
                 var sector = FindSector(c.U, c.V, p.W);
                 var localCoord = sector.LocalCoordinate(c);
-                // TODO: It feels like we should generate the coordinate here, and use special logic for the case
-                // where the terrain needs to be queried without generating. Otherwise we run the risk of missing
-                // a generate() invocation in some new code that deals with the terrain but forgets that it can
-                // be NotGenerated.
                 sector.Generate(localCoord.U, localCoord.V);
                 return sector[localCoord.U, localCoord.V];
             }
+        }
+
+        public void Generate(Coordinate c, Plane p)
+        {
+            // Intentionally does nothing, it generates when indexed
         }
 
         public void SetActiveSector(int x, int y, int z)
@@ -82,14 +83,6 @@ namespace CraftingGame
         private TerrainSector GetNextLoadingSector()
         {
             return sectorLoadingQueue.Any() ? sectorLoadingQueue.Dequeue() : null;
-        }
-
-        // Todo: All calls to here are bugs...
-        public void Generate(Coordinate c, Plane p)
-        {
-            var sector = FindSector(c.U, c.V, p.W);
-            var localCoord = sector.LocalCoordinate(c);
-            sector.Generate(localCoord.U, localCoord.V);
         }
 
         public void Destroy(Coordinate c, Plane p)

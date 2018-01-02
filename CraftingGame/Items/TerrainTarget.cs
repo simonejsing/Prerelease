@@ -60,7 +60,6 @@ namespace CraftingGame.Items
             var targetCoord = LookingAtCoordinate(wielderCoord, wielder.LookDirection);
 
             // Can the player dig here?
-            state.Terrain.Generate(targetCoord, wielder.Plane);
             var type = GetTerrainType(targetCoord);
             if (!validTerrain(targetCoord, type))
             {

@@ -149,9 +149,18 @@ namespace CraftingGame
             dynamicGridWidget = new DynamicGridWidget(Renderer, debugFont, BlockSize);
 
             freeCameraController = new FreeCameraController(Camera);
-            playerController = new PlayerController(State, physics, Camera);
+            playerController = new PlayerController(State, physics);
+
+            playerController.PlayerActivated += UpdateCameraFocus;
+            playerController.PlayerDeactivated += UpdateCameraFocus;
 
             TransitionToLevel(level.Name);
+        }
+
+        private void UpdateCameraFocus(object sender, PlayerGameStateEvent args)
+        {
+            Camera.Track(State.ActivePlayers.ToArray());
+            Camera.Follow();
         }
 
         public override void Update(FrameCounter counter, float timestep)
@@ -208,8 +217,6 @@ namespace CraftingGame
                     spriteResolver.ResolveBindings(newPlayer);
                     playerController.SpawnPlayer(newPlayer);
                 }
-
-                Camera.Track(State.BoundPlayers.ToArray());
                 /*var playerToFollow = State.BoundPlayers.FirstOrDefault();
                 if(playerToFollow != null)
                 {
