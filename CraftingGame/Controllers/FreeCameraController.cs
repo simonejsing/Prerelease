@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using System;
 using VectorMath;
 
 namespace CraftingGame.Controllers
@@ -7,11 +8,11 @@ namespace CraftingGame.Controllers
     {
         public const int ScrollSpeed = 50;
 
-        private readonly Camera camera;
+        private readonly Func<Camera> cameraFunc;
 
-        public FreeCameraController(Camera camera)
+        public FreeCameraController(Func<Camera> cameraFunc)
         {
-            this.camera = camera;
+            this.cameraFunc = cameraFunc;
         }
 
         public void Update(InputMask inputMask)
@@ -29,8 +30,9 @@ namespace CraftingGame.Controllers
 
             if (translation != Vector2.Zero)
             {
-                camera.Free();
-                camera.Translate(translation);
+                var camera = cameraFunc();
+                camera?.Free();
+                camera?.Translate(translation);
             }
 
             inputMask.Reset();

@@ -41,7 +41,7 @@ namespace CraftingGame
 
         public void Center(IReadonlyVector point)
         {
-            viewTranslation = -0.5f * (viewTransform*DisplaySize).FlipY + point;
+            viewTranslation = -0.5f * (viewTransform*(DisplaySize - Origin)).FlipY + point;
             UpdateProjection();
         }
 

@@ -147,7 +147,7 @@ namespace CraftingGame
             terrainWidget = new TerrainWidget(Renderer, State.Terrain, debugFont);
             dynamicGridWidget = new DynamicGridWidget(Renderer, debugFont, BlockSize);
 
-            freeCameraController = new FreeCameraController(FirstCamera);
+            freeCameraController = new FreeCameraController(() => FirstCamera);
             playerController = new PlayerController(State, physics);
 
             playerController.PlayerActivated += UpdateCameraFocus;
@@ -182,9 +182,11 @@ namespace CraftingGame
             {
                 ActiveViews[0].Camera.Track(player);
                 ActiveViews[0].Camera.Follow();
+                //ActiveViews[0].Viewport.Scale(2.0f);
                 //ActiveViews[1].Camera.Track(State.ActivePlayers.Skip(1).First());
                 ActiveViews[1].Camera.Track(player);
                 ActiveViews[1].Camera.Follow();
+                ActiveViews[1].Viewport.Scale(2.0f);
             }
         }
 
@@ -309,7 +311,7 @@ namespace CraftingGame
                 }
                 */
 
-                dynamicGridWidget.Render(viewport);
+                //dynamicGridWidget.Render(viewport);
 
                 Renderer.End();
             }

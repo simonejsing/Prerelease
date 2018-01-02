@@ -130,6 +130,19 @@ namespace MainGame.UnitTests
             VerifyProjection(viewports[1], new Vector2(100, 0), new Vector2(150, 0));
         }
 
+        [TestMethod]
+        public void CanScaleSplitViewport()
+        {
+            var projection = new ViewportProjection(new Vector2(100, 100));
+            var viewports = projection.SplitVertically();
+            viewports[1].Scale(2.0f);
+            viewports[1].Center(new Vector2(0, 0));
+            viewports[1].DisplaySize.Should().Be(new Vector2(50, 100));
+            viewports[1].Projection.TopLeft.Should().Be(new Vector2(-50, 100));
+            VerifyProjection(viewports[1], new Vector2(0, 0), new Vector2(75, -50));
+            VerifyProjection(viewports[1], new Vector2(100, 0), new Vector2(125, -50));
+        }
+
         private static void VerifyProjection(ViewportProjection projection, Vector2 point, Vector2 projectedPoint)
         {
             // Test projection from world to viewport
