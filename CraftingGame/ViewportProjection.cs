@@ -60,7 +60,7 @@ namespace CraftingGame
 
         private void UpdateProjection()
         {
-            Projection = new Rect2(MapToWorld(Vector2.Zero), MapSizeToWorld(DisplaySize));
+            Projection = new Rect2(MapToWorld(-Origin), MapSizeToWorld(DisplaySize));
         }
 
         public Vector2 MapToWorld(IReadonlyVector viewPortPixel)

@@ -125,7 +125,7 @@ namespace MainGame.UnitTests
             viewports[0].Projection.TopLeft.Should().Be(new Vector2(0, 0));
             VerifyProjection(viewports[0], new Vector2(0, 0), new Vector2(0, 0));
             viewports[1].DisplaySize.Should().Be(new Vector2(50, 100));
-            viewports[1].Projection.TopLeft.Should().Be(new Vector2(-50, 0));
+            viewports[1].Projection.TopLeft.Should().Be(new Vector2(0, 0));
             VerifyProjection(viewports[1], new Vector2(0, 0), new Vector2(50, 0));
             VerifyProjection(viewports[1], new Vector2(100, 0), new Vector2(150, 0));
         }
