@@ -31,7 +31,7 @@ namespace CraftingGame.Physics
 
         public PlayerObject(ActionQueue actionQueue) : base(actionQueue)
         {
-            inventory = new Inventory(100);
+            inventory = new Inventory(500);
             InputBound = false;
             HitPoints = 1;
             ObjectCollision += OnObjectCollision;

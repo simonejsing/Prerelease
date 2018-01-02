@@ -9,6 +9,7 @@ namespace Serialization
 {
     public class SerializableState
     {
+        public Dictionary<string, object> Global { get; set; }
         public Dictionary<string, Dictionary<Guid, IDictionary<string, object>>> State { get; set; }
 
         public static SerializableState FromStream(Stream stream)
@@ -27,7 +28,13 @@ namespace Serialization
 
         public SerializableState()
         {
+            this.Global = new Dictionary<string, object>();
             this.State = new Dictionary<string, Dictionary<Guid, IDictionary<string, object>>>();
+        }
+
+        public void AddGlobalProperty(string propertyName, object value)
+        {
+            this.Global.Add(propertyName, value);
         }
 
         public void AddEntities(string entityType, IEnumerable<IStatefulEntity> entities)

@@ -10,6 +10,7 @@ using VectorMath;
 using CraftingGame.Actions;
 using CraftingGame.State;
 using CraftingGame.Items;
+using System.IO;
 
 namespace CraftingGame
 {
@@ -24,13 +25,16 @@ namespace CraftingGame
         private const float UpdateStep = 1.0f;
 
         private readonly IStreamProvider streamProvider;
+        private readonly ActionQueue actionQueue;
+        private readonly ITerrainFactory terrainFactory;
+
         private SpriteResolver spriteResolver;
         private PhysicsEngine physics;
         private IFont debugFont = null;
         private InputMask[] inputMasks;
 
         // Terrain
-        private readonly ProceduralLevel level;
+        private ProceduralLevel level;
 
         // Widgets
         private TerrainWidget terrainWidget;
@@ -44,15 +48,15 @@ namespace CraftingGame
         private PlayerController playerController;
 
         public IModifiableTerrain Terrain => State.Terrain;
-        public Camera Camera { get; }
-        public ViewportProjection View { get; }
+        public Camera Camera { get; private set; }
+        public ViewportProjection View { get; private set; }
         public Grid Grid { get; } = new Grid(BlockSize, BlockSize);
         public Plane Plane { get; } = new Plane(0);
 
         // Game state
-        public GameState State { get; }
+        public GameState State { get; private set; }
 
-        private readonly Func<IEnumerable<TerrainSector>> SectorProbe;
+        private Func<IEnumerable<TerrainSector>> SectorProbe;
 
         public PlatformerSceene(IStreamProvider streamProvider, IRenderer renderer, IUserInterface ui, ActionQueue actionQueue) 
             : this(streamProvider, renderer, ui, actionQueue, new TerrainFactory(TerrainDepth, TerrainHeight, TerrainSeaLevel))
@@ -63,31 +67,50 @@ namespace CraftingGame
             : base("Platformer", renderer, ui, actionQueue)
         {
             this.streamProvider = streamProvider;
-            State = new GameState(actionQueue, Grid, terrainFactory);
+            this.actionQueue = actionQueue;
+            this.terrainFactory = terrainFactory;
 
             // Load latest game state
             var loaded = false;
             if (this.streamProvider.FileExists("state.json"))
             {
-                try
-                {
-                    State.LoadFromStream(this.streamProvider.ReadFile("state.json"));
-                    loaded = true;
-                }
-                catch
-                {
-                }
+                loaded = LoadGame(this.streamProvider.ReadFile("state.json"));
             }
 
-            if(!loaded)
+            if (!loaded)
             {
-                // Start new game
-                State.Terrain = new CachedTerrainGenerator(terrainFactory.Create());
+                NewGame();
             }
+        }
+
+        public void NewGame()
+        {
+            var state = GameState.Create(actionQueue, Grid, terrainFactory);
+            ChangeGameState(state);
+        }
+
+        public bool LoadGame(Stream stream)
+        {
+            try
+            {
+                var state = GameState.LoadFromStream(actionQueue, Grid, terrainFactory, stream);
+                ChangeGameState(state);
+                return true;
+            }
+            catch
+            {
+            }
+
+            return false;
+        }
+
+        private void ChangeGameState(GameState state)
+        {
+            State = state;
 
             SectorProbe = () => State.Terrain.Sectors;
             this.level = new ProceduralLevel(State.Terrain, Grid);
-            var viewPort = renderer.GetViewport();
+            var viewPort = Renderer.GetViewport();
             View = new ViewportProjection(viewPort);
             View.Center(new Vector2(0, 0));
             this.Camera = new Camera(View);

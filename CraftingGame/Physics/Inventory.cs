@@ -13,7 +13,7 @@ namespace CraftingGame.Physics
     {
         private readonly Dictionary<string, int> items = new Dictionary<string, int>();
 
-        public int Capacity { get; }
+        public int Capacity { get; set; }
         public int TotalCount => items.Values.Sum();
         public bool Full => Capacity == TotalCount;
 

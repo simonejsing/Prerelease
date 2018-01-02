@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using CraftingGame.Items;
 using CraftingGame.Physics;
+using CraftingGame.State.Upgrade;
 using Serialization;
 using System;
 using System.Collections.Generic;
@@ -103,6 +104,8 @@ namespace CraftingGame.State
 
     public class GameState
     {
+        public const int LatestVersion = 2;
+
         private readonly ITerrainFactory terrainFactory;
         private readonly List<PlayerObject> boundPlayers = new List<PlayerObject>();
 
@@ -112,6 +115,7 @@ namespace CraftingGame.State
         // Per level state
         private readonly List<LevelState> levels = new List<LevelState>();
 
+        public int Version { get; private set; }
         public ActionQueue ActionQueue { get; }
         public Grid Grid { get; }
         public CachedTerrainGenerator Terrain { get; set; }
@@ -124,13 +128,68 @@ namespace CraftingGame.State
         public IEnumerable<LevelState> Levels => levels;
         public LevelState ActiveLevel { get; private set; }
 
-        public GameState(ActionQueue actionQueue, Grid grid, ITerrainFactory terrainFactory)
+        public static GameState LoadFromStream(ActionQueue actionQueue, Grid grid, ITerrainFactory terrainFactory, Stream stream)
         {
+            var state = SerializableState.FromStream(stream);
+            StatefulObject globalState = ReadGlobalSection(actionQueue, state);
+            var version = globalState?.SafeReadValue("version", 1) ?? 1;
+            var gameState = Create(actionQueue, grid, terrainFactory, version);
+
+            // Load players
+            gameState.knownPlayers = gameState.LoadEntities(state, "players", PlayerObject.FromState).ToDictionary(p => p.PlayerBinding, p => p);
+
+            foreach (var player in gameState.knownPlayers.Values)
+            {
+                EquipPlayerItems(gameState, player);
+            }
+
+            // Load terrain
+            gameState.Terrain = gameState.LoadEntities(state, "terrain", s => CachedTerrainGenerator.FromState(terrainFactory, s)).First();
+
+            // Apply upgrade rules
+            var rules = new IGameStateUpgradeRule[] { new GameStateUpgradeV2() };
+            UpgradeGameState(gameState, rules);
+
+            return gameState;
+        }
+
+        private static void UpgradeGameState(GameState state, IGameStateUpgradeRule[] rules)
+        {
+            while(state.Version != LatestVersion)
+            {
+                // Find the next best rule
+                var nextRule = rules.Where(r => r.FromVersion == state.Version).OrderByDescending(r => r.ToVersion).First();
+                nextRule.Upgrade(state);
+                state.Version = nextRule.ToVersion;
+            }
+        }
+
+        private static StatefulObject ReadGlobalSection(ActionQueue actionQueue, SerializableState state)
+        {
+            return new StatefulObject(actionQueue, new Guid(), state.Global);
+        }
+
+        public static GameState Create(ActionQueue actionQueue, Grid grid, ITerrainFactory terrainFactory)
+        {
+            return Create(actionQueue, grid, terrainFactory, LatestVersion);
+        }
+
+        private static GameState Create(ActionQueue actionQueue, Grid grid, ITerrainFactory terrainFactory, int version)
+        {
+            return new GameState(actionQueue, grid, terrainFactory, version);
+        }
+
+        private GameState(ActionQueue actionQueue, Grid grid, ITerrainFactory terrainFactory, int currentVersion)
+        {
+            this.Version = currentVersion;
             this.ActionQueue = actionQueue;
             this.Grid = grid;
             this.terrainFactory = terrainFactory;
             this.ItemFactory = new ItemFactory(this);
             this.knownPlayers = new Dictionary<string, PlayerObject>();
+
+            // Start new game
+            Terrain = new CachedTerrainGenerator(terrainFactory.Create());
         }
 
         public void AddLevel(LevelState level)
@@ -146,25 +205,10 @@ namespace CraftingGame.State
         public void SaveToStream(Stream stream)
         {
             var state = new SerializableState();
+            state.AddGlobalProperty("version", Version);
             state.AddEntities("players", KnownPlayers);
             state.AddEntities("terrain", new[] { Terrain });
             state.Serialize(stream);
-        }
-
-        public void LoadFromStream(Stream stream)
-        {
-            var state = SerializableState.FromStream(stream);
-
-            // Load players
-            knownPlayers = LoadEntities(state, "players", PlayerObject.FromState).ToDictionary(p => p.PlayerBinding, p => p);
-
-            foreach(var player in knownPlayers.Values)
-            {
-                EquipPlayerItems(player);
-            }
-
-            // Load terrain
-            Terrain = LoadEntities(state, "terrain", s => CachedTerrainGenerator.FromState(terrainFactory, s)).First();
         }
 
         private T[] LoadEntities<T>(SerializableState state, string entityType, Func<StatefulObject, T> factory)
@@ -217,17 +261,17 @@ namespace CraftingGame.State
                 Color = Color.Red
             };
 
-            EquipPlayerItems(player);
+            EquipPlayerItems(this, player);
             player.BindInput(inputMask);
             boundPlayers.Add(player);
             return player;
         }
 
-        private void EquipPlayerItems(PlayerObject player)
+        private static void EquipPlayerItems(GameState state, PlayerObject player)
         {
-            player.AddEquipment(new PickAxe(this));
-            player.AddEquipment(new PlacableTerrainBlock(this, TerrainType.Dirt));
-            player.AddEquipment(new PlacableTerrainBlock(this, TerrainType.Rock));
+            player.AddEquipment(new PickAxe(state));
+            player.AddEquipment(new PlacableTerrainBlock(state, TerrainType.Dirt));
+            player.AddEquipment(new PlacableTerrainBlock(state, TerrainType.Rock));
         }
     }
 }

@@ -12,6 +12,7 @@ using Terrain;
 using VectorMath;
 using System.IO;
 using Serialization;
+using CraftingGame.State;
 
 namespace MainGame.UnitTests
 {
@@ -82,7 +83,7 @@ namespace MainGame.UnitTests
         public void LoadGame(Stream stream)
         {
             this.Game = CreateGame(mockRenderer.Object, terrain);
-            this.Game.State.LoadFromStream(stream);
+            this.Game.LoadGame(stream);
             this.Game.Activate(CreateInput("ui"), GenerateInputSets(playerInput));
         }
 

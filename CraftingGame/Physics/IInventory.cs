@@ -10,7 +10,7 @@ namespace CraftingGame.Physics
 {
     public interface IInventory
     {
-        int Capacity { get; }
+        int Capacity { get; set; }
         int TotalCount { get; }
         bool Full { get; }
 

@@ -20,7 +20,7 @@ namespace Serialization
         {
             this.ActionQueue = actionQueue;
             this.Id = key;
-            this.state = state;
+            this.state = state ?? new Dictionary<string, object>();
         }
 
         public T ReadMandatoryState<T>(string propertyName)

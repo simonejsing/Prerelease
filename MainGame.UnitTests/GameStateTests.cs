@@ -12,6 +12,7 @@ using Serialization;
 using CraftingGame;
 using System.Collections.Generic;
 using CraftingGame.Items;
+using System.Text;
 
 namespace MainGame.UnitTests
 {
@@ -71,10 +72,7 @@ namespace MainGame.UnitTests
         {
             var factory = new TerrainFactory(10, 10, 8, seed: 512);
             var grid = new Grid(30, 30);
-            var state = new GameState(null, grid, factory)
-            {
-                Terrain = new CachedTerrainGenerator(factory.Create())
-            };
+            var state = GameState.Create(null, grid, factory);
 
             using (var stream = new MemoryStream())
             {
@@ -83,8 +81,7 @@ namespace MainGame.UnitTests
 
                 // Load game state
                 var newFactory = new TerrainFactory(100, 100, 80, seed: 0);
-                var newState = new GameState(null, grid, newFactory);
-                newState.LoadFromStream(stream);
+                var newState = GameState.LoadFromStream(null, grid, newFactory, stream);
                 newState.Terrain.MaxDepth.Should().Be(10);
                 newState.Terrain.MaxHeight.Should().Be(10);
                 newState.Terrain.SeaLevel.Should().Be(8);
@@ -125,13 +122,58 @@ namespace MainGame.UnitTests
             state.ActiveLevel.CollectableObjects.Count().Should().Be(20);
         }
 
+        [TestMethod]
+        public void GameStateUpgradePlayerInventoryCapacityInVersion1()
+        {
+            var state = LoadFromString(Version1State());
+            state.Version.Should().Be(GameState.LatestVersion);
+            state.KnownPlayers.First().Inventory.Capacity.Should().Be(500);
+        }
+
+        private static string Version1State()
+        {
+            return @"
+            {
+                ""State"": {
+                    ""players"": {
+                        ""6c6a3357-27ea-4c38-95aa-c4ae6154113b"": {
+                            ""o.sprite"": ""Chicken"",
+                            ""p.bind"": ""player1"",
+                            ""p.inventory"": {
+                                ""i.c"": 100,
+                            }
+                        }
+                    },
+                    ""terrain"": {
+                        ""6c6a3357-27ea-4c38-95aa-c4ae6154113b"": {
+                            ""c.t"": {
+                                ""seed"": 0,
+                                ""md"": 100,
+                                ""mh"": 100,
+                                ""sl"": 80
+                            }
+                        }
+                    }
+                }
+            }";
+        }
+
         private static GameState CreateDefaultState()
         {
             var factory = new TerrainFactory(100, 100, 80);
-            var state = new GameState(new ActionQueue(), new Grid(30, 30), factory);
+            var state = GameState.Create(new ActionQueue(), new Grid(30, 30), factory);
             state.AddLevel(new LevelState("level", Vector2.Zero));
             state.SetActiveLevel("level");
             return state;
+        }
+
+        private static GameState LoadFromString(string json)
+        {
+            var factory = new TerrainFactory(100, 100, 80);
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+            {
+                return GameState.LoadFromStream(new ActionQueue(), new Grid(30, 30), factory, stream);
+            }
         }
 
         private static void TestGameStateModification(Func<GameHarness> constructor, Action<GameHarness> modifier, Action<GameHarness> verifier)
