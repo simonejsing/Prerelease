@@ -11,13 +11,13 @@ namespace CraftingGame.Items
     public class TerrainTarget
     {
         private readonly GameState state;
-        private readonly Func<TerrainType, bool> validTerrain;
+        private readonly Func<Coordinate, TerrainType, bool> validTerrain;
         private PlayerObject wielder;
 
         public Coordinate? Coordinate { get; private set; }
-        public bool IsValid => wielder != null && Coordinate.HasValue && validTerrain(GetTerrainType(Coordinate.Value));
+        public bool IsValid => wielder != null && Coordinate.HasValue && validTerrain(Coordinate.Value, GetTerrainType(Coordinate.Value));
 
-        public TerrainTarget(GameState state, Func<TerrainType, bool> validTerrain)
+        public TerrainTarget(GameState state, Func<Coordinate, TerrainType, bool> validTerrain)
         {
             this.state = state;
             this.validTerrain = validTerrain;
@@ -62,7 +62,7 @@ namespace CraftingGame.Items
             // Can the player dig here?
             state.Terrain.Generate(targetCoord, wielder.Plane);
             var type = GetTerrainType(targetCoord);
-            if (!validTerrain(type))
+            if (!validTerrain(targetCoord, type))
             {
                 return null;
                 // No, try below

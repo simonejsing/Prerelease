@@ -20,9 +20,23 @@ namespace CraftingGame.Items
             this.blockType = type;
         }
 
-        protected override bool ValidTerrainTarget(TerrainType type)
+        protected override bool ValidTerrainTarget(Coordinate coord, TerrainType type)
         {
-            return type == TerrainType.Free;
+            if (type != TerrainType.Free)
+                return false;
+
+            return AdjacentBlock(coord);
+        }
+
+        private bool AdjacentBlock(Coordinate centerCoord)
+        {
+            foreach (var coord in centerCoord.AdjacentCoordinates())
+            {
+                if (state.Terrain[coord, Wielder.Plane].Type != TerrainType.Free)
+                    return true;
+            }
+
+            return false;
         }
 
         public override void Attack()

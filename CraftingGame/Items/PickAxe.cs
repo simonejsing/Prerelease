@@ -17,7 +17,7 @@ namespace CraftingGame.Items
         {
         }
 
-        protected override bool ValidTerrainTarget(TerrainType type)
+        protected override bool ValidTerrainTarget(Coordinate coord, TerrainType type)
         {
             return type != TerrainType.Free;
         }

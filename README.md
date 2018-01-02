@@ -5,8 +5,6 @@ Alpha missing features:
 * Split-screen camera/render
 * Bug: Camera accounts for invisible player(s) when centering
 * Ores: Diamond, Gold, Iron
-* 500 inventory capacity (game state upgrade and upgrade rule for capacity)
-* Limit block placement to adjacant grid locations 
 * Save when running on xbox - how?
 
 Bugs:

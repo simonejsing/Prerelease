@@ -32,7 +32,7 @@ namespace CraftingGame.Items
             Target.Update();
         }
 
-        protected abstract bool ValidTerrainTarget(TerrainType type);
+        protected abstract bool ValidTerrainTarget(Coordinate coord, TerrainType type);
 
         public abstract void Attack();
     }

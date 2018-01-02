@@ -33,6 +33,21 @@ namespace Terrain
             return new Coordinate(self.U / other.U, self.V / other.V);
         }
 
+        public Coordinate[] AdjacentCoordinates()
+        {
+            return new[]
+            {
+                this + new Coordinate(1, 0),
+                this + new Coordinate(1, 1),
+                this + new Coordinate(0, 1),
+                this + new Coordinate(-1, 1),
+                this + new Coordinate(-1, 0),
+                this + new Coordinate(-1, -1),
+                this + new Coordinate(0, -1),
+                this + new Coordinate(1, -1),
+            };
+        }
+
         public static bool operator ==(Coordinate self, Coordinate other)
         {
             return self.Equals(other);

@@ -39,6 +39,11 @@ namespace CraftingGame
             {
                 var sector = FindSector(c.U, c.V, p.W);
                 var localCoord = sector.LocalCoordinate(c);
+                // TODO: It feels like we should generate the coordinate here, and use special logic for the case
+                // where the terrain needs to be queried without generating. Otherwise we run the risk of missing
+                // a generate() invocation in some new code that deals with the terrain but forgets that it can
+                // be NotGenerated.
+                sector.Generate(localCoord.U, localCoord.V);
                 return sector[localCoord.U, localCoord.V];
             }
         }
@@ -79,6 +84,7 @@ namespace CraftingGame
             return sectorLoadingQueue.Any() ? sectorLoadingQueue.Dequeue() : null;
         }
 
+        // Todo: All calls to here are bugs...
         public void Generate(Coordinate c, Plane p)
         {
             var sector = FindSector(c.U, c.V, p.W);
