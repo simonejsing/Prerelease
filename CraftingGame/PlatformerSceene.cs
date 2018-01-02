@@ -275,7 +275,6 @@ namespace CraftingGame
         {
             Renderer.Clear(Color.Black);
             foreach (var splitview in ActiveViews)
-            //foreach (var splitview in new[] { View })
             {
                 var viewport = splitview.Viewport;
                 Renderer.Begin();
@@ -311,7 +310,7 @@ namespace CraftingGame
                 }
                 */
 
-                //dynamicGridWidget.Render(viewport);
+                dynamicGridWidget.Render(viewport);
 
                 Renderer.End();
             }
