@@ -38,9 +38,14 @@ namespace Renderer
             ResetTransform();
         }
 
-        public IReadonlyVector GetViewport()
+        public IReadonlyVector GetDisplaySize()
         {
             return this.viewport;
+        }
+
+        public void SetScissorRectangle(IReadonlyVector position, IReadonlyVector size)
+        {
+            device.ScissorRectangle = new Rectangle(ToXnaPoint(position), ToXnaPoint(size));
         }
 
         public void Clear(Contracts.Color color)
@@ -50,7 +55,7 @@ namespace Renderer
 
         public void Begin()
         {
-            spriteBatch.Begin();
+            spriteBatch.Begin(rasterizerState: new RasterizerState() { ScissorTestEnable = true });
             //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
         }
 

@@ -86,7 +86,7 @@ namespace Prerelease.Main
             }
             
             // Align center vertically
-            var viewport = new Vector2(Renderer.GetViewport());
+            var viewport = new Vector2(Renderer.GetDisplaySize());
             var textBox = new Vector2(MaxLineLength * CharacterWidth, -MaxLines * TextHeight);
             var position = (viewport - textBox) / 2f;
 

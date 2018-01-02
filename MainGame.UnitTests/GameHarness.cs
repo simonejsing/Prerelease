@@ -166,7 +166,7 @@ namespace MainGame.UnitTests
             mockScope.Setup(m => m.ResolveSprite(It.IsAny<IBinding<ISprite>>()))
                 .Returns((IBinding<ISprite> b) => new ResolvedBinding<ISprite>(b, null));
             var mockRenderer = new Mock<IRenderer>();
-            mockRenderer.Setup(m => m.GetViewport()).Returns(viewPort);
+            mockRenderer.Setup(m => m.GetDisplaySize()).Returns(viewPort);
             mockRenderer.Setup(m => m.ActivateScope(It.IsAny<string>())).Returns(mockScope.Object);
             mockRenderer.Setup(m => m.RenderToGpuTexture(It.IsAny<IGpuTexture>(), It.IsAny<Action>())).Callback((IGpuTexture t, Action a) => a());
             return mockRenderer;

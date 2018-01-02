@@ -182,13 +182,13 @@ namespace Prerelease.Main
 
                 activeSceene.Prerender(renderCounter, gameTime.TotalGameTime.TotalMilliseconds);
 
-                renderer.Begin();
-
                 activeSceene.Render(renderCounter, gameTime.TotalGameTime.TotalMilliseconds);
                 userInterface.Render(renderCounter);
 
                 if (Debug)
                 {
+                    renderer.Begin();
+
                     var excess = updatePerfCounter.ExceedsThresshold || renderPerfCounter.ExceedsThresshold;
                     renderer.RenderText(
                         debugFont,
@@ -210,9 +210,9 @@ namespace Prerelease.Main
                             diagnosticsString,
                             Color.Red);
                     }
-                }
 
-                renderer.End();
+                    renderer.End();
+                }
 
                 base.Draw(gameTime);
             });

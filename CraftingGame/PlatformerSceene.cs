@@ -110,7 +110,7 @@ namespace CraftingGame
 
             SectorProbe = () => State.Terrain.Sectors;
             this.level = new ProceduralLevel(State.Terrain, Grid);
-            var viewPort = Renderer.GetViewport();
+            var viewPort = Renderer.GetDisplaySize();
             View = new ViewportProjection(viewPort);
             View.Center(new Vector2(0, 0));
             this.Camera = new Camera(View);
@@ -239,6 +239,10 @@ namespace CraftingGame
 
         public override void Render(FrameCounter counter, double gameTimeMsec)
         {
+            Renderer.Begin();
+
+            Renderer.SetScissorRectangle(Vector2.Zero, View.ViewPort);
+
             Renderer.ResetTransform();
             Renderer.Scale(1, -1);
             Renderer.Clear(Color.Black);
@@ -268,7 +272,9 @@ namespace CraftingGame
             }
             */
 
-            //dynamicGridWidget.Render(View);
+            dynamicGridWidget.Render(View);
+
+            Renderer.End();
         }
 
         private void RenderObject(IRenderableObject obj)

@@ -5,11 +5,14 @@ namespace Contracts
 {
     public interface IRenderer
     {
+        void Begin();
+        void End();
 
         void ResetTransform();
         void Scale(float x, float y);
 
-        IReadonlyVector GetViewport();
+        IReadonlyVector GetDisplaySize();
+        void SetScissorRectangle(IReadonlyVector position, IReadonlyVector size);
         void Clear(Color color);
         void RenderVector(IReadonlyVector origin, IReadonlyVector vector, Color color, float thickness = 1.0f);
         void RenderLine(IReadonlyVector point1, IReadonlyVector point2, Color color, float thickness);

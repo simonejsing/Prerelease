@@ -81,7 +81,7 @@ namespace Prerelease.Main
             menuFont = LoadFont("ConsoleFont");
 
             // Align center vertically
-            viewport = new Vector2(Renderer.GetViewport());
+            viewport = new Vector2(Renderer.GetDisplaySize());
             textBox = new Vector2(200, -mainMenu.Length * TextHeight);
         }
 
