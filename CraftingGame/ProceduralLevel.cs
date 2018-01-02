@@ -27,20 +27,8 @@ namespace CraftingGame
             this.grid = grid;
         }
 
-        public void Load(ViewportProjection view, Plane plane)
+        public void Load(Plane plane)
         {
-            // Initialize the starting sector(s) based on the active view
-            var activeView = view.Projection;
-            var points = new[] { activeView.TopLeft, activeView.BottomLeft, activeView.TopRight, activeView.BottomRight };
-            foreach (var point in points)
-            {
-                var coord = grid.PointToGridCoordinate(point);
-                var block = Terrain[coord, plane];
-            }
-
-            // Pre-load visible terrain
-            terrain.Update(-1);
-
             // Spawn the player on the first free coordinate (0,v)
             var spawnCoord = new Coordinate(0, -Terrain.MaxDepth);
             var type = TerrainType.NotGenerated;

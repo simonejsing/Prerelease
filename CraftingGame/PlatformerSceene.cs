@@ -9,7 +9,6 @@ using Terrain;
 using VectorMath;
 using CraftingGame.Actions;
 using CraftingGame.State;
-using CraftingGame.Items;
 using System.IO;
 
 namespace CraftingGame
@@ -140,11 +139,8 @@ namespace CraftingGame
             var proceduralManager = new ProceduralObjectManager(State.Terrain, Grid, Plane);
             physics = new PhysicsEngine(proceduralManager, UpdateStep);
 
-            level.Load(DisplayView, Plane);
+            level.Load(Plane);
             State.AddLevel(level.State);
-
-            var activeView = DisplayView.Projection;
-            State.Terrain.SetActiveSector((int)activeView.TopLeft.X, (int)activeView.TopLeft.Y, Plane.W);
 
             collectAction = new CollectAction();
 
@@ -344,7 +340,11 @@ namespace CraftingGame
             var lines = new List<string>();
 
             var sectors = SectorProbe().ToArray();
-            lines.Add(string.Format("View: {0}", DisplayView.Projection.TopLeft));
+            lines.Add(string.Format("Views:"));
+            foreach(var view in ActiveViews)
+            {
+                lines.Add(string.Format("{0}", view.Viewport.Projection.TopLeft));
+            }
             lines.Add(string.Format("Sectors: {0}/{1}", sectors.Count(s => s.FullyLoaded), sectors.Count()));
 
             foreach(var player in State.ActivePlayers)

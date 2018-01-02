@@ -162,11 +162,13 @@ namespace MainGame.UnitTests
 
         private static Mock<IRenderer> CreateRenderer(Vector2 viewPort)
         {
+            Func<int, int, IGpuTexture> textureFactory = GpuTextureStub.Create;
             var mockScope = new Mock<IRenderScope>();
             mockScope.Setup(m => m.ResolveSprite(It.IsAny<IBinding<ISprite>>()))
                 .Returns((IBinding<ISprite> b) => new ResolvedBinding<ISprite>(b, null));
             var mockRenderer = new Mock<IRenderer>();
             mockRenderer.Setup(m => m.GetDisplaySize()).Returns(viewPort);
+            mockRenderer.Setup(m => m.InitializeGpuTexture(It.IsAny<int>(), It.IsAny<int>())).Returns(textureFactory);
             mockRenderer.Setup(m => m.ActivateScope(It.IsAny<string>())).Returns(mockScope.Object);
             mockRenderer.Setup(m => m.RenderToGpuTexture(It.IsAny<IGpuTexture>(), It.IsAny<Action>())).Callback((IGpuTexture t, Action a) => a());
             return mockRenderer;
