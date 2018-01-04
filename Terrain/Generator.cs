@@ -139,7 +139,7 @@ namespace Terrain
         {
             // Noise parameters
             const double frequency = 1.0 / 64.0;
-            const double amplitude = 10.0;
+            const double amplitude = 12.0;
             const double exponent = 7.0;
             const double damping = 1.0;
 
