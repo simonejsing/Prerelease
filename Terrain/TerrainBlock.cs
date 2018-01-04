@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace Terrain
 {
+    public enum OreType { None = 0, Iron = 1 }
     public enum TerrainType { NotGenerated = -1, Free = 0, Dirt = 1, Rock = 2, Bedrock = 3, Sea = 4 }
 
     public struct TerrainBlock
     {
         public Coordinate Coord;
         public TerrainType Type;
+        public OreType Ore;
+        public double OreDensity;
     }
-
 }

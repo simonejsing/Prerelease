@@ -115,16 +115,24 @@ namespace CraftingGame.Widgets
             }
         }
 
-        private void RenderTerrainBlock(ViewportProjection view, TerrainType type, Vector2 position, Vector2 size, bool overwrite)
+        private void RenderTerrainBlock(ViewportProjection view, TerrainBlock block, Vector2 position, Vector2 size, bool overwrite)
         {
+            var type = block.Type;
             var color = TerrainColor(type);
             switch (type)
             {
                 case TerrainType.Dirt:
-                case TerrainType.Rock:
                 case TerrainType.Bedrock:
                 case TerrainType.Sea:
                     RenderRectangle(view, position, size, color);
+                    break;
+                case TerrainType.Rock:
+                    RenderRectangle(view, position, size, color);
+                    if(block.Ore != OreType.None)
+                    {
+                        // Render ore type overlay
+                        RenderRectangle(view, position + size / 2, size / 2, Color.Red);
+                    }
                     break;
                 default:
                     if (overwrite)
@@ -195,7 +203,7 @@ namespace CraftingGame.Widgets
             sector.TerrainSector.Generate(u, v);
             var block = sector.TerrainSector[u, v];
             var position = new Vector2(u, v) * grid.Size;
-            RenderTerrainBlock(sector.Projection, block.Type, position, grid.Size, overwrite);
+            RenderTerrainBlock(sector.Projection, block, position, grid.Size, overwrite);
         }
 
         private void RenderVector(ViewportProjection view, Vector2 point, Vector2 vector, Color color, float thickness)

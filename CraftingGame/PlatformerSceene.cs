@@ -158,8 +158,14 @@ namespace CraftingGame
 
         private void UpdateCameraFocus(object sender, PlayerGameStateEvent args)
         {
-            //ConfigureSingleScreen();
-            ConfigureSplitScreen();
+            if(State.ActivePlayers.Count() <= 1)
+            {
+                ConfigureSingleScreen();
+            }
+            else
+            {
+                ConfigureSplitScreen();
+            }
         }
 
         private void ConfigureSingleScreen()
@@ -183,10 +189,9 @@ namespace CraftingGame
                 ActiveViews[0].Camera.Track(player);
                 ActiveViews[0].Camera.Follow();
                 //ActiveViews[0].Viewport.Scale(2.0f);
-                //ActiveViews[1].Camera.Track(State.ActivePlayers.Skip(1).First());
-                ActiveViews[1].Camera.Track(player);
+                ActiveViews[1].Camera.Track(State.ActivePlayers.Skip(1).First());
                 ActiveViews[1].Camera.Follow();
-                ActiveViews[1].Viewport.Scale(2.0f);
+                //ActiveViews[1].Viewport.Scale(2.0f);
             }
         }
 

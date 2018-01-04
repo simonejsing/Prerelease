@@ -15,7 +15,9 @@ namespace TestNoise
     {
         static void Main(string[] args)
         {
-            RenderTerrain();
+            //RenderTerrain();
+
+            RenderDensityMap();
 
             SaveNoise();
         }
@@ -27,6 +29,7 @@ namespace TestNoise
             const int seaLevel = 80;
             var generator = new Generator(maxDepth, maxHeight, seaLevel, 0);
 
+            //var samples = IronOreLevels(generator);
             var samples = SeabedTerrain();
             //var samples = BedrockTerrain();
             //var samples = SampleNoise(generator.DirtLevel);
@@ -63,6 +66,8 @@ namespace TestNoise
                             break;
                         case TerrainType.Rock:
                             c = Color.DarkGray;
+                            //var red = Math.Max(0, Math.Min(255, (int)(block.OreDensity * 255)));
+                            //c = Color.FromArgb(red, 0, 0);
                             break;
                         case TerrainType.Dirt:
                             c = Color.SandyBrown;
@@ -76,6 +81,35 @@ namespace TestNoise
             }
 
             bitmap.Save("map.bmp");
+        }
+
+        private static void RenderDensityMap()
+        {
+            const int maxHeight = 100;
+            const int maxDepth = 100;
+            const int seaLevel = 80;
+            var generator = new Generator(maxDepth, maxHeight, seaLevel, 0);
+            //var generator = new OctaveNoise(new PerlinNoise(0), 4, 0.1);
+            //var generator = new PerlinNoise(0);
+
+            const int sizeX = 1000;
+            const int sizeY = 1000;
+            var bitmap = new Bitmap(sizeX, sizeY);
+            for (var y = 0; y < sizeY; y++)
+            {
+                for (var x = 0; x < sizeX; x++)
+                {
+                    var c = Color.Black;
+                    //var value = Perlin.perlin(x + 0.5, y + 0.5, 0);
+                    //var value = generator.Noise(x + 0.5, y + 0.5, 1.0, 1f / 100f, 0f, 1f);
+                    var value = generator.IronOreDensity(x, y);
+                    var colorTone = Math.Max(0, Math.Min(255, (int)(value * 255)));
+                    c = Color.FromArgb(colorTone, colorTone, colorTone);
+                    bitmap.SetPixel(x, y, c);
+                }
+            }
+
+            bitmap.Save("density.bmp");
         }
 
         private static Tuple<double, double>[] SampleNoise(Func<double, double, double> noiseFunc)

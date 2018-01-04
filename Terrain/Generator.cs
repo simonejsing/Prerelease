@@ -11,6 +11,7 @@ namespace Terrain
     public class Generator : ITerrainGenerator
     {
         private readonly INoiseGenerator rockGenerator, dirtGenerator, seabedGenerator;
+        private readonly INoiseGenerator ironOreGenerator;
 
         public int Seed { get; }
         public int SeaLevel { get; }
@@ -30,6 +31,8 @@ namespace Terrain
             rockGenerator = new OctaveNoise(noise, 4, 0.5);
             dirtGenerator = new OctaveNoise(noise, 4, 0.8);
             seabedGenerator = new OctaveNoise(noise, 4, 0.08);
+
+            ironOreGenerator = new OctaveNoise(noise, 4, 0.1);
         }
 
         public TerrainBlock this[Coordinate c, Plane p]
@@ -37,11 +40,14 @@ namespace Terrain
             get
             {
                 var type = GenerateBlock(c.U, c.V, p.W);
+                var oreDensity = GenerateResource(c.U, c.V, p.W, type);
 
                 return new TerrainBlock()
                 {
                     Coord = c,
                     Type = type,
+                    Ore = oreDensity > 0.7 ? OreType.Iron : OreType.None,
+                    OreDensity = oreDensity,
                 };
             }
         }
@@ -74,6 +80,43 @@ namespace Terrain
                 return TerrainType.Sea;
 
             return TerrainType.Free;
+        }
+
+        private double GenerateResource(double x, double y, double z, TerrainType type)
+        {
+            if (type != TerrainType.Rock)
+                return 0.0;
+
+            // Prefer higher rarity ores
+            return IronOreDensity(x + 0.5, y + 0.5);
+            /*if (IronOreValue(x, y))
+                return OreType.Iron;
+
+            return 0.0;*/
+        }
+
+        public double IronOreDensity(double x, double y)
+        {
+            // Noise parameters
+            const double frequency = 1.0 / 32.0;
+            const double amplitude = 4.0;
+            const double exponent = 7.0;
+            const double damping = 1.0;
+            const double phase = 10.0;
+
+            var value = 10.0 * Math.Pow(ironOreGenerator.Noise(x, y, amplitude, frequency, phase, damping), exponent) - 0.5;
+            value = Clamp(1.0 - Softmax(10.0 * value), 0.0, 1.0);
+            return value;
+
+            // Noise parameters
+            /*const double frequency = 1.0 / 512.0;
+            const double amplitude = 1.0;
+            //const double exponent = 2.0;
+            //const double scale = 2.0;
+            const double phase = 10.0;
+            const double damping = 1.0;
+
+            return ironOreGenerator.Noise(x, y, amplitude, frequency, phase, damping);*/
         }
 
         public double BedrockLevel(double x, double y)

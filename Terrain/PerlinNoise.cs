@@ -9,8 +9,8 @@ namespace Terrain
     public class PerlinNoise : INoiseGenerator
     {
         private const int GradSize = 2048;
-        private double[] GradX;
-        private double[] GradY;
+        private double[,] GradX;
+        private double[,] GradY;
         private readonly Random random;
 
         public PerlinNoise(int seed)
@@ -23,34 +23,37 @@ namespace Terrain
 
         private void InitializeGradientMap()
         {
-            GradX = new double[GradSize];
-            GradY = new double[GradSize];
+            GradX = new double[GradSize, GradSize];
+            GradY = new double[GradSize, GradSize];
 
-            for (int i = 0; i < GradSize; i++)
+            for (int j = 0; j < GradSize; j++)
             {
-                var r = random.NextDouble();
-                if (r < 0.25)
+                for (int i = 0; i < GradSize; i++)
                 {
-                    GradX[i] = 1.0;
-                    GradY[i] = 1.0;
+                    var r = random.NextDouble();
+                    if (r < 0.25)
+                    {
+                        GradX[j,i] = 1.0;
+                        GradY[j,i] = 1.0;
+                    }
+                    else if (r < 0.50)
+                    {
+                        GradX[j,i] = -1.0;
+                        GradY[j,i] = 1.0;
+                    }
+                    else if (r < 0.75)
+                    {
+                        GradX[j,i] = 1.0;
+                        GradY[j,i] = -1.0;
+                    }
+                    else
+                    {
+                        GradX[j,i] = -1.0;
+                        GradY[j,i] = -1.0;
+                    }
+                    //GradX[i] = random.NextDouble();
+                    //GradY[i] = random.NextDouble();
                 }
-                else if (r < 0.50)
-                {
-                    GradX[i] = -1.0;
-                    GradY[i] = 1.0;
-                }
-                else if (r < 0.75)
-                {
-                    GradX[i] = 1.0;
-                    GradY[i] = -1.0;
-                }
-                else
-                {
-                    GradX[i] = -1.0;
-                    GradY[i] = -1.0;
-                }
-                //GradX[i] = random.NextDouble();
-                //GradY[i] = random.NextDouble();
             }
         }
 
@@ -65,18 +68,19 @@ namespace Terrain
             return (1.0 - w) * a + w * b;
         }
 
-        private static int gradientIndex(int ix, int iy)
+        private static int gradientIndex(int v)
         {
-            return (Math.Abs(ix) + Math.Abs(iy)) % GradSize;
+            return Math.Abs(v) % GradSize;
         }
 
         // Assumes grid size is normalized to 1.
         private double dotGridGradient(int ix, int iy, double x, double y, double damping)
         {
             // Compute gradient at cell x,y
-            int gradIndex = gradientIndex(ix, iy);
-            double gradx = GradX[gradIndex] / damping;
-            double grady = GradY[gradIndex] / damping;
+            int gradIndexX = gradientIndex(ix);
+            int gradIndexY = gradientIndex(iy);
+            double gradx = GradX[gradIndexY, gradIndexX] / damping;
+            double grady = GradY[gradIndexY, gradIndexX] / damping;
 
             // Compute distance vector
             double dx = x - (double) ix;
@@ -116,7 +120,7 @@ namespace Terrain
 
         public double Noise(double x, double y, double amplitude, double frequency, double phase, double damping)
         {
-            return amplitude * perlin(x * frequency + phase, y, damping);
+            return amplitude * perlin(x * frequency + phase, y * frequency + phase, damping);
         }
     }
 }
