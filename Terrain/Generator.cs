@@ -11,7 +11,7 @@ namespace Terrain
     public class Generator : ITerrainGenerator
     {
         private readonly INoiseGenerator rockGenerator, dirtGenerator, seabedGenerator;
-        private readonly INoiseGenerator ironOreGenerator;
+        private readonly INoiseGenerator ironOreGenerator, goldOreGenerator, diamondOreGenerator;
 
         public int Seed { get; }
         public int SeaLevel { get; }
@@ -23,16 +23,19 @@ namespace Terrain
         public Generator(int maxDepth, int maxHeight, int seaLevel, int seed = 0)
         {
             this.Seed = seed;
+            var random = new Random(seed);
             SeaLevel = seaLevel;
             MaxDepth = maxDepth;
             MaxHeight = maxHeight;
-            var noise = new PerlinNoise(this.Seed);
+            var noise = new PerlinNoise(random.Next());
 
             rockGenerator = new OctaveNoise(noise, 4, 0.5);
             dirtGenerator = new OctaveNoise(noise, 4, 0.8);
             seabedGenerator = new OctaveNoise(noise, 4, 0.08);
 
-            ironOreGenerator = new OctaveNoise(noise, 4, 0.1);
+            ironOreGenerator = new OctaveNoise(new PerlinNoise(random.Next()), 4, 0.1);
+            goldOreGenerator = new OctaveNoise(new PerlinNoise(random.Next()), 4, 0.1);
+            diamondOreGenerator = new OctaveNoise(new PerlinNoise(random.Next()), 4, 0.1);
         }
 
         public TerrainBlock this[Coordinate c, Plane p]
@@ -40,14 +43,13 @@ namespace Terrain
             get
             {
                 var type = GenerateBlock(c.U, c.V, p.W);
-                var oreDensity = GenerateResource(c.U, c.V, p.W, type);
+                var oreType = GenerateResource(c.U, c.V, p.W, type);
 
                 return new TerrainBlock()
                 {
                     Coord = c,
                     Type = type,
-                    Ore = oreDensity > 0.7 ? OreType.Iron : OreType.None,
-                    OreDensity = oreDensity,
+                    Ore = oreType,
                 };
             }
         }
@@ -82,41 +84,72 @@ namespace Terrain
             return TerrainType.Free;
         }
 
-        private double GenerateResource(double x, double y, double z, TerrainType type)
+        private OreType GenerateResource(double x, double y, double z, TerrainType type)
         {
             if (type != TerrainType.Rock)
-                return 0.0;
+                return OreType.None;
 
             // Prefer higher rarity ores
-            return IronOreDensity(x + 0.5, y + 0.5);
-            /*if (IronOreValue(x, y))
+            if (DiamondOreDensity(x + 0.5, y + 0.5, z + 0.5) > 0.7)
+                return OreType.Diamond;
+
+            if (GoldOreDensity(x + 0.5, y + 0.5, z + 0.5) > 0.7)
+                return OreType.Gold;
+
+            if (IronOreDensity(x + 0.5, y + 0.5, z + 0.5) > 0.7)
                 return OreType.Iron;
 
-            return 0.0;*/
+            return OreType.None;
         }
 
-        public double IronOreDensity(double x, double y)
+        public double IronOreDensity(double x, double y, double z)
         {
             // Noise parameters
             const double frequency = 1.0 / 32.0;
             const double amplitude = 4.0;
             const double exponent = 7.0;
             const double damping = 1.0;
-            const double phase = 10.0;
+
+            // Should we randomize this shift?
+            double phase = z;
 
             var value = 10.0 * Math.Pow(ironOreGenerator.Noise(x, y, amplitude, frequency, phase, damping), exponent) - 0.5;
             value = Clamp(1.0 - Softmax(10.0 * value), 0.0, 1.0);
             return value;
+        }
 
+        public double GoldOreDensity(double x, double y, double z)
+        {
             // Noise parameters
-            /*const double frequency = 1.0 / 512.0;
-            const double amplitude = 1.0;
-            //const double exponent = 2.0;
-            //const double scale = 2.0;
-            const double phase = 10.0;
+            const double frequency = 1.0 / 8.0;
+            const double amplitude = 6.0;
+            const double exponent = 7.0;
             const double damping = 1.0;
 
-            return ironOreGenerator.Noise(x, y, amplitude, frequency, phase, damping);*/
+            // Should we randomize this shift?
+            double phase = 10000 + z;
+            //double phase = z;
+
+            var value = 5.0 * Math.Pow(ironOreGenerator.Noise(x, y, amplitude, frequency, phase, damping), exponent) - 0.5;
+            value = Clamp(1.0 - Softmax(10.0 * value), 0.0, 1.0);
+            return value;
+        }
+
+        public double DiamondOreDensity(double x, double y, double z)
+        {
+            // Noise parameters
+            const double frequency = 1.0 / 64.0;
+            const double amplitude = 10.0;
+            const double exponent = 7.0;
+            const double damping = 1.0;
+
+            // Should we randomize this shift?
+            double phase = 100000 + z;
+            //double phase = z;
+
+            var value = 5.0 * Math.Pow(ironOreGenerator.Noise(x, y, amplitude, frequency, phase, damping), exponent) - 0.5;
+            value = Clamp(1.0 - Softmax(10.0 * value), 0.0, 1.0);
+            return value;
         }
 
         public double BedrockLevel(double x, double y)

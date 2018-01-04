@@ -131,7 +131,8 @@ namespace CraftingGame.Widgets
                     if(block.Ore != OreType.None)
                     {
                         // Render ore type overlay
-                        RenderRectangle(view, position + size / 2, size / 2, Color.Red);
+                        var oreColor = OreColor(block.Ore);
+                        RenderRectangle(view, position + size / 2, size / 2, oreColor);
                     }
                     break;
                 default:
@@ -140,6 +141,21 @@ namespace CraftingGame.Widgets
                         RenderRectangle(view, position, size, color);
                     }
                     break;
+            }
+        }
+
+        private Color OreColor(OreType type)
+        {
+            switch (type)
+            {
+                case OreType.Iron:
+                    return Color.Red;
+                case OreType.Gold:
+                    return Color.Yellow;
+                case OreType.Diamond:
+                    return Color.Blue;
+                default:
+                    return Color.Black;
             }
         }
 

@@ -51,8 +51,8 @@ namespace Terrain
                         GradX[j,i] = -1.0;
                         GradY[j,i] = -1.0;
                     }
-                    //GradX[i] = random.NextDouble();
-                    //GradY[i] = random.NextDouble();
+                    //GradX[j,i] = random.NextDouble();
+                    //GradY[j,i] = random.NextDouble();
                 }
             }
         }

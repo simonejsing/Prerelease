@@ -17,9 +17,11 @@ namespace TestNoise
         {
             //RenderTerrain();
 
-            RenderDensityMap();
+            //RenderDensityMap();
 
-            SaveNoise();
+            EvaluateTerrain();
+
+            //SaveNoise();
         }
 
         private static void SaveNoise()
@@ -93,7 +95,9 @@ namespace TestNoise
             //var generator = new PerlinNoise(0);
 
             const int sizeX = 1000;
-            const int sizeY = 1000;
+            const int sizeY = maxHeight + maxDepth;
+            const int scale = 1;
+
             var bitmap = new Bitmap(sizeX, sizeY);
             for (var y = 0; y < sizeY; y++)
             {
@@ -102,7 +106,9 @@ namespace TestNoise
                     var c = Color.Black;
                     //var value = Perlin.perlin(x + 0.5, y + 0.5, 0);
                     //var value = generator.Noise(x + 0.5, y + 0.5, 1.0, 1f / 100f, 0f, 1f);
-                    var value = generator.IronOreDensity(x, y);
+                    //var value = generator.IronOreDensity(x, y, 0);
+                    var value = generator.GoldOreDensity(x * scale, y - maxDepth, 0);
+                    //var value = generator.DiamondOreDensity(x * scale, y * scale, 0);
                     var colorTone = Math.Max(0, Math.Min(255, (int)(value * 255)));
                     c = Color.FromArgb(colorTone, colorTone, colorTone);
                     bitmap.SetPixel(x, y, c);
@@ -110,6 +116,59 @@ namespace TestNoise
             }
 
             bitmap.Save("density.bmp");
+        }
+
+        private static void EvaluateTerrain()
+        {
+            const int maxHeight = 100;
+            const int maxDepth = 100;
+            const int seaLevel = 80;
+            var generator = new Generator(maxDepth, maxHeight, seaLevel, 1050);
+
+            var total = 0.0;
+            var numberRock = 0.0;
+            var numberIron = 0.0;
+            var numberGold = 0.0;
+            var numberDiamond = 0.0;
+
+            // Evaluate statistics for the generated terrain
+            const int maxX = 10000;
+            var plane = new Plane(0);
+            for(int x = 0; x < maxX; x++)
+            {
+                for (int y = -maxDepth; y <= 0; y++)
+                {
+                    var block = generator[new Coordinate(x, y), plane];
+                    total++;
+
+                    // If dirt or water then we can skip the rest of the slice
+                    if (block.Type == TerrainType.Dirt || block.Type == TerrainType.Sea)
+                    {
+                        total += 0 - y;
+                        break;
+                    }
+
+                    if (block.Type == TerrainType.Rock)
+                        numberRock++;
+
+                    if (block.Ore == OreType.Iron)
+                        numberIron++;
+
+                    if (block.Ore == OreType.Gold)
+                        numberGold++;
+
+                    if (block.Ore == OreType.Diamond)
+                        numberDiamond++;
+                }
+            }
+
+            // Print statistics
+            Console.WriteLine("Total blocks evaluated: {0}", total);
+            Console.WriteLine("Rock %: {0}", numberRock / total);
+            Console.WriteLine("Densities:");
+            Console.WriteLine("Iron: {0} ({1})", numberIron / numberRock, numberIron);
+            Console.WriteLine("Gold: {0} ({1})", numberGold / numberRock, numberGold);
+            Console.WriteLine("Diamond: {0} ({1})", numberDiamond / numberRock, numberDiamond);
         }
 
         private static Tuple<double, double>[] SampleNoise(Func<double, double, double> noiseFunc)
